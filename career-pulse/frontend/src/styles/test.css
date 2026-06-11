@@ -1,0 +1,27 @@
+/* ─── Страница теста ─── */
+.test-shell{min-height:100vh;display:flex;flex-direction:column}
+.test-top{position:sticky;top:0;z-index:50;background:rgba(7,7,14,.9);backdrop-filter:blur(20px);
+  border-bottom:1px solid var(--line);padding:16px 32px}
+.test-top-row{max-width:840px;margin:0 auto;display:flex;align-items:center;gap:18px}
+.test-logo{font-family:'Bebas Neue',sans-serif;font-size:18px;letter-spacing:3px;white-space:nowrap}
+.test-logo span{color:var(--accent)}
+.test-count{font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--ghost);white-space:nowrap}
+
+.block-nav{display:flex;gap:8px;flex-wrap:wrap;max-width:840px;margin:18px auto 0;padding:0 32px}
+.block-chip{display:flex;align-items:center;gap:7px;padding:8px 13px;border-radius:100px;
+  border:1px solid var(--line);background:var(--card);font-size:12px;font-weight:700;color:var(--sub);
+  cursor:pointer;transition:all .18s}
+.block-chip--active{border-color:var(--accent);color:var(--accent);background:rgba(0,229,200,.06)}
+.block-chip--done{color:var(--ok);border-color:rgba(34,217,122,.3)}
+.block-chip__count{font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--ghost)}
+
+.test-body{flex:1;max-width:760px;margin:0 auto;padding:36px 32px 120px;width:100%}
+.q-card{margin-bottom:18px}
+.q-eyebrow{font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:2px;text-transform:uppercase;
+  color:var(--accent);margin-bottom:10px;display:flex;align-items:center;gap:8px}
+.q-text{font-size:21px;font-weight:700;line-height:1.4;margin-bottom:20px;color:var(--text)}
+
+.test-footer-bar{position:fixed;bottom:0;left:0;right:0;background:rgba(7,7,14,.92);
+  backdrop-filter:blur(20px);border-top:1px solid var(--line);padding:16px 32px;z-index:50}
+.test-footer-inner{max-width:760px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;gap:16px}
+.test-footer-meta{font-size:13px;color:var(--ghost);font-family:'JetBrains Mono',monospace}

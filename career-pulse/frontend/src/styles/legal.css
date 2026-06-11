@@ -1,0 +1,84 @@
+:root{
+  --ink:#07070e; --surface:#0c0c18; --card:#111120; --card2:#161626;
+  --accent:#00e5c8; --violet:#7b5cf0; --ember:#ff6b35;
+  --text:#ecedf8; --sub:#9898b8; --ghost:#55557a;
+  --line:rgba(255,255,255,0.07); --line2:rgba(255,255,255,0.12);
+  --ok:#22d97a;
+}
+.cp-legal *{margin:0;padding:0;box-sizing:border-box}
+.cp-legal{scroll-behavior:smooth}
+.cp-legal{background:var(--ink);color:var(--text);font-family:'Manrope',sans-serif;font-size:16px;line-height:1.7;-webkit-font-smoothing:antialiased}
+.cp-legal ::-webkit-scrollbar{width:3px}
+.cp-legal ::-webkit-scrollbar-thumb{background:var(--violet);border-radius:2px}
+
+.cp-legal /* NAV */
+nav.legal-nav{
+  position:fixed;top:0;left:0;right:0;z-index:200;
+  display:flex;align-items:center;justify-content:space-between;
+  padding:16px 64px;
+  background:rgba(7,7,14,.88);backdrop-filter:blur(20px);
+  border-bottom:1px solid var(--line);
+}
+.cp-legal .nav-logo-link{display:flex;align-items:center;gap:9px;text-decoration:none}
+.cp-legal .nav-logo-mark{width:28px;height:28px;border-radius:7px;background:linear-gradient(135deg,var(--violet),var(--accent));display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0}
+.cp-legal .nav-logo-txt{font-family:'Bebas Neue',sans-serif;font-size:20px;letter-spacing:3px;color:var(--text)}
+.cp-legal .nav-logo-txt span{color:var(--accent)}
+.cp-legal .nav-back-link{color:var(--sub);text-decoration:none;font-size:13px;font-weight:600;display:flex;align-items:center;gap:6px;padding:8px 16px;border-radius:6px;border:1px solid var(--line);transition:all .2s}
+.cp-legal .nav-back-link:hover{border-color:var(--accent);color:var(--accent)}
+
+.cp-legal /* PAGE */
+.legal-page{padding:108px 0 80px;min-height:100vh}
+.cp-legal .container{max-width:820px;margin:0 auto;padding:0 32px}
+
+.cp-legal /* HEADER */
+.legal-header{margin-bottom:48px;padding-bottom:32px;border-bottom:1px solid var(--line)}
+.cp-legal .legal-eyebrow{display:inline-flex;align-items:center;gap:8px;font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:var(--accent);margin-bottom:14px}
+.cp-legal .legal-eyebrow::before{content:'';width:20px;height:1px;background:var(--accent)}
+.cp-legal .legal-header h1{font-family:'Bebas Neue',sans-serif;font-size:clamp(36px,5vw,60px);letter-spacing:2px;line-height:1;margin-bottom:12px}
+.cp-legal .legal-meta{font-size:13px;color:var(--ghost);font-family:'JetBrains Mono',monospace}
+.cp-legal .legal-meta a{color:var(--accent);text-decoration:none}
+
+.cp-legal /* HIGHLIGHT */
+.legal-highlight{background:rgba(0,229,200,.06);border:1px solid rgba(0,229,200,.18);border-left:3px solid var(--accent);border-radius:10px;padding:18px 22px;margin:0 0 32px}
+.cp-legal .legal-highlight p{margin:0;font-size:14px;color:var(--sub);line-height:1.6}
+
+.cp-legal /* BODY */
+.legal-body h2{
+  font-family:'Bebas Neue',sans-serif;font-size:26px;letter-spacing:2px;
+  color:var(--accent);margin:36px 0 14px;padding-top:28px;
+  border-top:1px solid var(--line);
+}
+.cp-legal .legal-body h2:first-child{margin-top:0;padding-top:0;border-top:none}
+.cp-legal .legal-body p{font-size:15px;color:var(--sub);margin-bottom:14px;line-height:1.75}
+.cp-legal .legal-body ul, .cp-legal .legal-body ol{margin:0 0 16px 20px;display:flex;flex-direction:column;gap:8px}
+.cp-legal .legal-body li{font-size:15px;color:var(--sub);line-height:1.65}
+.cp-legal .legal-body a{color:var(--accent);text-decoration:none}
+.cp-legal .legal-body a:hover{text-decoration:underline}
+.cp-legal .legal-body strong{color:var(--text);font-weight:700}
+
+.cp-legal /* FOOTER */
+.legal-footer{
+  background:var(--surface);border-top:1px solid var(--line);
+  padding:40px 64px;margin-top:80px;
+}
+.cp-legal .lf-inner{max-width:820px;margin:0 auto}
+.cp-legal .lf-grid{display:grid;grid-template-columns:1.4fr 1fr 1fr;gap:40px;margin-bottom:28px}
+.cp-legal .lf-brand .lf-logo{font-family:'Bebas Neue',sans-serif;font-size:18px;letter-spacing:3px;color:var(--text);margin-bottom:6px}
+.cp-legal .lf-brand .lf-logo span{color:var(--accent)}
+.cp-legal .lf-brand p{font-size:12px;color:var(--ghost);line-height:1.6}
+.cp-legal .lf-col h4{font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--ghost);margin-bottom:12px;font-family:'JetBrains Mono',monospace}
+.cp-legal .lf-col ul{list-style:none;display:flex;flex-direction:column;gap:7px}
+.cp-legal .lf-col ul li a{font-size:13px;color:var(--sub);text-decoration:none;transition:color .2s}
+.cp-legal .lf-col ul li a:hover{color:var(--accent)}
+.cp-legal .lf-bottom{padding-top:20px;border-top:1px solid var(--line);display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px}
+.cp-legal .lf-copy{font-size:12px;color:var(--ghost)}
+.cp-legal .lf-links{display:flex;gap:18px;flex-wrap:wrap}
+.cp-legal .lf-links a{font-size:12px;color:var(--ghost);text-decoration:none;transition:color .2s}
+.cp-legal .lf-links a:hover{color:var(--sub)}
+
+@media(max-width:768px){
+  .cp-legal nav.legal-nav{padding:14px 20px}
+  .cp-legal .container{padding:0 20px}
+  .cp-legal .legal-footer{padding:32px 20px}
+  .cp-legal .lf-grid{grid-template-columns:1fr}
+}
