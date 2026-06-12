@@ -118,7 +118,7 @@ export default function Landing() {
     <li><a href="#register">Записаться</a></li>
   </ul>
   <div className="nav-right">
-    <a href="#register" className="btn-ghost">Войти</a>
+    <a href="#register" className="btn-ghost">Зарегистрироваться</a>
     <a href="/dashboard" className="btn-nav" style={{marginRight:'6px',background:'transparent',color:'var(--text)',border:'1px solid rgba(255,255,255,0.15)'}}>Войти</a><a href="#register" className="btn-nav">Начать бесплатно</a>
   </div>
 </nav>

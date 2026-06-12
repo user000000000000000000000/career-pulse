@@ -5,7 +5,7 @@ import BlockNavigator from '../components/Test/BlockNavigator.jsx'
 import TestProgress from '../components/Test/TestProgress.jsx'
 import Button from '../components/UI/Button.jsx'
 import { BLOCKS } from '../data/scoring'
-import { QUESTION_BANK, questionsByBlock, TOTAL_QUESTIONS } from '../data/questions'
+import { QUESTION_BANK, TOTAL_QUESTIONS, getBlockQuestions } from '../data/questions.js';
 import { calculateScores } from '../utils/scoreCalculator'
 import { analyzeTest } from '../services/testAPI'
 import { getCurrentUser, markTestDone } from '../services/auth'
@@ -15,7 +15,16 @@ const LS_ANSWERS = 'cp_test_answers'
 
 export default function Test() {
   const navigate = useNavigate()
-  const grouped = useMemo(() => questionsByBlock(BLOCKS), [])
+  
+
+  const grouped = useMemo(() => {
+    const result = {}
+    BLOCKS.forEach(block => {
+      result[block.id] = getBlockQuestions(block.id)
+    })
+    return result
+  }, [])
+  
   const [activeBlock, setActiveBlock] = useState(BLOCKS[0].id)
   const [answers, setAnswers] = useState(() => {
     try { return JSON.parse(localStorage.getItem(LS_ANSWERS)) || {} } catch { return {} }
@@ -23,7 +32,6 @@ export default function Test() {
   const [submitting, setSubmitting] = useState(false)
   const [error, setError] = useState('')
 
-  // Сохранение прогресса (возобновление при перезагрузке)
   useEffect(() => {
     localStorage.setItem(LS_ANSWERS, JSON.stringify(answers))
   }, [answers])
@@ -35,7 +43,6 @@ export default function Test() {
   const answeredCount = Object.keys(answers).length
   const allAnswered = answeredCount >= TOTAL_QUESTIONS
 
-  // Счётчики по блокам
   const counts = useMemo(() => {
     const out = {}
     for (const b of BLOCKS) {

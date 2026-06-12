@@ -3,6 +3,86 @@ import { useNavigate } from 'react-router-dom'
 import { getCurrentUser, logout as doLogout } from '../services/auth'
 import '../styles/dashboard.css'
 
+const BLOCKS = [
+  {
+    num: '01', id: 'context', axis: 'НАДО', axisColor: 'var(--gold)',
+    title: 'Анкета-контекст',
+    desc: 'Базовый профиль: класс, ЕГЭ, планы, тревоги вокруг выбора. Настраивает остальные блоки под тебя.',
+    questions: 20, time: 7, required: true,
+    weight: 10,
+  },
+  {
+    num: '02', id: 'holland', axis: 'ХОЧУ', axisColor: 'var(--accent)',
+    title: 'Склонности в деятельности',
+    desc: 'Holland RIASEC: 30 пар занятий. Выясняем, к чему ты тянешься — техника, наука, творчество, люди, управление или порядок.',
+    questions: 36, time: 15, required: false,
+    weight: 15,
+  },
+  {
+    num: '03', id: 'values', axis: 'ХОЧУ', axisColor: 'var(--accent)',
+    title: 'Жизненные ценности',
+    desc: '28 ситуационных дилемм. Определяем, что для тебя важнее: развитие, свобода, деньги, статус, смысл или отношения.',
+    questions: 30, time: 15, required: false,
+    weight: 10,
+  },
+  {
+    num: '04', id: 'personality', axis: 'КТО Я', axisColor: 'var(--violet)',
+    title: 'Личностные качества',
+    desc: 'Big Five + EPI Айзенка: 35 вопросов. Строим профиль: дружелюбие, добросовестность, открытость, тревожность, самоконтроль.',
+    questions: 35, time: 12, required: false,
+    weight: 10,
+  },
+  {
+    num: '05', id: 'intelligence', axis: 'МОГУ', axisColor: 'var(--ember)',
+    title: 'Тип интеллекта',
+    desc: 'Гарднер + VARK: 28 вопросов + 4 мини-задачи. Языковой, логический, творческий, кинестетический — твой доминирующий тип.',
+    questions: 32, time: 12, required: false,
+    weight: 10,
+  },
+  {
+    num: '06', id: 'readiness', axis: 'МОГУ', axisColor: 'var(--ember)',
+    title: 'Профессиональная готовность',
+    desc: 'Вектор: 20 вопросов самооценки + 2 открытых. Определяем, в каком типе деятельности у тебя реальные навыки прямо сейчас.',
+    questions: 22, time: 10, required: false,
+    weight: 10,
+  },
+  {
+    num: '07', id: 'self_efficacy', axis: 'КТО Я', axisColor: 'var(--violet)',
+    title: 'Самоэффективность',
+    desc: 'Бандура: 25 вопросов + 3 ситуационных кейса. Насколько ты веришь в себя и как принимаешь важные решения.',
+    questions: 28, time: 10, required: false,
+    weight: 10,
+  },
+  {
+    num: '08', id: 'future', axis: 'ХОЧУ', axisColor: 'var(--accent)',
+    title: 'Образ будущего',
+    desc: '10 закрытых + 2 открытых вопроса. Что важнее: стабильность или рост? Команда или самостоятельность? Твой образ себя через 5 лет.',
+    questions: 12, time: 8, required: false,
+    weight: 5,
+  },
+  {
+    num: '09', id: 'social', axis: 'КОНТЕКСТ', axisColor: 'var(--sub)',
+    title: 'Социальный и семейный контекст',
+    desc: '20 закрытых + 2 открытых. Семья, хобби, практический опыт, поддержка — всё, что формирует твои скрытые возможности.',
+    questions: 22, time: 8, required: false,
+    weight: 5,
+  },
+  {
+    num: '10', id: 'letter', axis: 'ХОЧУ', axisColor: 'var(--accent)',
+    title: 'Письмо в будущее',
+    desc: '19 открытых вопросов в 5 блоках. Рефлексивная практика — кто ты сейчас, каким хочешь стать и что для этого нужно.',
+    questions: 19, time: 25, required: false,
+    weight: 15, special: true,
+  },
+]
+
+const AXIS_INFO = [
+  { key: 'ХОЧУ', color: 'var(--accent)', icon: '💡', desc: 'Интересы, ценности, образ будущего', blocks: [2, 3, 8, 10] },
+  { key: 'МОГУ', color: 'var(--ember)', icon: '⚡', desc: 'Интеллект, навыки, готовность', blocks: [5, 6] },
+  { key: 'КТО Я', color: 'var(--violet)', icon: '🧠', desc: 'Личность, уверенность, стиль решений', blocks: [4, 7] },
+  { key: 'НАДО', color: 'var(--gold)', icon: '🎯', desc: 'Контекст, ЕГЭ, рынок труда', blocks: [1] },
+]
+
 export default function Dashboard() {
   const rootRef = useRef(null)
   const navigate = useNavigate()
@@ -14,38 +94,18 @@ export default function Dashboard() {
     const q = (id) => root.querySelector('#' + id)
     const setText = (id, txt) => { const el = q(id); if (el) el.textContent = txt }
 
-    // ── Профиль пользователя
     let alive = true
     getCurrentUser().then((u) => {
       if (!alive || !u) return
       const parts = (u.name || 'ИИ').split(' ')
       const initials = ((parts[0]?.[0] || '') + (parts[1]?.[0] || parts[0]?.[1] || '')).toUpperCase()
-      setText('welcome-name', u.name || 'Пользователь')
+      setText('welcome-name', u.name ? u.name.split(' ')[0] : 'Пользователь')
       setText('sb-av-el', initials)
       setText('sb-username', (u.name || 'Пользователь').split(' ')[0] + ' ' + ((u.name || '').split(' ')[1]?.[0] || '') + '.')
-      const roleMap = { student: 'Выпускник', specialist: 'Специалист', entrepreneur: 'Предприниматель', hr: 'HR / Компания' }
+      const roleMap = { parent: 'Родитель школьника', student: 'Школьник / Студент', specialist: 'Специалист', entrepreneur: 'Предприниматель', hr: 'HR / Компания' }
       setText('sb-role', roleMap[u.role] || 'Пользователь')
-      if (u.testDone) {
-        const st = q('stat-test'); if (st) { st.textContent = '✓'; st.style.color = 'var(--ok)' }
-        setText('stat-test-sub', 'Тест пройден')
-        const pb = q('pb-fill'); if (pb) pb.style.width = '34%'
-        setText('progress-pct', '34%')
-        renderTraits()
-      }
     })
 
-    function renderTraits() {
-      const block = q('traits-block')
-      if (!block) return
-      block.innerHTML = `
-        <div class="t-row"><div class="t-lbl"><span>Лидерство</span><span>92%</span></div><div class="t-track"><div class="t-fill" style="width:92%;background:linear-gradient(90deg,#7b5cf0,#00e5c8)"></div></div></div>
-        <div class="t-row"><div class="t-lbl"><span>Стратегия</span><span>90%</span></div><div class="t-track"><div class="t-fill" style="width:90%;background:linear-gradient(90deg,#00e5c8,#7b5cf0)"></div></div></div>
-        <div class="t-row"><div class="t-lbl"><span>Аналитика</span><span>85%</span></div><div class="t-track"><div class="t-fill" style="width:85%;background:linear-gradient(90deg,#ff6b35,#7b5cf0)"></div></div></div>
-        <div class="t-row"><div class="t-lbl"><span>Коммуникация</span><span>88%</span></div><div class="t-track"><div class="t-fill" style="width:88%;background:linear-gradient(90deg,#7b5cf0,#00e5c8)"></div></div></div>
-        <div class="t-row"><div class="t-lbl"><span>Решительность</span><span>94%</span></div><div class="t-track"><div class="t-fill" style="width:94%;background:linear-gradient(90deg,#00e5c8,#ff6b35)"></div></div></div>`
-    }
-
-    // ── Меню пользователя
     const userBtn = q('sb-user-btn')
     const menu = q('sb-user-menu')
     const chevron = q('sb-chevron')
@@ -59,55 +119,40 @@ export default function Dashboard() {
     document.addEventListener('click', onDocClick)
     cleanups.push(() => document.removeEventListener('click', onDocClick))
 
-    // ── Тур по кабинету
+    const sidebar = q('sidebar')
     const tour = q('tour-modal')
     const openTour = () => tour && tour.classList.add('show')
     const closeTour = () => tour && tour.classList.remove('show')
     const onTourBg = (e) => { if (e.target === tour) closeTour() }
     if (tour) { tour.addEventListener('click', onTourBg); cleanups.push(() => tour.removeEventListener('click', onTourBg)) }
 
-    // ── Мобильный сайдбар
-    const sidebar = q('sidebar')
-
-    // ── Делегирование кликов
     const onClick = (e) => {
       const a = e.target.closest('a')
       const btn = e.target.closest('button')
-
-      // Логаут
       const danger = e.target.closest('.sum-danger')
       if (danger) {
         e.preventDefault()
-        if (confirm('Выйти из личного кабинета?')) {
-          doLogout().finally(() => navigate('/'))
-        }
+        if (confirm('Выйти из личного кабинета?')) { doLogout().finally(() => navigate('/')) }
         return
       }
-      // Внутренние ссылки → SPA
       if (a) {
         const href = a.getAttribute('href')
         if (href && href.startsWith('/')) { e.preventDefault(); navigate(href); closeTour(); return }
       }
       if (btn) {
-        const txt = (btn.textContent || '').trim()
         if (btn.classList.contains('mobile-menu-btn')) { sidebar && sidebar.classList.toggle('open'); return }
-        if (btn.classList.contains('topbar-btn') || txt.includes('Знакомство с кабинетом')) { openTour(); return }
+        if (btn.classList.contains('topbar-btn') || btn.classList.contains('btn-tour')) { openTour(); return }
         if (btn.classList.contains('modal-close')) { closeTour(); return }
-        if (tour && tour.contains(btn)) {
-          if (txt.includes('начать диагностику')) { closeTour(); navigate('/test'); return }
-          closeTour(); return
-        }
+        if (tour && tour.contains(btn) && btn.classList.contains('btn-start-test')) { closeTour(); navigate('/test'); return }
       }
-      // Cookie-настройки
       if (e.target.closest('#cookie-settings')) {
         e.preventDefault()
-        alert('Для управления cookie отключите их в настройках браузера или установите расширение uBlock Origin.')
+        alert('Для управления cookie отключите их в настройках браузера.')
       }
     }
     root.addEventListener('click', onClick)
     cleanups.push(() => root.removeEventListener('click', onClick))
 
-    // ── Показ тура при первом визите
     let tourTimer
     if (!localStorage.getItem('cp_tour_seen')) {
       tourTimer = setTimeout(() => { openTour(); localStorage.setItem('cp_tour_seen', '1') }, 1200)
@@ -116,277 +161,289 @@ export default function Dashboard() {
     return () => { alive = false; clearTimeout(tourTimer); cleanups.forEach((fn) => fn()) }
   }, [navigate])
 
+  const totalQ = BLOCKS.reduce((s, b) => s + b.questions, 0)
+  const totalTime = BLOCKS.reduce((s, b) => s + b.time, 0)
+
   return (
     <div ref={rootRef} className="cp-dashboard">
-<aside className="sidebar" id="sidebar">
-  <a href="/" className="sb-logo" style={{textDecoration:'none'}}>
-    <div className="sb-logo-mark">⚡</div>
-    <div className="sb-logo-text">CAREER<span>PULSE</span></div>
-  </a>
 
-  <div className="sb-section">Главное</div>
-  <a href="/dashboard" className="sb-item active"><span className="icon">📊</span> Дашборд</a>
-  <a href="/test" className="sb-item"><span className="icon">🧠</span> Моя диагностика</a>
-  <a href="dashboard.html#plan" className="sb-item"><span className="icon">🗺️</span> Карьерный план</a>
-  <a href="dashboard.html#atlas" className="sb-item"><span className="icon">📚</span> Атлас профессий</a>
+      {/* ── SIDEBAR ── */}
+      <aside className="sidebar" id="sidebar">
+        <a href="/" className="sb-logo" style={{textDecoration:'none'}}>
+          <div className="sb-logo-mark">⚡</div>
+          <div className="sb-logo-text">CAREER<span>PULSE</span></div>
+        </a>
 
-  <div className="sb-section">Работа</div>
-  <a href="dashboard.html#booking" className="sb-item"><span className="icon">📅</span> Мои встречи <span className="sb-badge">2</span></a>
-  <a href="dashboard.html#notifications" className="sb-item"><span className="icon">🔔</span> Уведомления</a>
-  <a href="dashboard.html#profile" className="sb-item"><span className="icon">⚙️</span> Профиль</a>
+        <div className="sb-section">Главное</div>
+        <a href="/dashboard" className="sb-item active"><span className="icon">📊</span> Дашборд</a>
+        <a href="/test" className="sb-item"><span className="icon">🧠</span> Диагностика</a>
+        <a href="/dashboard" className="sb-item"><span className="icon">🗺️</span> Карьерный маршрут</a>
+        <a href="/dashboard" className="sb-item"><span className="icon">📚</span> Атлас профессий</a>
 
-  <div className="sb-user" style={{position:'relative'}}>
-    <div className="sb-user-btn" style={{display:'flex',alignItems:'center',gap:'10px',cursor:'pointer',flex:'1',padding:'4px',borderRadius:'8px',transition:'background .2s'}} id="sb-user-btn">
-      <div className="sb-av" id="sb-av-el">ИИ</div>
-      <div style={{flex:'1',minWidth:'0'}}>
-        <div className="sb-name" id="sb-username">Пользователь</div>
-        <div className="sb-role" id="sb-role">Специалист</div>
-      </div>
-      <div id="sb-chevron" style={{fontSize:'10px',color:'var(--ghost)',transition:'transform .2s'}}>▲</div>
-    </div>
-    <div className="sb-user-menu" id="sb-user-menu">
-      <a href="dashboard.html#profile" className="sum-item"><span>⚙️</span> Настройки профиля</a>
-      <a href="/legal/privacy" className="sum-item" target="_blank"><span>🔒</span> Конфиденциальность</a>
-      <a href="/legal" className="sum-item" target="_blank"><span>📋</span> Правовые документы</a>
-      <div className="sum-divider"></div>
-      <a href="/" className="sum-item"><span>🏠</span> На главную сайта</a>
-      <div className="sum-divider"></div>
-      <a href="/" className="sum-item sum-danger"><span>🚪</span> Выйти из кабинета</a>
-    </div>
-  </div>
-</aside>
+        <div className="sb-section">Работа</div>
+        <a href="/dashboard" className="sb-item"><span className="icon">📅</span> Мои встречи <span className="sb-badge">2</span></a>
+        <a href="/dashboard" className="sb-item"><span className="icon">🔔</span> Уведомления</a>
+        <a href="/dashboard" className="sb-item"><span className="icon">⚙️</span> Профиль</a>
 
-
-<div className="main">
-
-  
-  <div className="topbar">
-    <div className="topbar-left">
-      <button className="mobile-menu-btn">☰</button>
-      <div className="page-crumb">CareerPulse / <span id="topbar-page">Дашборд</span></div>
-    </div>
-    <div className="topbar-right">
-      <button className="topbar-btn notif-dot">🔔</button>
-      <button className="topbar-btn">🗺️ Знакомство с кабинетом</button>
-      <a href="/" className="topbar-btn">← На главную</a>
-    </div>
-  </div>
-
-  
-  <div className="content">
-
-    
-    <div className="welcome-banner">
-      <div className="wb-text">
-        <h2>Привет, <span id="welcome-name">Пользователь</span>! 👋</h2>
-        <p>Добро пожаловать в CareerPulse. Ты в 1 шаге от своего персонального карьерного маршрута. Начни с диагностики — это займёт 30 минут.</p>
-      </div>
-      <div className="wb-actions">
-        <a href="/test" className="btn btn-accent">🧠 Начать диагностику</a>
-        <button className="btn btn-outline">🗺️ Знакомство с кабинетом</button>
-      </div>
-    </div>
-
-    
-    <div className="progress-block">
-      <div className="pb-header">
-        <div className="pb-title">Готовность к карьерному переходу</div>
-        <div className="pb-pct" id="progress-pct">0%</div>
-      </div>
-      <div className="pb-track"><div className="pb-fill" id="pb-fill" style={{width:'0%'}}></div></div>
-      <div className="pb-hint">Пройди диагностику чтобы получить первый результат и активировать карьерный план</div>
-    </div>
-
-    
-    <div className="stats-grid">
-      <div className="stat-card">
-        <div className="sc-val" style={{color:'var(--ghost)'}} id="stat-test">—</div>
-        <div className="sc-label">Диагностика</div>
-        <div className="sc-delta d-sub" id="stat-test-sub">Не пройдена</div>
-      </div>
-      <div className="stat-card">
-        <div className="sc-val" style={{color:'var(--gold)'}} id="stat-meeting">—</div>
-        <div className="sc-label">Встреча</div>
-        <div className="sc-delta d-sub" id="stat-meeting-sub">Не запланирована</div>
-      </div>
-      <div className="stat-card">
-        <div className="sc-val" style={{color:'var(--violet)'}} id="stat-tasks">0</div>
-        <div className="sc-label">Задач в плане</div>
-        <div className="sc-delta d-sub">Откроются после теста</div>
-      </div>
-      <div className="stat-card">
-        <div className="sc-val" style={{color:'var(--accent)'}} id="stat-fav">0</div>
-        <div className="sc-label">Профессий в избранном</div>
-        <div className="sc-delta d-sub"><a href="dashboard.html#atlas" style={{color:'var(--accent)',textDecoration:'none'}}>Открыть Атлас →</a></div>
-      </div>
-    </div>
-
-    
-    <div className="two-col">
-      <div className="panel">
-        <div className="panel-title">Компетенции · по результатам диагностики</div>
-        <div id="traits-block">
-          <div style={{textAlign:'center',padding:'32px 0',color:'var(--ghost)'}}>
-            <div style={{fontSize:'36px',marginBottom:'12px'}}>🧠</div>
-            <div style={{fontSize:'14px',fontWeight:'700',marginBottom:'6px'}}>Диагностика не пройдена</div>
-            <div style={{fontSize:'12px',marginBottom:'16px'}}>Пройди тест чтобы увидеть свой профиль компетенций</div>
-            <a href="/test" className="btn btn-accent" style={{fontSize:'12px',padding:'9px 20px'}}>Начать тест →</a>
-          </div>
-        </div>
-      </div>
-      <div style={{display:'flex',flexDirection:'column',gap:'14px'}}>
-        <div className="next-step-card">
-          <div className="ns-eyebrow">Следующий шаг</div>
-          <div className="ns-title" id="next-step-text">Пройти диагностику личности</div>
-          <a href="/test" className="btn btn-accent" style={{fontSize:'12px',padding:'9px 20px'}}>Начать →</a>
-        </div>
-        <div className="panel" style={{padding:'16px'}}>
-          <div className="panel-title">Мой наставник</div>
-          <div className="mentor-card">
-            <div className="m-av" style={{background:'linear-gradient(135deg,#e040fb,var(--violet))'}}>ОК</div>
-            <div>
-              <div className="m-name">Ольга Карпова</div>
-              <div className="m-spec">Карьерный коуч</div>
-              <div className="m-stars">★★★★★</div>
+        <div className="sb-user" style={{position:'relative'}}>
+          <div className="sb-user-btn" style={{display:'flex',alignItems:'center',gap:'10px',cursor:'pointer',flex:'1',padding:'4px',borderRadius:'8px',transition:'background .2s'}} id="sb-user-btn">
+            <div className="sb-av" id="sb-av-el">ИИ</div>
+            <div style={{flex:'1',minWidth:'0'}}>
+              <div className="sb-name" id="sb-username">Пользователь</div>
+              <div className="sb-role" id="sb-role">Специалист</div>
             </div>
-            <button className="m-btn">Записаться</button>
+            <div id="sb-chevron" style={{fontSize:'10px',color:'var(--ghost)',transition:'transform .2s'}}>▲</div>
+          </div>
+          <div className="sb-user-menu" id="sb-user-menu">
+            <a href="/dashboard" className="sum-item"><span>⚙️</span> Настройки профиля</a>
+            <a href="/legal/privacy" className="sum-item" target="_blank"><span>🔒</span> Конфиденциальность</a>
+            <a href="/legal" className="sum-item" target="_blank"><span>📋</span> Правовые документы</a>
+            <div className="sum-divider"></div>
+            <a href="/" className="sum-item"><span>🏠</span> На главную сайта</a>
+            <div className="sum-divider"></div>
+            <a href="/" className="sum-item sum-danger"><span>🚪</span> Выйти из кабинета</a>
           </div>
         </div>
-      </div>
-    </div>
+      </aside>
 
-    
-    <div className="panel">
-      <div className="panel-title">Активность</div>
-      <div className="activity-list" id="activity-list">
-        <div className="activity-item">
-          <div className="a-icon">🎉</div>
-          <div>
-            <div className="a-text">Аккаунт создан</div>
-            <div className="a-sub">Добро пожаловать в CareerPulse</div>
+      {/* ── MAIN ── */}
+      <div className="main">
+        <div className="topbar">
+          <div className="topbar-left">
+            <button className="mobile-menu-btn">☰</button>
+            <div className="page-crumb">CareerPulse / <span>Дашборд диагностики</span></div>
           </div>
-          <div className="a-time">Только что</div>
-        </div>
-        <div className="activity-item">
-          <div className="a-icon">📚</div>
-          <div>
-            <div className="a-text">Атлас профессий доступен</div>
-            <div className="a-sub">105 профессий с совместимостью по профилю</div>
+          <div className="topbar-right">
+            <button className="topbar-btn notif-dot">🔔</button>
+            <button className="topbar-btn btn-tour">🗺️ Как это работает</button>
+            <a href="/" className="topbar-btn">← На главную</a>
           </div>
-          <div className="a-time">Сегодня</div>
         </div>
-      </div>
-    </div>
 
-  </div>
+        <div className="content">
 
-  
-  <footer className="site-footer">
-    <div className="footer-grid">
-      <div className="footer-brand">
-        <div className="fb-logo">CAREER<span>PULSE</span></div>
-        <p>Персональная платформа карьерной диагностики. Психодиагностика, анализ рынка труда и живой наставник в одном маршруте.</p>
-      </div>
-      <div className="footer-col">
-        <h4>Правовые документы</h4>
-        <ul>
-          <li><a href="/legal/privacy">Политика конфиденциальности</a></li>
-          <li><a href="/legal/terms">Пользовательское соглашение</a></li>
-          <li><a href="/legal">Правовые документы</a></li>
-          <li><a href="/legal/consent">Согласие на обработку ПД</a></li>
-          <li><a href="/legal/adconsent">Согласие на рекламу</a></li>
-          <li><a href="/legal/recomm">Рекомендательные технологии</a></li>
-          <li><a href="#" id="cookie-settings">Настройки cookie</a></li>
-        </ul>
-      </div>
-      <div className="footer-col">
-        <h4>Контакты</h4>
-        <ul>
-          <li><a href="https://t.me/SokolovNYU" target="_blank">✈️ Telegram</a></li>
-          <li><a href="https://vk.ru/sokolovnyu" target="_blank">🔵 ВКонтакте</a></li>
-          <li><a href="https://youtube.com/@SokolovNYU" target="_blank">▶️ YouTube</a></li>
-          <li><a href="https://rutube.ru/channel/SokolovNYU" target="_blank">📺 Rutube</a></li>
-          <li><a href="mailto:SokolovNYu@mail.ru">✉️ SokolovNYu@mail.ru</a></li>
-        </ul>
-      </div>
-    </div>
-    <div className="footer-bottom">
-      <div className="footer-copy">© 2026 CareerPulse · careerpulse.ru · Никита Соколов</div>
-      <div className="footer-legal-links">
-        <a href="/legal/privacy">Конфиденциальность</a>
-        <a href="/legal/terms">Соглашение</a>
-        <a href="/legal">Документы</a>
-      </div>
-    </div>
-  </footer>
+          {/* ── WELCOME ── */}
+          <div className="welcome-banner">
+            <div className="wb-text">
+              <h2>Привет, <span id="welcome-name">Пользователь</span>! 👋</h2>
+              <p>Твоя профориентационная диагностика — <strong>10 блоков</strong>, {totalQ} вопросов, ~{totalTime} минут. Можно проходить частями. Каждый блок сразу добавляет слой в твой профиль.</p>
+            </div>
+            <div className="wb-actions">
+              <a href="/test" className="btn btn-accent">🧠 Начать диагностику</a>
+              <button className="btn btn-outline btn-tour">🗺️ Как это работает</button>
+            </div>
+          </div>
 
-</div>
+          {/* ── PROGRESS ── */}
+          <div className="progress-block">
+            <div className="pb-header">
+              <div className="pb-title">Прогресс профориентационной диагностики</div>
+              <div className="pb-pct" id="progress-pct">0%</div>
+            </div>
+            <div className="pb-milestones">
+              <div className="pb-milestone" style={{left:'10%'}}><div className="pm-dot"></div><div className="pm-label">Блок 1<br/>10%</div></div>
+              <div className="pb-milestone" style={{left:'45%'}}><div className="pm-dot"></div><div className="pm-label">Блоки 2–4<br/>45%</div></div>
+              <div className="pb-milestone" style={{left:'65%'}}><div className="pm-dot pm-key"></div><div className="pm-label">+ Письмо<br/>65%</div></div>
+              <div className="pb-milestone" style={{left:'100%'}}><div className="pm-dot"></div><div className="pm-label">Всё<br/>100%</div></div>
+            </div>
+            <div className="pb-track"><div className="pb-fill" id="pb-fill" style={{width:'0%'}}></div></div>
+            <div className="pb-hint">Минимум для первой консультации — блоки 1, 2, 3, 4 + Письмо в будущее (блок 10)</div>
+          </div>
 
+          {/* ── ОСИ ── */}
+          <div className="axes-grid">
+            {AXIS_INFO.map(ax => (
+              <div key={ax.key} className="axis-card" style={{'--ax-color': ax.color}}>
+                <div className="ax-icon">{ax.icon}</div>
+                <div className="ax-key">{ax.key}</div>
+                <div className="ax-desc">{ax.desc}</div>
+                <div className="ax-blocks">блоки {ax.blocks.join(', ')}</div>
+              </div>
+            ))}
+          </div>
 
-<div className="modal-overlay" id="tour-modal">
-  <div className="modal-box">
-    <div className="modal-head">
-      <h3>🗺️ ЗНАКОМСТВО С КАБИНЕТОМ</h3>
-      <button className="modal-close">✕</button>
-    </div>
-    <div className="modal-body">
-      <p style={{fontSize:'14px',color:'var(--sub)',marginBottom:'20px',lineHeight:'1.7'}}>Твой личный кабинет CareerPulse — это 6 разделов, каждый из которых помогает двигаться к карьерной цели. Вот с чего начать:</p>
-      <div className="tour-steps">
-        <div className="tour-step">
-          <div className="ts-icon">🧠</div>
-          <div>
-            <div className="ts-title">Моя диагностика</div>
-            <div className="ts-desc">Пройди тест за 30 минут — получи профиль личности по MBTI, Кеттеллу и Векторной системе. Сильные стороны, ценности, мотивационные драйверы.</div>
-            <button className="ts-link">→ Перейти к диагностике</button>
+          {/* ── 10 БЛОКОВ ── */}
+          <div className="blocks-section">
+            <div className="section-header">
+              <div className="section-title">10 блоков диагностики</div>
+              <div className="section-sub">{totalQ} вопросов · ~{totalTime} минут · можно проходить частями</div>
+            </div>
+            <div className="blocks-grid">
+              {BLOCKS.map((blk, i) => (
+                <div key={blk.id} className={['block-card', blk.special && 'block-card--special', i === 0 && 'block-card--available'].filter(Boolean).join(' ')}>
+                  <div className="bc-top">
+                    <div className="bc-num">{blk.num}</div>
+                    <div className="bc-axis" style={{color: blk.axisColor, borderColor: blk.axisColor + '44', background: blk.axisColor + '11'}}>{blk.axis}</div>
+                    {blk.required && <div className="bc-badge bc-badge--req">Первым</div>}
+                    {blk.special && <div className="bc-badge bc-badge--special">★ Ключевой</div>}
+                  </div>
+                  <div className="bc-title">{blk.title}</div>
+                  <div className="bc-desc">{blk.desc}</div>
+                  <div className="bc-meta">
+                    <span>📝 {blk.questions} вопросов</span>
+                    <span>⏱ ~{blk.time} мин</span>
+                    <span style={{marginLeft:'auto',color:'var(--ghost)'}}>+{blk.weight}% профиля</span>
+                  </div>
+                  <a href="/test" className="btn btn-outline bc-btn">
+                    {i === 0 ? 'Начать →' : 'Перейти →'}
+                  </a>
+                </div>
+              ))}
+            </div>
           </div>
-        </div>
-        <div className="tour-step">
-          <div className="ts-icon">🗺️</div>
-          <div>
-            <div className="ts-title">Карьерный план</div>
-            <div className="ts-desc">После теста платформа строит два карьерных пути: Путь A — рост там где ты есть, Путь B — переход в новую сферу. Чеклист задач по 4 фазам.</div>
-            <button className="ts-link">→ Открыть карьерный план</button>
+
+          {/* ── НИЖНИЙ РЯД: НАСТАВНИК + ЧТО ДАЁТь ── */}
+          <div className="two-col" style={{marginTop:'24px'}}>
+            <div className="panel">
+              <div className="panel-title">Мой наставник и эксперт</div>
+              <div className="mentor-card">
+                <div className="m-av" style={{background:'linear-gradient(135deg,var(--violet),var(--accent))'}}>НС</div>
+                <div style={{flex:'1'}}>
+                  <div className="m-name">Никита Соколов</div>
+                  <div className="m-spec">Профориентолог-наставник</div>
+                  <div className="m-stars">★★★★★ · 10+ лет · 2000+ консультаций</div>
+                  <div style={{fontSize:'11px',color:'var(--ghost)',marginTop:'4px'}}>9 лет в вузах · Санкт-Петербург</div>
+                </div>
+                <a href="https://t.me/SokolovNYU" target="_blank" className="m-btn" style={{textDecoration:'none'}}>Записаться</a>
+              </div>
+              <div style={{marginTop:'12px',fontSize:'12px',color:'var(--ghost)',lineHeight:'1.6'}}>
+                После прохождения диагностики Никита разберёт твой полный профиль и поможет выстроить маршрут. Бесплатно получишь предварительные рекомендации после блоков 1–4.
+              </div>
+            </div>
+            <div style={{display:'flex',flexDirection:'column',gap:'14px'}}>
+              <div className="panel" style={{padding:'16px'}}>
+                <div className="panel-title">Что ты получишь по итогу</div>
+                <ul style={{listStyle:'none',display:'flex',flexDirection:'column',gap:'8px'}}>
+                  {[
+                    ['💡','Профиль Holland RIASEC (ось ХОЧУ)'],
+                    ['🧠','Личностный профиль Big Five (КТО Я)'],
+                    ['⚡','Тип интеллекта и стиль обучения (МОГУ)'],
+                    ['🎯','Карта ценностей и мотивации'],
+                    ['📍','Карьерный архетип и топ профессий'],
+                    ['🗺️','Персональный маршрут на 3–6 месяцев'],
+                    ['📄','PDF-отчёт на 20+ страниц'],
+                  ].map(([icon, text]) => (
+                    <li key={text} style={{display:'flex',gap:'8px',fontSize:'12px',color:'var(--sub)'}}>
+                      <span style={{fontSize:'14px'}}>{icon}</span><span>{text}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+              <div className="panel" style={{padding:'16px'}}>
+                <div className="panel-title">Активность</div>
+                <div className="activity-item" style={{padding:'8px 0',borderBottom:'none'}}>
+                  <div className="a-icon">🎉</div>
+                  <div><div className="a-text">Аккаунт создан</div><div className="a-sub">Добро пожаловать в CareerPulse</div></div>
+                  <div className="a-time">Сегодня</div>
+                </div>
+                <div className="activity-item" style={{padding:'8px 0',borderBottom:'none'}}>
+                  <div className="a-icon">📚</div>
+                  <div><div className="a-text">Диагностика готова</div><div className="a-sub">10 блоков · {totalQ} вопросов доступны</div></div>
+                  <div className="a-time">Сегодня</div>
+                </div>
+              </div>
+            </div>
           </div>
+
         </div>
-        <div className="tour-step">
-          <div className="ts-icon">📚</div>
-          <div>
-            <div className="ts-title">Атлас профессий</div>
-            <div className="ts-desc">105 профессий с зарплатами, навыками и AI-прогнозом. После диагностики каждая профессия показывает % совместимости с твоим профилем.</div>
-            <button className="ts-link">→ Открыть Атлас</button>
+
+        {/* ── FOOTER ── */}
+        <footer className="site-footer">
+          <div className="footer-grid">
+            <div className="footer-brand">
+              <div className="fb-logo">CAREER<span>PULSE</span></div>
+              <p>Платформа профориентации и карьерного наставничества. Глубокая диагностика, профиль личности и живой эксперт — Никита Соколов — в одном маршруте.</p>
+            </div>
+            <div className="footer-col">
+              <h4>Правовые документы</h4>
+              <ul>
+                <li><a href="/legal/privacy">Политика конфиденциальности</a></li>
+                <li><a href="/legal/terms">Пользовательское соглашение</a></li>
+                <li><a href="/legal">Правовые документы</a></li>
+                <li><a href="/legal/consent">Согласие на обработку ПД</a></li>
+                <li><a href="/legal/adconsent">Согласие на рекламу</a></li>
+                <li><a href="/legal/recomm">Рекомендательные технологии</a></li>
+                <li><a href="#" id="cookie-settings">Настройки cookie</a></li>
+              </ul>
+            </div>
+            <div className="footer-col">
+              <h4>Контакты</h4>
+              <ul>
+                <li><a href="https://t.me/SokolovNYU" target="_blank">✈️ Telegram</a></li>
+                <li><a href="https://vk.ru/sokolovnyu" target="_blank">🔵 ВКонтакте</a></li>
+                <li><a href="https://youtube.com/@SokolovNYU" target="_blank">▶️ YouTube</a></li>
+                <li><a href="https://rutube.ru/channel/SokolovNYU" target="_blank">📺 Rutube</a></li>
+                <li><a href="mailto:SokolovNYu@mail.ru">✉️ SokolovNYu@mail.ru</a></li>
+              </ul>
+            </div>
           </div>
-        </div>
-        <div className="tour-step">
-          <div className="ts-icon">📅</div>
-          <div>
-            <div className="ts-title">Мои встречи</div>
-            <div className="ts-desc">Запись к живому карьерному наставнику по твоей сфере. Выбор специалиста, бронирование слота, онлайн-встреча в Zoom.</div>
-            <button className="ts-link">→ Записаться к наставнику</button>
+          <div className="footer-bottom">
+            <div className="footer-copy">© 2026 CareerPulse · careerpulse.ru · Никита Соколов</div>
+            <div className="footer-legal-links">
+              <a href="/legal/privacy">Конфиденциальность</a>
+              <a href="/legal/terms">Соглашение</a>
+              <a href="/legal">Документы</a>
+            </div>
           </div>
-        </div>
-        <div className="tour-step">
-          <div className="ts-icon">📄</div>
-          <div>
-            <div className="ts-title">PDF-отчёт</div>
-            <div className="ts-desc">По результатам диагностики формируется полный отчёт на 20+ страниц. Можно скачать, поделиться с наставником или прикрепить к резюме.</div>
-            <button className="ts-link">→ После прохождения теста</button>
+        </footer>
+      </div>
+
+      {/* ── ТУР-МОДАЛ ── */}
+      <div className="modal-overlay" id="tour-modal">
+        <div className="modal-box">
+          <div className="modal-head">
+            <h3>🗺️ КАК РАБОТАЕТ ДИАГНОСТИКА</h3>
+            <button className="modal-close">✕</button>
           </div>
-        </div>
-        <div className="tour-step">
-          <div className="ts-icon">🌐</div>
-          <div>
-            <div className="ts-title">Также доступны</div>
-            <div className="ts-desc">Обзорный лендинг кабинета с демонстрацией всех экранов. Полезно если хочешь показать платформу коллеге или руководителю.</div>
-            <a href="/dashboard" className="ts-link" target="_blank">→ Смотреть демо-тур кабинета</a>
+          <div className="modal-body">
+            <p style={{fontSize:'14px',color:'var(--sub)',marginBottom:'20px',lineHeight:'1.7'}}>
+              CareerPulse — это не один тест, а система из 10 блоков. Каждый пройденный блок сразу добавляет слой в твой профиль. После 3–4 блоков уже видны первые рекомендации.
+            </p>
+            <div className="tour-steps">
+              <div className="tour-step">
+                <div className="ts-icon">🎯</div>
+                <div>
+                  <div className="ts-title">Три оси профиля</div>
+                  <div className="ts-desc">Система строит профиль по трём осям: <strong>ХОЧУ</strong> (интересы и ценности), <strong>МОГУ</strong> (интеллект и навыки), <strong>КТО Я</strong> (личность и самоэффективность). Плюс ось <strong>НАДО</strong> — контекст жизни.</div>
+                </div>
+              </div>
+              <div className="tour-step">
+                <div className="ts-icon">📝</div>
+                <div>
+                  <div className="ts-title">Блок 1 — обязательно первым</div>
+                  <div className="ts-desc">Анкета-контекст (20 вопросов, 7 минут) собирает базу: класс, ЕГЭ, планы, тревоги. Она настраивает все остальные блоки под тебя лично.</div>
+                </div>
+              </div>
+              <div className="tour-step">
+                <div className="ts-icon">💡</div>
+                <div>
+                  <div className="ts-title">Блоки 2–4 — основа профиля</div>
+                  <div className="ts-desc">Склонности (Holland), Ценности и Личность дают 45% профиля и первые рекомендации. После них система уже знает, к чему ты тянешься и кто ты по характеру.</div>
+                </div>
+              </div>
+              <div className="tour-step">
+                <div className="ts-icon">✍️</div>
+                <div>
+                  <div className="ts-title">Блок 10 — Письмо в будущее ★</div>
+                  <div className="ts-desc">19 открытых вопросов о себе сейчас и через 5 лет. Самый ценный блок — ИИ анализирует твой нарратив и добавляет то, что тест никогда не покажет. После него профиль достигает 65%.</div>
+                </div>
+              </div>
+              <div className="tour-step">
+                <div className="ts-icon">🤝</div>
+                <div>
+                  <div className="ts-title">Консультация с Никитой Соколовым</div>
+                  <div className="ts-desc">После блоков 1, 2, 3, 4 + Письма — достаточно для первой глубокой консультации. Никита разберёт твой профиль, выявит противоречия и построит маршрут.</div>
+                </div>
+              </div>
+            </div>
+            <div style={{marginTop:'20px',display:'flex',gap:'10px',flexWrap:'wrap'}}>
+              <button className="btn btn-accent btn-start-test">Начать с Блока 1 →</button>
+              <button className="btn btn-outline modal-close">Закрыть</button>
+            </div>
           </div>
         </div>
       </div>
-      <div style={{marginTop:'20px',display:'flex',gap:'10px',flexWrap:'wrap'}}>
-        <button className="btn btn-accent">Всё понял, начать диагностику →</button>
-        <button className="btn btn-outline">Закрыть</button>
-      </div>
+
     </div>
-  </div>
-</div>    </div>
   )
 }
