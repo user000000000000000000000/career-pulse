@@ -9,15 +9,16 @@ import '../styles/legal.css'
 import '../styles/auth.css'
 
 const ROLES = [
-  { value: 'student', label: '🎓 Выпускник' },
-  { value: 'specialist', label: '💼 Специалист' },
+  { value: 'parent', label: '👪 Родитель школьника' },
+  { value: 'student', label: '🎓 Школьник / Студент' },
+  { value: 'specialist', label: '💼 Специалист / Взрослый' },
   { value: 'entrepreneur', label: '🚀 Предприниматель' },
   { value: 'hr', label: '🏢 HR / Компания' }
 ]
 
 export default function Register() {
   const navigate = useNavigate()
-  const [form, setForm] = useState({ name: '', email: '', password: '', role: 'student' })
+  const [form, setForm] = useState({ name: '', email: '', password: '', role: 'parent' })
   const [agree, setAgree] = useState(false)
   const [error, setError] = useState('')
   const [busy, setBusy] = useState(false)
