@@ -183,7 +183,7 @@ export default function Dashboard() {
         <div className="sb-section">Работа</div>
         <a href="/dashboard" className="sb-item"><span className="icon">📅</span> Мои встречи <span className="sb-badge">2</span></a>
         <a href="/dashboard" className="sb-item"><span className="icon">🔔</span> Уведомления</a>
-        <a href="/dashboard" className="sb-item"><span className="icon">⚙️</span> Профиль</a>
+        <a href="/profile" className="sb-item"><span className="icon">⚙️</span> Профиль</a>
 
         <div className="sb-user" style={{position:'relative'}}>
           <div className="sb-user-btn" style={{display:'flex',alignItems:'center',gap:'10px',cursor:'pointer',flex:'1',padding:'4px',borderRadius:'8px',transition:'background .2s'}} id="sb-user-btn">
@@ -195,7 +195,7 @@ export default function Dashboard() {
             <div id="sb-chevron" style={{fontSize:'10px',color:'var(--ghost)',transition:'transform .2s'}}>▲</div>
           </div>
           <div className="sb-user-menu" id="sb-user-menu">
-            <a href="/dashboard" className="sum-item"><span>⚙️</span> Настройки профиля</a>
+            <a href="/profile" className="sum-item"><span>⚙️</span> Настройки профиля</a>
             <a href="/legal/privacy" className="sum-item" target="_blank"><span>🔒</span> Конфиденциальность</a>
             <a href="/legal" className="sum-item" target="_blank"><span>📋</span> Правовые документы</a>
             <div className="sum-divider"></div>

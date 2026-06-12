@@ -19,9 +19,10 @@ const ROLES = [
 export default function Register() {
   const navigate = useNavigate()
   const [form, setForm] = useState({ name: '', email: '', password: '', role: 'parent' })
-  const [agree, setAgree] = useState(false)
-  const [error, setError] = useState('')
-  const [busy, setBusy] = useState(false)
+  const [agree, setAgree]         = useState(false)
+  const [error, setError]         = useState('')
+  const [busy, setBusy]           = useState(false)
+  const [confirmed, setConfirmed] = useState(false)
 
   const upd = (k) => (e) => setForm({ ...form, [k]: e.target.value })
 
@@ -33,13 +34,40 @@ export default function Register() {
     if (!agree) return setError('Примите условия использования')
     try {
       setBusy(true)
-      await doRegister(form)
-      navigate('/dashboard')
+      const { user } = await doRegister(form)
+      // Supabase требует подтверждения email — у сессии не будет токена сразу
+      if (user && !user.confirmed_at && !user.email_confirmed_at) {
+        setConfirmed(true)
+      } else {
+        navigate('/dashboard')
+      }
     } catch (err) {
       setError(err.message || 'Не удалось зарегистрироваться')
       setBusy(false)
     }
   }
+
+  if (confirmed) return (
+    <div className="cp-legal">
+      <Header backTo="/" backLabel="← На главную" />
+      <div className="auth-wrap">
+        <Card accent className="auth-card">
+          <div style={{ textAlign: 'center', padding: '20px 0' }}>
+            <div style={{ fontSize: 48, marginBottom: 16 }}>📬</div>
+            <div className="auth-eyebrow">Почти готово</div>
+            <h1 className="auth-title" style={{ fontSize: 'clamp(28px,5vw,40px)' }}>ПОДТВЕРДИТЕ EMAIL</h1>
+            <p className="auth-sub">
+              Мы отправили письмо на <strong>{form.email}</strong>.<br />
+              Перейдите по ссылке в письме, чтобы активировать аккаунт.
+            </p>
+            <div style={{ marginTop: 24 }}>
+              <Button block onClick={() => navigate('/login')}>Перейти ко входу →</Button>
+            </div>
+          </div>
+        </Card>
+      </div>
+    </div>
+  )
 
   return (
     <div className="cp-legal">

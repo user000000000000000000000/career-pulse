@@ -25,3 +25,15 @@
 .res-report{font-size:15px;line-height:1.8;color:var(--sub);white-space:pre-wrap}
 .res-actions{display:flex;gap:12px;flex-wrap:wrap;margin-top:26px}
 .res-empty{text-align:center;padding:80px 20px;color:var(--sub)}
+
+/* ─── Диаграммы ─── */
+.charts-section{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin:24px 0}
+@media (max-width:720px){.charts-section{grid-template-columns:1fr}}
+.chart-block{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:20px 16px}
+.chart-title{font-size:12px;font-weight:800;letter-spacing:1.5px;text-transform:uppercase;
+  color:var(--ghost);margin-bottom:16px}
+.chart-legend{display:flex;flex-direction:column;gap:6px;margin-top:12px}
+.legend-item{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--sub)}
+.legend-item .legend-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+.legend-item .legend-val{margin-left:auto;font-family:'JetBrains Mono',monospace;
+  font-size:11px;color:var(--accent)}

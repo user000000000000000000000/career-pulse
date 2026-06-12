@@ -52,12 +52,19 @@ export default function Landing() {
     }
     if (phone) { phone.addEventListener('input', onPhone); cleanups.push(() => phone.removeEventListener('input', onPhone)) }
 
-    // ── Перехват внутренних ссылок → SPA-навигация
+    // ── Перехват ссылок: SPA-навигация + плавный скролл к якорям
     const onClick = (e) => {
       const a = e.target.closest('a')
       if (!a) return
       const href = a.getAttribute('href')
-      if (href && href.startsWith('/')) { e.preventDefault(); navigate(href) }
+      if (!href) return
+      if (href.startsWith('#')) {
+        e.preventDefault()
+        const target = root.querySelector(href)
+        if (target) target.scrollIntoView({ behavior: 'smooth', block: 'start' })
+        return
+      }
+      if (href.startsWith('/')) { e.preventDefault(); navigate(href) }
     }
     root.addEventListener('click', onClick)
     cleanups.push(() => root.removeEventListener('click', onClick))
