@@ -7,6 +7,7 @@ import Dashboard from './pages/Dashboard.jsx'
 import Test from './pages/Test.jsx'
 import Result from './pages/Result.jsx'
 import Profile from './pages/Profile.jsx'
+import Atlas from './pages/Atlas.jsx'
 
 import LegalHub from './pages/Legal/LegalHub.jsx'
 import Privacy from './pages/Legal/Privacy.jsx'
@@ -28,6 +29,7 @@ export default function App() {
       <Route path="/test"      element={<RequireAuth><Test /></RequireAuth>} />
       <Route path="/result"    element={<RequireAuth><Result /></RequireAuth>} />
       <Route path="/profile"   element={<RequireAuth><Profile /></RequireAuth>} />
+      <Route path="/atlas"     element={<RequireAuth><Atlas /></RequireAuth>} />
 
       <Route path="/legal"           element={<LegalHub />} />
       <Route path="/legal/privacy"   element={<Privacy />} />

@@ -3,8 +3,9 @@ import { useLocation, useNavigate, Link } from 'react-router-dom'
 import Header from '../components/Layout/Header.jsx'
 import Card from '../components/UI/Card.jsx'
 import Button from '../components/UI/Button.jsx'
-import { HollandRadar, BigFiveBar, IntelligencePie, ProfessionBars } from '../components/Charts/ResultCharts.jsx'
+import { InterestsRadar, AbilitiesBar, ValuesPie, BehaviorBar, ProfessionBars } from '../components/Charts/ResultCharts.jsx'
 import { supabase, isSupabaseConfigured } from '../services/supabase'
+import { PROFESSIONS } from '../data/professions.js'
 import { getCurrentUser } from '../services/auth'
 import '../styles/legal.css'
 import '../styles/result.css'
@@ -13,7 +14,7 @@ export default function Result() {
   const location = useLocation()
   const navigate = useNavigate()
   const [report, setReport] = useState(location.state?.report || null)
-  const [scores, setScores] = useState(location.state?.scores || {})
+  const [scores, setScores] = useState(location.state?.result?.scores || location.state?.scores || {})
   const [loading, setLoading] = useState(!location.state?.report)
 
   useEffect(() => {
@@ -88,28 +89,36 @@ export default function Result() {
 
       {/* ── Диаграммы ── */}
       <div className="charts-section">
-        <HollandRadar scores={scores} />
-        <BigFiveBar scores={scores} />
+        <InterestsRadar scores={scores} />
+        <AbilitiesBar scores={scores} />
       </div>
-      <div className="charts-section" style={{ gridTemplateColumns: '1fr 1fr' }}>
-        <IntelligencePie scores={scores} />
+      <div className="charts-section">
+        <ValuesPie scores={scores} />
+        <BehaviorBar scores={scores} />
+      </div>
+      <div className="charts-section" style={{ gridTemplateColumns: '1fr' }}>
         <ProfessionBars professions={professions} />
       </div>
 
       {/* ── Список профессий ── */}
       <Card accent style={{ marginBottom: 18 }}>
         <div className="res-card-h"><span className="dot" style={{ background: 'var(--accent)' }} />Подходящие профессии</div>
-        {professions.length ? professions.map((p, i) => (
-          <div className="res-prof" key={i}>
-            <span className="res-prof__name">{p.name}</span>
-            {typeof p.match === 'number' && (
-              <>
-                <span className="res-prof__bar"><span className="res-prof__fill" style={{ width: `${p.match}%` }} /></span>
+        {professions.length ? professions.map((p, i) => {
+          const atlas = PROFESSIONS.find(a => a.name.toLowerCase() === p.name.toLowerCase())
+          return (
+            <div className="res-prof" key={i}>
+              <span className="res-prof__name">{p.name}</span>
+              <span className="res-prof__tags">
+                {atlas ? atlas.holland.map(h => (
+                  <span key={h} className="res-prof__htag" data-h={h}>{h}</span>
+                )) : <span className="res-prof__cat">{atlas?.category || ''}</span>}
+              </span>
+              {typeof p.match === 'number' && (
                 <span className="res-prof__pct">{p.match}%</span>
-              </>
-            )}
-          </div>
-        )) : <p style={{ color: 'var(--sub)' }}>—</p>}
+              )}
+            </div>
+          )
+        }) : <p style={{ color: 'var(--sub)' }}>—</p>}
       </Card>
 
       {/* ── Полный разбор ── */}

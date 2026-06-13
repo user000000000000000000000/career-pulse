@@ -32,6 +32,7 @@ export function calculateScores(answers = []) {
   // Нормировка 0..100 относительно максимума внутри каждого блока.
   const scores = {}
   for (const [blockId, scales] of Object.entries(BLOCK_SCALES)) {
+    if (!scales.length) continue
     const max = Math.max(1, ...scales.map(s => raw[s] || 0))
     for (const s of scales) {
       scores[s] = Math.round(((raw[s] || 0) / max) * 100)
