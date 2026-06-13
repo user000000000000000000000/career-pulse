@@ -5,82 +5,54 @@ import '../styles/dashboard.css'
 
 const BLOCKS = [
   {
-    num: '01', id: 'context', axis: 'НАДО', axisColor: 'var(--gold)',
-    title: 'Анкета-контекст',
-    desc: 'Базовый профиль: класс, ЕГЭ, планы, тревоги вокруг выбора. Настраивает остальные блоки под тебя.',
-    questions: 20, time: 7, required: true,
-    weight: 10,
+    num: '01', id: 'interests', axis: 'ХОЧУ', axisColor: 'var(--accent)',
+    title: 'Интересы и склонности',
+    desc: '50 вопросов о том, что тебя притягивает: техника, анализ, творчество, общение, лидерство или структура.',
+    questions: 50, time: 17, required: true,
+    weight: 35,
   },
   {
-    num: '02', id: 'holland', axis: 'ХОЧУ', axisColor: 'var(--accent)',
-    title: 'Склонности в деятельности',
-    desc: 'Holland RIASEC: 30 пар занятий. Выясняем, к чему ты тянешься — техника, наука, творчество, люди, управление или порядок.',
-    questions: 36, time: 15, required: false,
+    num: '02', id: 'personality', axis: 'КТО Я', axisColor: 'var(--violet)',
+    title: 'Личностный стиль',
+    desc: '50 вопросов о твоём психотипе: экстраверсия, логика, структура, устойчивость, самостоятельность.',
+    questions: 50, time: 15, required: false,
     weight: 15,
   },
   {
-    num: '03', id: 'values', axis: 'ХОЧУ', axisColor: 'var(--accent)',
-    title: 'Жизненные ценности',
-    desc: '28 ситуационных дилемм. Определяем, что для тебя важнее: развитие, свобода, деньги, статус, смысл или отношения.',
-    questions: 30, time: 15, required: false,
+    num: '03', id: 'abilities', axis: 'МОГУ', axisColor: 'var(--ember)',
+    title: 'Способности',
+    desc: '50 вопросов о твоих сильных сторонах: аналитика, коммуникация, креативность, организация, практика.',
+    questions: 50, time: 15, required: false,
+    weight: 25,
+  },
+  {
+    num: '04', id: 'behavior', axis: 'МОГУ', axisColor: 'var(--ember)',
+    title: 'Поведенческие паттерны',
+    desc: '50 вопросов о том, как ты действуешь: инициатива, дисциплина, стойкость, командность, ответственность.',
+    questions: 50, time: 15, required: false,
+    weight: 15,
+  },
+  {
+    num: '05', id: 'values', axis: 'ХОЧУ', axisColor: 'var(--accent)',
+    title: 'Ценности и мотивация',
+    desc: '50 вопросов о том, что важно: доход, стабильность, свобода, признание, польза, самовыражение, рост.',
+    questions: 50, time: 15, required: false,
     weight: 10,
   },
   {
-    num: '04', id: 'personality', axis: 'КТО Я', axisColor: 'var(--violet)',
-    title: 'Личностные качества',
-    desc: 'Big Five + EPI Айзенка: 35 вопросов. Строим профиль: дружелюбие, добросовестность, открытость, тревожность, самоконтроль.',
-    questions: 35, time: 12, required: false,
-    weight: 10,
-  },
-  {
-    num: '05', id: 'intelligence', axis: 'МОГУ', axisColor: 'var(--ember)',
-    title: 'Тип интеллекта',
-    desc: 'Гарднер + VARK: 28 вопросов + 4 мини-задачи. Языковой, логический, творческий, кинестетический — твой доминирующий тип.',
-    questions: 32, time: 12, required: false,
-    weight: 10,
-  },
-  {
-    num: '06', id: 'readiness', axis: 'МОГУ', axisColor: 'var(--ember)',
-    title: 'Профессиональная готовность',
-    desc: 'Вектор: 20 вопросов самооценки + 2 открытых. Определяем, в каком типе деятельности у тебя реальные навыки прямо сейчас.',
-    questions: 22, time: 10, required: false,
-    weight: 10,
-  },
-  {
-    num: '07', id: 'self_efficacy', axis: 'КТО Я', axisColor: 'var(--violet)',
-    title: 'Самоэффективность',
-    desc: 'Бандура: 25 вопросов + 3 ситуационных кейса. Насколько ты веришь в себя и как принимаешь важные решения.',
-    questions: 28, time: 10, required: false,
-    weight: 10,
-  },
-  {
-    num: '08', id: 'future', axis: 'ХОЧУ', axisColor: 'var(--accent)',
-    title: 'Образ будущего',
-    desc: '10 закрытых + 2 открытых вопроса. Что важнее: стабильность или рост? Команда или самостоятельность? Твой образ себя через 5 лет.',
-    questions: 12, time: 8, required: false,
-    weight: 5,
-  },
-  {
-    num: '09', id: 'social', axis: 'КОНТЕКСТ', axisColor: 'var(--sub)',
-    title: 'Социальный и семейный контекст',
-    desc: '20 закрытых + 2 открытых. Семья, хобби, практический опыт, поддержка — всё, что формирует твои скрытые возможности.',
-    questions: 22, time: 8, required: false,
-    weight: 5,
-  },
-  {
-    num: '10', id: 'letter', axis: 'ХОЧУ', axisColor: 'var(--accent)',
+    num: '06', id: 'letter', axis: 'РЕФЛЕКСИЯ', axisColor: 'var(--sub)',
     title: 'Письмо в будущее',
-    desc: '19 открытых вопросов в 5 блоках. Рефлексивная практика — кто ты сейчас, каким хочешь стать и что для этого нужно.',
-    questions: 19, time: 25, required: false,
-    weight: 15, special: true,
+    desc: '19 открытых вопросов. Рефлексивная практика — кто ты сейчас, каким хочешь стать и что для этого нужно.',
+    questions: 19, time: 40, required: false,
+    weight: 0, special: true,
   },
 ]
 
 const AXIS_INFO = [
-  { key: 'ХОЧУ', color: 'var(--accent)', icon: '💡', desc: 'Интересы, ценности, образ будущего', blocks: [2, 3, 8, 10] },
-  { key: 'МОГУ', color: 'var(--ember)', icon: '⚡', desc: 'Интеллект, навыки, готовность', blocks: [5, 6] },
-  { key: 'КТО Я', color: 'var(--violet)', icon: '🧠', desc: 'Личность, уверенность, стиль решений', blocks: [4, 7] },
-  { key: 'НАДО', color: 'var(--gold)', icon: '🎯', desc: 'Контекст, ЕГЭ, рынок труда', blocks: [1] },
+  { key: 'ХОЧУ',     color: 'var(--accent)', icon: '💡', desc: 'Интересы, склонности, ценности и мотивация',    blocks: [1, 5] },
+  { key: 'МОГУ',     color: 'var(--ember)',  icon: '⚡', desc: 'Способности, поведение, рабочие паттерны',      blocks: [3, 4] },
+  { key: 'КТО Я',   color: 'var(--violet)', icon: '🧠', desc: 'Личностный стиль, психотип, стиль решений',     blocks: [2] },
+  { key: 'РЕФЛЕКСИЯ',color: 'var(--sub)',    icon: '✍️', desc: 'Открытые вопросы, письмо в будущее',           blocks: [6] },
 ]
 
 export default function Dashboard() {
@@ -104,6 +76,18 @@ export default function Dashboard() {
       setText('sb-username', (u.name || 'Пользователь').split(' ')[0] + ' ' + ((u.name || '').split(' ')[1]?.[0] || '') + '.')
       const roleMap = { parent: 'Родитель школьника', student: 'Школьник / Студент', specialist: 'Специалист', entrepreneur: 'Предприниматель', hr: 'HR / Компания' }
       setText('sb-role', roleMap[u.role] || 'Пользователь')
+
+      // Прогресс: пока нет поблочного трекинга — если тест пройден, ставим 100%
+      const pct = u.testDone ? 100 : 0
+      setText('progress-pct', pct + '%')
+      const fill = root.querySelector('#pb-fill')
+      if (fill) fill.style.width = pct + '%'
+      // Подсветить достигнутые milestone-dots
+      if (pct >= 100) {
+        root.querySelectorAll('.pm-dot').forEach(d => {
+          d.style.background = 'var(--accent)'
+        })
+      }
     })
 
     const userBtn = q('sb-user-btn')
@@ -176,14 +160,14 @@ export default function Dashboard() {
 
         <div className="sb-section">Главное</div>
         <a href="/dashboard" className="sb-item active"><span className="icon">📊</span> Дашборд</a>
-        <a href="/test" className="sb-item"><span className="icon">🧠</span> Диагностика</a>
+        <a href="/result" className="sb-item"><span className="icon">🧠</span> Диагностика</a>
         <a href="/dashboard" className="sb-item"><span className="icon">🗺️</span> Карьерный маршрут</a>
-        <a href="/dashboard" className="sb-item"><span className="icon">📚</span> Атлас профессий</a>
+        <a href="/atlas" className="sb-item"><span className="icon">📚</span> Атлас профессий</a>
 
         <div className="sb-section">Работа</div>
         <a href="/dashboard" className="sb-item"><span className="icon">📅</span> Мои встречи <span className="sb-badge">2</span></a>
         <a href="/dashboard" className="sb-item"><span className="icon">🔔</span> Уведомления</a>
-        <a href="/dashboard" className="sb-item"><span className="icon">⚙️</span> Профиль</a>
+        <a href="/profile" className="sb-item"><span className="icon">⚙️</span> Профиль</a>
 
         <div className="sb-user" style={{position:'relative'}}>
           <div className="sb-user-btn" style={{display:'flex',alignItems:'center',gap:'10px',cursor:'pointer',flex:'1',padding:'4px',borderRadius:'8px',transition:'background .2s'}} id="sb-user-btn">
@@ -195,7 +179,7 @@ export default function Dashboard() {
             <div id="sb-chevron" style={{fontSize:'10px',color:'var(--ghost)',transition:'transform .2s'}}>▲</div>
           </div>
           <div className="sb-user-menu" id="sb-user-menu">
-            <a href="/dashboard" className="sum-item"><span>⚙️</span> Настройки профиля</a>
+            <a href="/profile" className="sum-item"><span>⚙️</span> Настройки профиля</a>
             <a href="/legal/privacy" className="sum-item" target="_blank"><span>🔒</span> Конфиденциальность</a>
             <a href="/legal" className="sum-item" target="_blank"><span>📋</span> Правовые документы</a>
             <div className="sum-divider"></div>

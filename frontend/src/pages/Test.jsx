@@ -9,6 +9,7 @@ import { QUESTION_BANK, TOTAL_QUESTIONS, getBlockQuestions } from '../data/quest
 import { calculateScores } from '../utils/scoreCalculator'
 import { analyzeTest } from '../services/testAPI'
 import { getCurrentUser, markTestDone } from '../services/auth'
+import { supabase, isSupabaseConfigured } from '../services/supabase'
 import '../styles/test.css'
 
 const LS_ANSWERS = 'cp_test_answers'
@@ -61,6 +62,30 @@ export default function Test() {
   function goNext() { if (!isLastBlock) { setActiveBlock(BLOCKS[blockIndex + 1].id); scrollTop() } }
   function scrollTop() { window.scrollTo({ top: 0, behavior: 'smooth' }) }
 
+  // DEV-only: быстрое прохождение с заданным профилем
+  const DEV_PROFILES = {
+    programmer: { interests: 1, personality: 0, abilities: 0, behavior: 0, values: 6 }, // anal, intro, AN, IN, DV
+    designer:   { interests: 2, personality: 1, abilities: 2, behavior: 2, values: 5 }, // crea, extro, CR, RS, SR
+    manager:    { interests: 4, personality: 1, abilities: 3, behavior: 0, values: 3 }, // lead, extro, OR, IN, PR
+  }
+
+  function devFill(profileKey) {
+    const profile = DEV_PROFILES[profileKey]
+    const filled = {}
+    for (const q of QUESTION_BANK) {
+      if (q.type === 'open') {
+        filled[q.id] = 'Тестовый ответ для быстрой проверки.'
+      } else {
+        // выбираем нужный вариант для блока, с небольшой рандомизацией
+        const base = profile[q.block] ?? 0
+        const jitter = Math.random() < 0.3 ? (Math.floor(Math.random() * q.options.length)) : base
+        const idx = Math.min(jitter, q.options.length - 1)
+        filled[q.id] = idx
+      }
+    }
+    setAnswers(filled)
+  }
+
   async function finish() {
     setError('')
     if (!allAnswered) {
@@ -75,7 +100,20 @@ export default function Test() {
       setSubmitting(true)
       const result = calculateScores(answersArray)
       const user = await getCurrentUser()
-      const report = await analyzeTest({ scores: result.scores, answers: answersArray, userId: user?.id })
+
+      // Сохраняем ответы в Supabase сразу, не ждём AI
+      if (isSupabaseConfigured && user?.id) {
+        await supabase.from('test_answers').upsert(
+          { user_id: user.id, answers: answersArray, scores: result.scores, saved_at: new Date().toISOString() },
+          { onConflict: 'user_id' }
+        )
+      }
+
+      const letterAnswers = QUESTION_BANK
+        .filter(q => q.block === 'letter' && answers[q.id])
+        .map(q => ({ question: q.text, text: String(answers[q.id]) }))
+
+      const report = await analyzeTest({ scores: result.scores, answers: answersArray, letterAnswers, userId: user?.id })
       await markTestDone()
       localStorage.removeItem(LS_ANSWERS)
       navigate('/result', { state: { result, report } })
@@ -87,8 +125,21 @@ export default function Test() {
 
   return (
     <div className="test-shell">
+      {import.meta.env.DEV && (
+        <div style={{ position: 'fixed', bottom: 16, right: 16, zIndex: 9999, display: 'flex', gap: 8 }}>
+          {Object.keys(DEV_PROFILES).map(p => (
+            <button key={p} onClick={() => devFill(p)}
+              style={{ background: '#7b5cf0', color: '#fff', border: 'none', borderRadius: 8,
+                padding: '6px 12px', fontSize: 12, fontWeight: 700, cursor: 'pointer' }}>
+              ⚡ {p}
+            </button>
+          ))}
+        </div>
+      )}
+
       <div className="test-top">
         <div className="test-top-row">
+          <button className="test-back-btn" onClick={() => navigate('/dashboard')}>← Дашборд</button>
           <div className="test-logo">CAREER<span>PULSE</span></div>
           <TestProgress answered={answeredCount} total={TOTAL_QUESTIONS} />
           <div className="test-count">{answeredCount}/{TOTAL_QUESTIONS}</div>

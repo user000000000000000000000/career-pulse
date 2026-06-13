@@ -1,0 +1,180 @@
+import { useEffect, useRef, useState } from 'react'
+import { useNavigate, Link } from 'react-router-dom'
+import Header from '../components/Layout/Header.jsx'
+import Card from '../components/UI/Card.jsx'
+import Input from '../components/UI/Input.jsx'
+import Button from '../components/UI/Button.jsx'
+import { getCurrentUser } from '../services/auth'
+import { supabase, isSupabaseConfigured } from '../services/supabase'
+import '../styles/legal.css'
+import '../styles/auth.css'
+import '../styles/profile.css'
+
+const ROLES = [
+  { value: 'student',       label: '🎓 Школьник / Студент' },
+  { value: 'parent',        label: '👪 Родитель школьника' },
+  { value: 'specialist',    label: '💼 Специалист / Взрослый' },
+  { value: 'entrepreneur',  label: '🚀 Предприниматель' },
+  { value: 'hr',            label: '🏢 HR / Компания' },
+]
+
+export default function Profile() {
+  const navigate = useNavigate()
+  const fileRef = useRef(null)
+
+  const [user, setUser]       = useState(null)
+  const [form, setForm]       = useState({ full_name: '', email: '', phone: '', role: 'specialist' })
+  const [avatar, setAvatar]   = useState(null)
+  const [preview, setPreview] = useState(null)
+  const [saving, setSaving]   = useState(false)
+  const [uploading, setUploading] = useState(false)
+  const [msg, setMsg]         = useState('')
+  const [error, setError]     = useState('')
+
+  useEffect(() => {
+    getCurrentUser().then(u => {
+      if (!u) { navigate('/login'); return }
+      setUser(u)
+      setForm({ full_name: u.name || '', email: u.email || '', phone: u.phone || '', role: u.role || 'specialist' })
+      if (u.avatar_url) setPreview(u.avatar_url)
+    })
+  }, [navigate])
+
+  const upd = (k) => (e) => setForm(f => ({ ...f, [k]: e.target.value }))
+
+  function onFileChange(e) {
+    const file = e.target.files?.[0]
+    if (!file) return
+    if (file.size > 5 * 1024 * 1024) { setError('Файл не должен превышать 5 МБ'); return }
+    setAvatar(file)
+    setPreview(URL.createObjectURL(file))
+  }
+
+  async function uploadAvatar(userId) {
+    if (!avatar || !isSupabaseConfigured) return null
+    setUploading(true)
+    const ext  = avatar.name.split('.').pop()
+    const path = `${userId}/avatar.${ext}`
+    const { error: upErr } = await supabase.storage.from('avatars').upload(path, avatar, { upsert: true })
+    setUploading(false)
+    if (upErr) { setError('Ошибка загрузки фото: ' + upErr.message); return null }
+    const { data } = supabase.storage.from('avatars').getPublicUrl(path)
+    return data.publicUrl
+  }
+
+  async function onSave() {
+    setError(''); setMsg('')
+    if (!form.full_name.trim()) { setError('Введите имя'); return }
+
+    setSaving(true)
+    try {
+      let avatar_url = preview
+
+      if (avatar) {
+        const url = await uploadAvatar(user.id)
+        if (url) avatar_url = url
+      }
+
+      if (isSupabaseConfigured) {
+        const { error: uErr } = await supabase
+          .from('profiles')
+          .update({ full_name: form.full_name, phone: form.phone, role: form.role, avatar_url })
+          .eq('id', user.id)
+        if (uErr) throw new Error(uErr.message)
+      } else {
+        // демо-режим: сохраняем в localStorage
+        const stored = JSON.parse(localStorage.getItem('cp_user') || '{}')
+        localStorage.setItem('cp_user', JSON.stringify({ ...stored, name: form.full_name, phone: form.phone, role: form.role, avatar_url }))
+      }
+
+      setMsg('Профиль сохранён ✓')
+      setTimeout(() => setMsg(''), 3000)
+    } catch (err) {
+      setError(err.message || 'Не удалось сохранить')
+    } finally {
+      setSaving(false)
+    }
+  }
+
+  const initials = form.full_name
+    ? form.full_name.split(' ').map(w => w[0]).slice(0, 2).join('').toUpperCase()
+    : '??'
+
+  return (
+    <div className="cp-legal">
+      <Header backTo="/dashboard" backLabel="← В кабинет" />
+      <div className="auth-wrap" style={{ paddingTop: 40 }}>
+        <Card accent className="profile-card">
+          <div className="auth-eyebrow">Личный кабинет</div>
+          <h1 className="auth-title" style={{ fontSize: 'clamp(28px,5vw,42px)', marginBottom: 28 }}>МОЙ ПРОФИЛЬ</h1>
+
+          {/* ── Аватар ── */}
+          <div className="profile-avatar-wrap">
+            <div
+              className="profile-avatar"
+              onClick={() => fileRef.current?.click()}
+              title="Нажмите, чтобы сменить фото"
+            >
+              {preview
+                ? <img src={preview} alt="avatar" />
+                : <span>{initials}</span>
+              }
+              <div className="profile-avatar-overlay">
+                {uploading ? '⏳' : '📷'}
+              </div>
+            </div>
+            <input ref={fileRef} type="file" accept="image/jpeg,image/png,image/webp" style={{ display: 'none' }} onChange={onFileChange} />
+            <div className="profile-avatar-hint">JPG / PNG / WEBP · до 5 МБ</div>
+          </div>
+
+          {error && <div className="auth-error">{error}</div>}
+          {msg   && <div className="auth-success">{msg}</div>}
+
+          {/* ── Роль ── */}
+          <div style={{ marginBottom: 20 }}>
+            <div style={{ fontSize: 12, fontWeight: 700, color: 'var(--sub)', marginBottom: 10 }}>Кто вы?</div>
+            <div className="auth-roles">
+              {ROLES.map(r => (
+                <div
+                  key={r.value}
+                  className={['auth-role', form.role === r.value && 'auth-role--active'].filter(Boolean).join(' ')}
+                  onClick={() => setForm(f => ({ ...f, role: r.value }))}
+                >
+                  {r.label}
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* ── Поля ── */}
+          <Input
+            id="p-name" label="Полное имя (ФИО)"
+            placeholder="Иван Иванович Иванов"
+            value={form.full_name} onChange={upd('full_name')}
+          />
+          <Input
+            id="p-email" label="Email" type="email"
+            placeholder="ivan@email.com"
+            value={form.email}
+            onChange={upd('email')}
+            disabled
+            hint="Email изменить нельзя"
+          />
+          <Input
+            id="p-phone" label="Телефон" type="tel"
+            placeholder="+7 (___) ___-__-__"
+            value={form.phone} onChange={upd('phone')}
+          />
+
+          <Button block onClick={onSave} disabled={saving || uploading} style={{ marginTop: 8 }}>
+            {saving ? 'Сохраняем…' : 'Сохранить профиль'}
+          </Button>
+
+          <div className="auth-foot" style={{ marginTop: 20 }}>
+            <Link to="/dashboard">← Вернуться в кабинет</Link>
+          </div>
+        </Card>
+      </div>
+    </div>
+  )
+}

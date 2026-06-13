@@ -114,6 +114,27 @@ drop policy if exists "professions_read_all" on public.professions;
 create policy "professions_read_all" on public.professions
   for select using (true);
 
+-- ════════════════════════════════════════════════════════════════
+--  TEST_ANSWERS — сырые ответы пользователя на вопросы теста
+--  Одна запись на пользователя (upsert при повторном прохождении).
+-- ════════════════════════════════════════════════════════════════
+create table if not exists public.test_answers (
+  user_id    uuid primary key references auth.users(id) on delete cascade,
+  answers    jsonb not null default '[]'::jsonb,
+  scores     jsonb not null default '{}'::jsonb,
+  saved_at   timestamptz not null default now()
+);
+
+alter table public.test_answers enable row level security;
+
+drop policy if exists "answers_all_own" on public.test_answers;
+create policy "answers_all_own" on public.test_answers
+  for all using (auth.uid() = user_id) with check (auth.uid() = user_id);
+
+-- ════════════════════════════════════════════════════════════════
+--  PROFESSIONS — справочник профессий
+-- ════════════════════════════════════════════════════════════════
+
 insert into public.professions (name, category) values
   ('Product Director', 'Управление'),
   ('EdTech Founder', 'Предпринимательство'),

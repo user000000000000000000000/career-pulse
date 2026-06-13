@@ -87,7 +87,7 @@ export async function getCurrentUser() {
 
   const { data: profile } = await supabase
     .from('profiles')
-    .select('full_name, role, has_passed_test, email')
+    .select('full_name, role, has_passed_test, email, phone, avatar_url')
     .eq('id', user.id)
     .maybeSingle()
 
@@ -96,6 +96,8 @@ export async function getCurrentUser() {
     name: profile?.full_name || user.user_metadata?.full_name || 'Пользователь',
     email: profile?.email || user.email,
     role: profile?.role || user.user_metadata?.role || 'specialist',
+    phone: profile?.phone || '',
+    avatar_url: profile?.avatar_url || '',
     testDone: Boolean(profile?.has_passed_test)
   }
 }

@@ -3,7 +3,7 @@ import '../../styles/ui.css'
 
 /** Поле ввода с подписью и ошибкой. */
 const Input = forwardRef(function Input(
-  { label, error, className = '', id, ...rest }, ref
+  { label, error, hint, className = '', id, ...rest }, ref
 ) {
   return (
     <div className="cp-field">
@@ -15,6 +15,7 @@ const Input = forwardRef(function Input(
         {...rest}
       />
       {error && <span className="cp-field__error">{error}</span>}
+      {hint  && <span className="input-hint">{hint}</span>}
     </div>
   )
 })
