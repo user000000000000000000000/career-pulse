@@ -1,63 +1,67 @@
-import { useEffect, useRef } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { getCurrentUser, logout as doLogout } from '../services/auth'
+import CP from '../services/cpStorage'
+import { DEV_PROFILES, applyDevProfile } from '../data/devProfiles'
 import '../styles/dashboard.css'
 
 const BLOCKS = [
-  {
-    num: '01', id: 'interests', axis: 'ХОЧУ', axisColor: 'var(--accent)',
-    title: 'Интересы и склонности',
-    desc: '50 вопросов о том, что тебя притягивает: техника, анализ, творчество, общение, лидерство или структура.',
-    questions: 50, time: 17, required: true,
-    weight: 35,
-  },
-  {
-    num: '02', id: 'personality', axis: 'КТО Я', axisColor: 'var(--violet)',
-    title: 'Личностный стиль',
-    desc: '50 вопросов о твоём психотипе: экстраверсия, логика, структура, устойчивость, самостоятельность.',
-    questions: 50, time: 15, required: false,
-    weight: 15,
-  },
-  {
-    num: '03', id: 'abilities', axis: 'МОГУ', axisColor: 'var(--ember)',
-    title: 'Способности',
-    desc: '50 вопросов о твоих сильных сторонах: аналитика, коммуникация, креативность, организация, практика.',
-    questions: 50, time: 15, required: false,
-    weight: 25,
-  },
-  {
-    num: '04', id: 'behavior', axis: 'МОГУ', axisColor: 'var(--ember)',
-    title: 'Поведенческие паттерны',
-    desc: '50 вопросов о том, как ты действуешь: инициатива, дисциплина, стойкость, командность, ответственность.',
-    questions: 50, time: 15, required: false,
-    weight: 15,
-  },
-  {
-    num: '05', id: 'values', axis: 'ХОЧУ', axisColor: 'var(--accent)',
-    title: 'Ценности и мотивация',
-    desc: '50 вопросов о том, что важно: доход, стабильность, свобода, признание, польза, самовыражение, рост.',
-    questions: 50, time: 15, required: false,
-    weight: 10,
-  },
-  {
-    num: '06', id: 'letter', axis: 'РЕФЛЕКСИЯ', axisColor: 'var(--sub)',
-    title: 'Письмо в будущее',
-    desc: '19 открытых вопросов. Рефлексивная практика — кто ты сейчас, каким хочешь стать и что для этого нужно.',
-    questions: 19, time: 40, required: false,
-    weight: 0, special: true,
-  },
+  { num: '01', n: 1, axis: 'НАДО', axisColor: 'var(--sub)', title: 'Анкета-контекст',
+    desc: 'Класс, ЕГЭ, планы, тревоги. Настраивает все остальные блоки под тебя. Проходится первой.',
+    questions: 20, time: 7, required: true, weight: 8 },
+  { num: '02', n: 2, axis: 'ХОЧУ', axisColor: 'var(--accent)', title: 'Склонности в деятельности',
+    desc: 'Holland RIASEC: попарный выбор занятий с силой предпочтения. Даёт карьерный архетип.',
+    questions: 30, time: 10, weight: 15 },
+  { num: '03', n: 3, axis: 'ХОЧУ', axisColor: 'var(--accent)', title: 'Жизненные ценности',
+    desc: 'Ситуационные дилеммы. Топ-3 ценности, мотивационный профиль и согласованность.',
+    questions: 28, time: 10, weight: 10 },
+  { num: '04', n: 4, axis: 'КТО Я', axisColor: 'var(--violet)', title: 'Личностные качества',
+    desc: 'Big Five + стрессоустойчивость и толерантность к неопределённости. С контролем искренности.',
+    questions: 44, time: 12, weight: 12 },
+  { num: '05', n: 5, axis: 'МОГУ', axisColor: 'var(--ember)', title: 'Когнитивный профиль',
+    desc: 'Самооценка мышления + практические задачи + стиль обучения VARK.',
+    questions: 40, time: 12, weight: 10 },
+  { num: '06', n: 6, axis: 'МОГУ', axisColor: 'var(--ember)', title: 'Профессиональная готовность',
+    desc: 'Что реально получается: самооценка + реальный опыт по 5 типам деятельности.',
+    questions: 32, time: 12, weight: 13 },
+  { num: '07', n: 7, axis: 'КТО Я', axisColor: 'var(--violet)', title: 'Самоэффективность',
+    desc: 'Уверенность в силах + стиль принятия решений (Бандура). Матрица Хочу–Могу–Верю.',
+    questions: 39, time: 10, weight: 10 },
+  { num: '08', n: 8, axis: 'ХОЧУ', axisColor: 'var(--accent)', title: 'Образ будущего',
+    desc: 'Какой ты видишь работу и жизнь. Параметры-фильтры + смысловой вектор.',
+    questions: 16, time: 8, weight: 7 },
+  { num: '09', n: 9, axis: 'КОНТЕКСТ', axisColor: 'var(--sub)', title: 'Социальный контекст',
+    desc: 'Семья, окружение, опыт и поддержка. Полная картина для наставника.',
+    questions: 25, time: 8, weight: 8 },
+  { num: '10', n: 10, axis: 'КОНТЕКСТ', axisColor: 'var(--gold)', title: 'Письмо в будущее',
+    desc: '19 открытых вопросов. Рефлексивная практика — самый ценный источник данных для эксперта.',
+    questions: 19, time: 25, weight: 7, special: true },
 ]
 
 const AXIS_INFO = [
-  { key: 'ХОЧУ',     color: 'var(--accent)', icon: '💡', desc: 'Интересы, склонности, ценности и мотивация',    blocks: [1, 5] },
-  { key: 'МОГУ',     color: 'var(--ember)',  icon: '⚡', desc: 'Способности, поведение, рабочие паттерны',      blocks: [3, 4] },
-  { key: 'КТО Я',   color: 'var(--violet)', icon: '🧠', desc: 'Личностный стиль, психотип, стиль решений',     blocks: [2] },
-  { key: 'РЕФЛЕКСИЯ',color: 'var(--sub)',    icon: '✍️', desc: 'Открытые вопросы, письмо в будущее',           blocks: [6] },
+  { key: 'ХОЧУ',     color: 'var(--accent)', icon: '💡', desc: 'Склонности, ценности, образ будущего',          blocks: [2, 3, 8] },
+  { key: 'МОГУ',     color: 'var(--ember)',  icon: '⚡', desc: 'Когнитивный профиль, проф. готовность',          blocks: [5, 6] },
+  { key: 'ВОЗМОЖНОСТИ',   color: 'var(--violet)', icon: '🧠', desc: 'Личность, самоэффективность, стиль решений',     blocks: [4, 7] },
+  { key: 'КТО Я', color: 'var(--sub)',    icon: '🌐', desc: 'Анкета, соц. контекст, письмо в будущее',        blocks: [1, 9, 10] },
 ]
 
 export default function Dashboard() {
   const rootRef = useRef(null)
   const navigate = useNavigate()
+  const [completed, setCompleted] = useState([])
+
+  useEffect(() => {
+    let progAlive = true
+    CP.getProgress().then((p) => {
+      if (!progAlive) return
+      setCompleted(p.completed || [])
+      const root = rootRef.current
+      if (!root) return
+      const el = root.querySelector('#progress-pct'); if (el) el.textContent = (p.pct || 0) + '%'
+      const fill = root.querySelector('#pb-fill'); if (fill) fill.style.width = (p.pct || 0) + '%'
+    })
+    return () => { progAlive = false }
+  }, [])
 
   useEffect(() => {
     const root = rootRef.current
@@ -77,17 +81,6 @@ export default function Dashboard() {
       const roleMap = { parent: 'Родитель школьника', student: 'Школьник / Студент', specialist: 'Специалист', entrepreneur: 'Предприниматель', hr: 'HR / Компания' }
       setText('sb-role', roleMap[u.role] || 'Пользователь')
 
-      // Прогресс: пока нет поблочного трекинга — если тест пройден, ставим 100%
-      const pct = u.testDone ? 100 : 0
-      setText('progress-pct', pct + '%')
-      const fill = root.querySelector('#pb-fill')
-      if (fill) fill.style.width = pct + '%'
-      // Подсветить достигнутые milestone-dots
-      if (pct >= 100) {
-        root.querySelectorAll('.pm-dot').forEach(d => {
-          d.style.background = 'var(--accent)'
-        })
-      }
     })
 
     const userBtn = q('sb-user-btn')
@@ -127,7 +120,7 @@ export default function Dashboard() {
         if (btn.classList.contains('mobile-menu-btn')) { sidebar && sidebar.classList.toggle('open'); return }
         if (btn.classList.contains('topbar-btn') || btn.classList.contains('btn-tour')) { openTour(); return }
         if (btn.classList.contains('modal-close')) { closeTour(); return }
-        if (tour && tour.contains(btn) && btn.classList.contains('btn-start-test')) { closeTour(); navigate('/test'); return }
+        if (tour && tour.contains(btn) && btn.classList.contains('btn-start-test')) { closeTour(); navigate('/test/1'); return }
       }
       if (e.target.closest('#cookie-settings')) {
         e.preventDefault()
@@ -160,8 +153,8 @@ export default function Dashboard() {
 
         <div className="sb-section">Главное</div>
         <a href="/dashboard" className="sb-item active"><span className="icon">📊</span> Дашборд</a>
-        <a href="/result" className="sb-item"><span className="icon">🧠</span> Диагностика</a>
-        <a href="/dashboard" className="sb-item"><span className="icon">🗺️</span> Карьерный маршрут</a>
+        <a href="/diagnostic" className="sb-item"><span className="icon">🧠</span> Результаты диагностики</a>
+        <a href="/roadmap" className="sb-item"><span className="icon">🗺️</span> Карьерный маршрут</a>
         <a href="/atlas" className="sb-item"><span className="icon">📚</span> Атлас профессий</a>
 
         <div className="sb-section">Работа</div>
@@ -213,7 +206,7 @@ export default function Dashboard() {
               <p>Твоя профориентационная диагностика — <strong>10 блоков</strong>, {totalQ} вопросов, ~{totalTime} минут. Можно проходить частями. Каждый блок сразу добавляет слой в твой профиль.</p>
             </div>
             <div className="wb-actions">
-              <a href="/test" className="btn btn-accent">🧠 Начать диагностику</a>
+              <a href="/test/1" className="btn btn-accent">🧠 Начать диагностику</a>
               <button className="btn btn-outline btn-tour">🗺️ Как это работает</button>
             </div>
           </div>
@@ -253,26 +246,30 @@ export default function Dashboard() {
               <div className="section-sub">{totalQ} вопросов · ~{totalTime} минут · можно проходить частями</div>
             </div>
             <div className="blocks-grid">
-              {BLOCKS.map((blk, i) => (
-                <div key={blk.id} className={['block-card', blk.special && 'block-card--special', i === 0 && 'block-card--available'].filter(Boolean).join(' ')}>
-                  <div className="bc-top">
-                    <div className="bc-num">{blk.num}</div>
-                    <div className="bc-axis" style={{color: blk.axisColor, borderColor: blk.axisColor + '44', background: blk.axisColor + '11'}}>{blk.axis}</div>
-                    {blk.required && <div className="bc-badge bc-badge--req">Первым</div>}
-                    {blk.special && <div className="bc-badge bc-badge--special">★ Ключевой</div>}
+              {BLOCKS.map((blk) => {
+                const done = completed.includes(blk.n)
+                return (
+                  <div key={blk.n} className={['block-card', blk.special && 'block-card--special', done && 'block-card--available'].filter(Boolean).join(' ')}>
+                    <div className="bc-top">
+                      <div className="bc-num">{blk.num}</div>
+                      <div className="bc-axis" style={{color: blk.axisColor, borderColor: blk.axisColor + '44', background: blk.axisColor + '11'}}>{blk.axis}</div>
+                      {done && <div className="bc-badge bc-badge--special" style={{color:'var(--ok)',borderColor:'rgba(34,217,122,.3)',background:'rgba(34,217,122,.08)'}}>✓ Пройден</div>}
+                      {!done && blk.required && <div className="bc-badge bc-badge--req">Первым</div>}
+                      {!done && blk.special && <div className="bc-badge bc-badge--special">★ Ключевой</div>}
+                    </div>
+                    <div className="bc-title">{blk.title}</div>
+                    <div className="bc-desc">{blk.desc}</div>
+                    <div className="bc-meta">
+                      <span>📝 {blk.questions} вопросов</span>
+                      <span>⏱ ~{blk.time} мин</span>
+                      <span style={{marginLeft:'auto',color:'var(--ghost)'}}>+{blk.weight}% профиля</span>
+                    </div>
+                    <a href={'/test/' + blk.n} className="btn btn-outline bc-btn">
+                      {done ? 'Пройти заново ↻' : 'Начать →'}
+                    </a>
                   </div>
-                  <div className="bc-title">{blk.title}</div>
-                  <div className="bc-desc">{blk.desc}</div>
-                  <div className="bc-meta">
-                    <span>📝 {blk.questions} вопросов</span>
-                    <span>⏱ ~{blk.time} мин</span>
-                    <span style={{marginLeft:'auto',color:'var(--ghost)'}}>+{blk.weight}% профиля</span>
-                  </div>
-                  <a href="/test" className="btn btn-outline bc-btn">
-                    {i === 0 ? 'Начать →' : 'Перейти →'}
-                  </a>
-                </div>
-              ))}
+                )
+              })}
             </div>
           </div>
 
@@ -371,6 +368,30 @@ export default function Dashboard() {
           </div>
         </footer>
       </div>
+
+      {/* ── DEV: быстрое заполнение тестов ── */}
+      {import.meta.env.DEV && (
+        <div style={{ position: 'fixed', bottom: 16, right: 16, zIndex: 9999, display: 'flex', flexDirection: 'column', gap: 8, background: 'rgba(12,12,24,0.94)', border: '1px solid var(--violet)', borderRadius: 12, padding: 12, boxShadow: '0 8px 32px rgba(0,0,0,0.5)' }}>
+          <div style={{ fontSize: 10, fontWeight: 700, letterSpacing: 1, color: 'var(--violet)', textTransform: 'uppercase', fontFamily: "'JetBrains Mono',monospace" }}>DEV · быстрый прогон</div>
+          {Object.entries(DEV_PROFILES).map(([key, p]) => (
+            <button key={key}
+              onClick={async () => { await applyDevProfile(key); navigate('/diagnostic') }}
+              style={{ background: 'var(--violet)', color: '#fff', border: 'none', borderRadius: 8, padding: '8px 14px', fontSize: 12, fontWeight: 700, cursor: 'pointer', fontFamily: "'Manrope',sans-serif", textAlign: 'left' }}>
+              ⚡ {p.label}
+            </button>
+          ))}
+          <button onClick={() => {
+            for (let i = localStorage.length - 1; i >= 0; i--) {
+              const k = localStorage.key(i)
+              if (k && k.startsWith('cp_') && k !== 'cp_user' && k !== 'cp_tour_seen') localStorage.removeItem(k)
+            }
+            window.location.reload()
+          }}
+            style={{ background: 'transparent', color: 'var(--sub)', border: '1px solid var(--line2)', borderRadius: 8, padding: '6px 14px', fontSize: 11, fontWeight: 700, cursor: 'pointer', fontFamily: "'Manrope',sans-serif" }}>
+            🗑 Сбросить диагностику
+          </button>
+        </div>
+      )}
 
       {/* ── ТУР-МОДАЛ ── */}
       <div className="modal-overlay" id="tour-modal">

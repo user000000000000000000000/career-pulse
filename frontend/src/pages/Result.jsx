@@ -57,7 +57,7 @@ export default function Result() {
     <div className="res-page">
       <div className="res-empty">
         <p style={{ marginBottom: 18 }}>Результатов пока нет — сначала пройдите диагностику.</p>
-        <Button as={Link} to="/test">Пройти тест →</Button>
+        <Button as={Link} to="/test/1">Пройти тест →</Button>
       </div>
     </div>
   )
@@ -129,7 +129,7 @@ export default function Result() {
 
       <div className="res-actions">
         <Button as={Link} to="/dashboard">← Вернуться в кабинет</Button>
-        <Button variant="ghost" onClick={() => navigate('/test')}>Пройти заново</Button>
+        <Button variant="ghost" onClick={() => navigate('/test/1')}>Пройти заново</Button>
       </div>
     </div>
   )

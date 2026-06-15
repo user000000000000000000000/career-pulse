@@ -5,6 +5,7 @@ import Card from '../components/UI/Card.jsx'
 import Input from '../components/UI/Input.jsx'
 import Button from '../components/UI/Button.jsx'
 import { register as doRegister } from '../services/auth'
+import { isSupabaseConfigured } from '../services/supabase'
 import '../styles/legal.css'
 import '../styles/auth.css'
 
@@ -35,11 +36,12 @@ export default function Register() {
     try {
       setBusy(true)
       const { user } = await doRegister(form)
-      // Supabase требует подтверждения email — у сессии не будет токена сразу
-      if (user && !user.confirmed_at && !user.email_confirmed_at) {
+      // Supabase требует подтверждения email — у сессии не будет токена сразу.
+      // В демо-режиме (без Supabase) подтверждать нечего — сразу на лендинг.
+      if (isSupabaseConfigured && user && !user.confirmed_at && !user.email_confirmed_at) {
         setConfirmed(true)
       } else {
-        navigate('/dashboard')
+        navigate('/')
       }
     } catch (err) {
       setError(err.message || 'Не удалось зарегистрироваться')
