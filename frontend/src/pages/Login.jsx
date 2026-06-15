@@ -22,7 +22,7 @@ export default function Login() {
     try {
       setBusy(true)
       await doLogin({ email, password })
-      navigate('/dashboard')
+      navigate('/')
     } catch (err) {
       setError(err.message || 'Не удалось войти')
       setBusy(false)

@@ -5,6 +5,9 @@ import Register from './pages/Register.jsx'
 import Login from './pages/Login.jsx'
 import Dashboard from './pages/Dashboard.jsx'
 import Test from './pages/Test.jsx'
+import DiagnosticBlock from './pages/Diagnostic/DiagnosticBlock.jsx'
+import DiagResults from './pages/Diagnostic/DiagResults.jsx'
+import Roadmap from './pages/Diagnostic/Roadmap.jsx'
 import Result from './pages/Result.jsx'
 import Profile from './pages/Profile.jsx'
 import Atlas from './pages/Atlas.jsx'
@@ -26,7 +29,10 @@ export default function App() {
       <Route path="/login" element={<Login />} />
 
       <Route path="/dashboard" element={<RequireAuth><Dashboard /></RequireAuth>} />
-      <Route path="/test"      element={<RequireAuth><Test /></RequireAuth>} />
+      <Route path="/test"        element={<RequireAuth><Test /></RequireAuth>} />
+      <Route path="/test/:n"     element={<RequireAuth><DiagnosticBlock /></RequireAuth>} />
+      <Route path="/diagnostic"  element={<RequireAuth><DiagResults /></RequireAuth>} />
+      <Route path="/roadmap"     element={<RequireAuth><Roadmap /></RequireAuth>} />
       <Route path="/result"    element={<RequireAuth><Result /></RequireAuth>} />
       <Route path="/profile"   element={<RequireAuth><Profile /></RequireAuth>} />
       <Route path="/atlas"     element={<RequireAuth><Atlas /></RequireAuth>} />

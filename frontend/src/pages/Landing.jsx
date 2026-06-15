@@ -1,11 +1,33 @@
-import { useEffect, useRef } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { register as doRegister } from '../services/auth'
+import { register as doRegister, getCurrentUser, logout as doLogout } from '../services/auth'
 import '../styles/landing.css'
+
+function shortName(name = '') {
+  const parts = name.trim().split(/\s+/)
+  if (!parts[0]) return 'Профиль'
+  return parts[1] ? `${parts[0]} ${parts[1][0].toUpperCase()}.` : parts[0]
+}
+function initials(name = '') {
+  const p = name.trim().split(/\s+/)
+  return ((p[0]?.[0] || '') + (p[1]?.[0] || p[0]?.[1] || '')).toUpperCase() || 'И'
+}
 
 export default function Landing() {
   const rootRef = useRef(null)
   const navigate = useNavigate()
+  const [user, setUser] = useState(null)
+
+  useEffect(() => {
+    let alive = true
+    getCurrentUser().then((u) => { if (alive) setUser(u) })
+    return () => { alive = false }
+  }, [])
+
+  async function onLogout() {
+    await doLogout()
+    setUser(null)
+  }
 
   useEffect(() => {
     const root = rootRef.current
@@ -115,7 +137,8 @@ export default function Landing() {
         
         const fc = q('form-content'); if (fc) fc.style.display = 'none'
         const sm = q('success-msg'); if (sm) sm.style.display = 'block'
-        setTimeout(() => navigate('/dashboard'), 1600)
+        // Остаёмся на лендинге, но уже авторизованными — перезагрузка покажет новую шапку
+        setTimeout(() => window.location.reload(), 1600)
       } catch (err) {
         btn.disabled = false
         btn.textContent = 'Начать диагностику →'
@@ -146,8 +169,21 @@ export default function Landing() {
     <li><a href="#register">Записаться</a></li>
   </ul>
   <div className="nav-right">
-    <a href="#register" className="btn-ghost">Зарегистрироваться</a>
-    <a href="/dashboard" className="btn-nav" style={{marginRight:'6px',background:'transparent',color:'var(--text)',border:'1px solid rgba(255,255,255,0.15)'}}>Войти</a><a href="#register" className="btn-nav">Начать бесплатно</a>
+    {user ? (
+      <>
+        <a href="/profile" className="nav-user" style={{display:'flex',alignItems:'center',gap:'8px',textDecoration:'none',color:'var(--text)',fontWeight:'700',fontSize:'13px',marginRight:'4px'}}>
+          <span style={{width:'30px',height:'30px',borderRadius:'50%',background:'linear-gradient(135deg,var(--accent2),var(--accent))',display:'flex',alignItems:'center',justifyContent:'center',fontSize:'12px',fontWeight:'800',color:'#08080f'}}>{initials(user.name)}</span>
+          {shortName(user.name)}
+        </a>
+        <a href="/dashboard" className="btn-nav">Пройти диагностику</a>
+        <button className="btn-ghost" style={{background:'transparent',cursor:'pointer',fontFamily:'inherit'}} onClick={onLogout}>Выйти</button>
+      </>
+    ) : (
+      <>
+        <a href="#register" className="btn-ghost">Зарегистрироваться</a>
+        <a href="/login" className="btn-nav" style={{marginRight:'6px',background:'transparent',color:'var(--text)',border:'1px solid rgba(255,255,255,0.15)'}}>Войти</a><a href="#register" className="btn-nav">Начать бесплатно</a>
+      </>
+    )}
   </div>
 </nav>
 
