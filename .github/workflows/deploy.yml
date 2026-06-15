@@ -36,7 +36,7 @@ jobs:
         env:
           VITE_SUPABASE_URL: https://gsxpapwpchbtyoxipuwf.supabase.co
           VITE_SUPABASE_ANON_KEY: sb_publishable_Hq7o_GFrYm3lP8xioyeQAw_EMdjXr4P
-          VITE_VK_APP_ID: "54638178"
+          VITE_VK_APP_ID: "54638224"
 
       - name: Add .nojekyll
         run: touch frontend/dist/.nojekyll
