@@ -15,7 +15,7 @@ const BLOCKS = [
   { num: '03', n: 3, axis: 'ХОЧУ', axisColor: 'var(--accent)', title: 'Жизненные ценности',
     desc: 'Ситуационные дилеммы. Топ-3 ценности, мотивационный профиль и согласованность.',
     questions: 28, time: 10, weight: 10 },
-  { num: '04', n: 4, axis: 'КТО Я', axisColor: 'var(--violet)', title: 'Личностные качества',
+  { num: '04', n: 4, axis: 'ВОЗМОЖНОСТИ', axisColor: 'var(--violet)', title: 'Личностные качества',
     desc: 'Big Five + стрессоустойчивость и толерантность к неопределённости. С контролем искренности.',
     questions: 44, time: 12, weight: 12 },
   { num: '05', n: 5, axis: 'МОГУ', axisColor: 'var(--ember)', title: 'Когнитивный профиль',
@@ -24,16 +24,16 @@ const BLOCKS = [
   { num: '06', n: 6, axis: 'МОГУ', axisColor: 'var(--ember)', title: 'Профессиональная готовность',
     desc: 'Что реально получается: самооценка + реальный опыт по 5 типам деятельности.',
     questions: 32, time: 12, weight: 13 },
-  { num: '07', n: 7, axis: 'КТО Я', axisColor: 'var(--violet)', title: 'Самоэффективность',
+  { num: '07', n: 7, axis: 'ВОЗМОЖНОСТИ', axisColor: 'var(--violet)', title: 'Самоэффективность',
     desc: 'Уверенность в силах + стиль принятия решений (Бандура). Матрица Хочу–Могу–Верю.',
     questions: 39, time: 10, weight: 10 },
   { num: '08', n: 8, axis: 'ХОЧУ', axisColor: 'var(--accent)', title: 'Образ будущего',
     desc: 'Какой ты видишь работу и жизнь. Параметры-фильтры + смысловой вектор.',
     questions: 16, time: 8, weight: 7 },
-  { num: '09', n: 9, axis: 'КОНТЕКСТ', axisColor: 'var(--sub)', title: 'Социальный контекст',
+  { num: '09', n: 9, axis: 'КТО Я', axisColor: 'var(--sub)', title: 'Социальный контекст',
     desc: 'Семья, окружение, опыт и поддержка. Полная картина для наставника.',
     questions: 25, time: 8, weight: 8 },
-  { num: '10', n: 10, axis: 'КОНТЕКСТ', axisColor: 'var(--gold)', title: 'Письмо в будущее',
+  { num: '10', n: 10, axis: 'КТО Я', axisColor: 'var(--gold)', title: 'Письмо в будущее',
     desc: '19 открытых вопросов. Рефлексивная практика — самый ценный источник данных для эксперта.',
     questions: 19, time: 25, weight: 7, special: true },
 ]
@@ -73,14 +73,27 @@ export default function Dashboard() {
     let alive = true
     getCurrentUser().then((u) => {
       if (!alive || !u) return
-      const parts = (u.name || 'ИИ').split(' ')
-      const initials = ((parts[0]?.[0] || '') + (parts[1]?.[0] || parts[0]?.[1] || '')).toUpperCase()
-      setText('welcome-name', u.name ? u.name.split(' ')[0] : 'Пользователь')
-      setText('sb-av-el', initials)
-      setText('sb-username', (u.name || 'Пользователь').split(' ')[0] + ' ' + ((u.name || '').split(' ')[1]?.[0] || '') + '.')
+      // ФИО хранится как «Фамилия Имя [Отчество]» → имя = 2-е слово
+      const parts = (u.name || '').trim().split(/\s+/).filter(Boolean)
+      const family = parts[0] || ''
+      const given = parts[1] || parts[0] || 'Пользователь'
+      const initials = ((given[0] || '') + (family && family !== given ? family[0] : '')).toUpperCase() || 'ИИ'
+      setText('welcome-name', given)
+      setText('sb-username', given + (family && family !== given ? ' ' + family[0] + '.' : ''))
       const roleMap = { parent: 'Родитель школьника', student: 'Школьник / Студент', specialist: 'Специалист', entrepreneur: 'Предприниматель', hr: 'HR / Компания' }
       setText('sb-role', roleMap[u.role] || 'Пользователь')
-
+      // Аватар: показываем фото, если загружено, иначе инициалы
+      const avEl = q('sb-av-el')
+      if (avEl) {
+        if (u.avatar_url) {
+          avEl.textContent = ''
+          avEl.style.backgroundImage = `url(${u.avatar_url})`
+          avEl.style.backgroundSize = 'cover'
+          avEl.style.backgroundPosition = 'center'
+        } else {
+          avEl.textContent = initials
+        }
+      }
     })
 
     const userBtn = q('sb-user-btn')
@@ -402,42 +415,42 @@ export default function Dashboard() {
           </div>
           <div className="modal-body">
             <p style={{fontSize:'14px',color:'var(--sub)',marginBottom:'20px',lineHeight:'1.7'}}>
-              CareerPulse — это не один тест, а система из 10 блоков. Каждый пройденный блок сразу добавляет слой в твой профиль. После 3–4 блоков уже видны первые рекомендации.
+              Это не один тест, а 10 коротких блоков. Каждый блок делает твой портрет точнее. Уже после нескольких блоков появятся первые советы по профессиям.
             </p>
             <div className="tour-steps">
               <div className="tour-step">
                 <div className="ts-icon">🎯</div>
                 <div>
-                  <div className="ts-title">Три оси профиля</div>
-                  <div className="ts-desc">Система строит профиль по трём осям: <strong>ХОЧУ</strong> (интересы и ценности), <strong>МОГУ</strong> (интеллект и навыки), <strong>КТО Я</strong> (личность и самоэффективность). Плюс ось <strong>НАДО</strong> — контекст жизни.</div>
+                  <div className="ts-title">Что мы про тебя узнаём</div>
+                  <div className="ts-desc">Тест смотрит на тебя с четырёх сторон: что тебе <strong>интересно</strong>, что у тебя <strong>получается</strong>, какой ты <strong>по характеру</strong> и в какой ты сейчас <strong>ситуации</strong>. Из этого собирается полная картина.</div>
                 </div>
               </div>
               <div className="tour-step">
                 <div className="ts-icon">📝</div>
                 <div>
-                  <div className="ts-title">Блок 1 — обязательно первым</div>
-                  <div className="ts-desc">Анкета-контекст (20 вопросов, 7 минут) собирает базу: класс, ЕГЭ, планы, тревоги. Она настраивает все остальные блоки под тебя лично.</div>
+                  <div className="ts-title">Начни с короткой анкеты</div>
+                  <div className="ts-desc">Первый блок — анкета на 7 минут: класс, экзамены, планы, что волнует. Она подстроит все остальные блоки лично под тебя.</div>
                 </div>
               </div>
               <div className="tour-step">
                 <div className="ts-icon">💡</div>
                 <div>
-                  <div className="ts-title">Блоки 2–4 — основа профиля</div>
-                  <div className="ts-desc">Склонности (Holland), Ценности и Личность дают 45% профиля и первые рекомендации. После них система уже знает, к чему ты тянешься и кто ты по характеру.</div>
+                  <div className="ts-title">Главные блоки</div>
+                  <div className="ts-desc">Блоки про склонности, ценности и характер дают основу профиля и первые рекомендации. После них система уже понимает, к чему ты тянешься.</div>
                 </div>
               </div>
               <div className="tour-step">
                 <div className="ts-icon">✍️</div>
                 <div>
-                  <div className="ts-title">Блок 10 — Письмо в будущее ★</div>
-                  <div className="ts-desc">19 открытых вопросов о себе сейчас и через 5 лет. Самый ценный блок — ИИ анализирует твой нарратив и добавляет то, что тест никогда не покажет. После него профиль достигает 65%.</div>
+                  <div className="ts-title">Письмо в будущее</div>
+                  <div className="ts-desc">19 вопросов о себе сейчас и через 5 лет. Самый важный блок: ИИ читает твои ответы и видит то, что обычный тест не покажет.</div>
                 </div>
               </div>
               <div className="tour-step">
                 <div className="ts-icon">🤝</div>
                 <div>
-                  <div className="ts-title">Консультация с Никитой Соколовым</div>
-                  <div className="ts-desc">После блоков 1, 2, 3, 4 + Письма — достаточно для первой глубокой консультации. Никита разберёт твой профиль, выявит противоречия и построит маршрут.</div>
+                  <div className="ts-title">Встреча с наставником</div>
+                  <div className="ts-desc">Когда пройдёшь основные блоки и письмо — можно записаться к наставнику. Он разберёт твой профиль и поможет составить маршрут.</div>
                 </div>
               </div>
             </div>

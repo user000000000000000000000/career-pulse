@@ -10,6 +10,11 @@ const SCALE_COLORS = { agreeableness: '#00e5c8', conscientiousness: '#7b5cf0', e
 const COG_NAMES = { LANG: 'Вербальное', MATH: 'Логико-мат.', SPAT: 'Пространств.', KINE: 'Практическое', MUSI: 'Музыкальное', SOC: 'Социальный инт.', SYS: 'Системное' }
 const COG_COLORS = ['#00e5c8', '#7b5cf0', '#ff6b35', '#f5c842', '#22d97a', '#00a8e0', '#a480f8']
 const VARK_NAMES = { V: 'Визуальный', A: 'Аудиальный', R: 'Чтение/Письмо', K: 'Кинестетический', multimodal: 'Мультимодальный' }
+const VALUE_NAMES = { KR: 'Креативность', AK: 'Активные контакты', RZ: 'Развитие себя', DU: 'Духовное удовлетворение', PR: 'Престиж', MB: 'Материальное', DO: 'Достижения', IN: 'Индивидуальность' }
+const MOTIV = { spiritual: 'Духовный', pragmatic: 'Прагматический', mixed: 'Смешанный' }
+const READY_NAMES = { HH: 'Человек–Человек', HT: 'Человек–Техника', HZ: 'Человек–Знак', HX: 'Человек–Образ', HP: 'Человек–Природа' }
+const READY_COLORS = { HH: '#00e5c8', HT: '#7b5cf0', HZ: '#ff6b35', HX: '#f5c842', HP: '#22d97a' }
+const SE_NAMES = { S: 'Люди', I: 'Аналитика', A: 'Творчество', E: 'Лидерство', C: 'Системность' }
 
 function HollandRadar({ scores }) {
   const types = ['R', 'I', 'A', 'S', 'E', 'C']
@@ -166,6 +171,48 @@ export default function DiagResults() {
             <div className="r-label" style={{ marginBottom: 12 }}>Когнитивный профиль {profile.vark_style ? `· стиль ${VARK_NAMES[profile.vark_style] || profile.vark_style}` : ''}</div>
             {cogSorted.map(([k, v], i) => (
               <div key={k} className="bar-row"><div className="bar-lbl">{COG_NAMES[k] || k}</div><div className="bar-track"><div className="bar-fill" style={{ width: v + '%', background: COG_COLORS[i % 7] }}></div></div><div className="bar-val">{Math.round(v)}</div></div>
+            ))}
+          </div>
+        )}
+
+        {(profile.values_archetype || profile.values_top3) && (
+          <div className="r-card" style={{ marginTop: 18 }}>
+            <div className="r-label" style={{ marginBottom: 10 }}>Ценности {profile.motivation_type ? `· ${MOTIV[profile.motivation_type] || profile.motivation_type} профиль` : ''}</div>
+            {profile.values_archetype && <div className="r-val r-accent" style={{ fontSize: 15, marginBottom: 8 }}>{profile.values_archetype}</div>}
+            {profile.values_top3?.length > 0 && (
+              <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
+                {profile.values_top3.map((v, i) => (
+                  <span key={v} style={{ padding: '6px 14px', borderRadius: 100, background: 'rgba(0,229,200,.08)', border: '1px solid rgba(0,229,200,.25)', color: 'var(--accent)', fontSize: 12, fontWeight: 700 }}>{i + 1}. {VALUE_NAMES[v] || v}</span>
+                ))}
+              </div>
+            )}
+            {profile.values_consistency != null && <div style={{ fontSize: 12, color: 'var(--ghost)', marginTop: 8 }}>Согласованность ценностей: {profile.values_consistency}%</div>}
+          </div>
+        )}
+
+        {profile.readiness_scores && (
+          <div className="r-card" style={{ marginTop: 18 }}>
+            <div className="r-label" style={{ marginBottom: 12 }}>Профессиональная готовность · самооценка vs реальный опыт</div>
+            {Object.entries(profile.readiness_scores).sort((a, b) => (b[1].combined || 0) - (a[1].combined || 0)).map(([code, d]) => {
+              const c = READY_COLORS[code] || 'var(--accent)'
+              return (
+                <div key={code} className="dual-bar">
+                  <div className="dual-label">{READY_NAMES[code] || code}</div>
+                  <div className="dual-tracks">
+                    <div className="dtrack"><div className="dtrack-lbl">Самооценка</div><div className="dtrack-bar"><div className="dtrack-fill" style={{ width: (d.ability_pct || 0) + '%', background: c, opacity: .6 }}></div></div><div className="dtrack-val">{Math.round(d.ability_pct || 0)}</div></div>
+                    <div className="dtrack"><div className="dtrack-lbl">Опыт</div><div className="dtrack-bar"><div className="dtrack-fill" style={{ width: (d.experience_pct || 0) + '%', background: c }}></div></div><div className="dtrack-val">{Math.round(d.experience_pct || 0)}</div></div>
+                  </div>
+                </div>
+              )
+            })}
+          </div>
+        )}
+
+        {profile.se_confidence && (
+          <div className="r-card" style={{ marginTop: 18 }}>
+            <div className="r-label" style={{ marginBottom: 12 }}>Уверенность в себе по направлениям</div>
+            {Object.entries(profile.se_confidence).sort((a, b) => b[1] - a[1]).map(([d, v], i) => (
+              <div key={d} className="bar-row"><div className="bar-lbl">{SE_NAMES[d] || d}</div><div className="bar-track"><div className="bar-fill" style={{ width: v + '%', background: COG_COLORS[i % 7] }}></div></div><div className="bar-val">{Math.round(v)}</div></div>
             ))}
           </div>
         )}

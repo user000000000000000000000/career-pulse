@@ -90,12 +90,13 @@ export default function Block2Holland() {
   }
   const pct = result ? 100 : Math.round(progressDone() / TOTAL_STEPS * 100)
 
-  function nextPair() {
-    if (!curChoice || !curIntensity) return
+  function nextPair(intensityArg) {
+    const intensity = intensityArg || curIntensity
+    if (!curChoice || !intensity) return
     const p = PAIRS[pairIdx]
     const type = curChoice === 'A' ? p.tA : p.tB
-    scales[type] += curIntensity
-    pairAnswers.push({ qId: p.id, choice: curChoice, intensity: curIntensity, type })
+    scales[type] += intensity
+    pairAnswers.push({ qId: p.id, choice: curChoice, intensity, type })
     const ni = pairIdx + 1
     setPairIdx(ni)
     setCurChoice(null); setCurIntensity(0)
@@ -191,12 +192,12 @@ export default function Block2Holland() {
             <div className="int-label">Насколько выбранный вариант ближе?</div>
             <div className="int-row">
               {[1, 2, 3].map((v, i) => (
-                <div key={v} className={'int-btn' + (curIntensity === v ? ' sel' : '')} onClick={() => setCurIntensity(v)}>{['Немного', 'Заметно', 'Намного'][i]}</div>
+                <div key={v} className={'int-btn' + (curIntensity === v ? ' sel' : '')}
+                  onClick={() => { setCurIntensity(v); setTimeout(() => nextPair(v), 200) }}>{['Немного', 'Заметно', 'Намного'][i]}</div>
               ))}
             </div>
           </div>
         )}
-        <div className="nav-row"><button className="btn btn-accent" disabled={!curChoice || !curIntensity} onClick={nextPair}>Далее →</button></div>
       </>
     )
   } else if (phase === 'maturity') {

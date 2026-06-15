@@ -34,8 +34,9 @@ jobs:
         run: npm run build
         working-directory: frontend
         env:
-          VITE_SUPABASE_URL: ${{ secrets.VITE_SUPABASE_URL }}
-          VITE_SUPABASE_ANON_KEY: ${{ secrets.VITE_SUPABASE_ANON_KEY }}
+          VITE_SUPABASE_URL: https://gsxpapwpchbtyoxipuwf.supabase.co
+          VITE_SUPABASE_ANON_KEY: sb_publishable_Hq7o_GFrYm3lP8xioyeQAw_EMdjXr4P
+          VITE_VK_APP_ID: "54638178"
 
       - name: Add .nojekyll
         run: touch frontend/dist/.nojekyll
