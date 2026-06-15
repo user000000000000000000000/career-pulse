@@ -27,7 +27,7 @@ export default function Atlas() {
   }, [search, activeCategory, activeHolland])
 
   return (
-    <div className="atlas-page">
+    <div className="atlas-page cp-legal">
       <Header backTo="/dashboard" backLabel="← В кабинет" />
 
       <div className="atlas-hero">

@@ -1,6 +1,8 @@
 import { useEffect, useRef, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { register as doRegister, getCurrentUser, logout as doLogout } from '../services/auth'
+import { isSupabaseConfigured } from '../services/supabase'
+import { startVkLogin } from '../services/vk'
 import '../styles/landing.css'
 
 function shortName(name = '') {
@@ -124,7 +126,17 @@ export default function Landing() {
       if (!name) return shake('f-name', 'Введите имя')
       if (!email || !email.includes('@')) return shake('f-email', 'Введите корректный email')
       if (pass.length < 8) return shake('f-pass', 'Пароль минимум 8 символов')
-      if (!agree) { alert('Примите условия использования'); return }
+      if (!agree) {
+        const wrap = root.querySelector('.form-agree')
+        if (wrap) {
+          wrap.style.color = '#ff4d6d'
+          wrap.style.outline = '2px solid rgba(255,77,109,0.6)'
+          wrap.style.outlineOffset = '6px'
+          wrap.style.borderRadius = '8px'
+          setTimeout(() => { wrap.style.outline = ''; wrap.style.color = '' }, 2500)
+        }
+        return
+      }
 
       const fullName = name + (surname ? ' ' + surname : '')
       
@@ -136,9 +148,16 @@ export default function Landing() {
         await doRegister({ name: fullName, email, password: pass, role })
         
         const fc = q('form-content'); if (fc) fc.style.display = 'none'
-        const sm = q('success-msg'); if (sm) sm.style.display = 'block'
-        // Остаёмся на лендинге, но уже авторизованными — перезагрузка покажет новую шапку
-        setTimeout(() => window.location.reload(), 1600)
+        const sm = q('success-msg')
+        if (sm) {
+          sm.style.display = 'block'
+          if (needConfirm) {
+            sm.innerHTML = '<span class="s-icon">📬</span><h3>ПОДТВЕРДИТЕ EMAIL</h3>' +
+              '<p>Мы отправили письмо на <b>' + email + '</b>. Перейди по ссылке в письме, чтобы активировать аккаунт и войти.</p>'
+          }
+        }
+        // Без подтверждения (демо или confirm выключен) — просто обновляем лендинг авторизованными
+        if (!needConfirm) setTimeout(() => window.location.reload(), 1600)
       } catch (err) {
         btn.disabled = false
         btn.textContent = 'Начать диагностику →'
@@ -151,6 +170,11 @@ export default function Landing() {
       btn.addEventListener('click', onSubmit)
       cleanups.push(() => btn.removeEventListener('click', onSubmit))
     }
+
+    // ── Вход через ВКонтакте (VK ID OAuth) ──
+    const vkBtn = root.querySelector('#vk-login')
+    const onVk = (e) => { e.preventDefault(); startVkLogin() }
+    if (vkBtn) { vkBtn.addEventListener('click', onVk); cleanups.push(() => vkBtn.removeEventListener('click', onVk)) }
 
     return () => cleanups.forEach((fn) => fn())
   }, [navigate])
@@ -172,7 +196,9 @@ export default function Landing() {
     {user ? (
       <>
         <a href="/profile" className="nav-user" style={{display:'flex',alignItems:'center',gap:'8px',textDecoration:'none',color:'var(--text)',fontWeight:'700',fontSize:'13px',marginRight:'4px'}}>
-          <span style={{width:'30px',height:'30px',borderRadius:'50%',background:'linear-gradient(135deg,var(--accent2),var(--accent))',display:'flex',alignItems:'center',justifyContent:'center',fontSize:'12px',fontWeight:'800',color:'#08080f'}}>{initials(user.name)}</span>
+          {user.avatar_url
+            ? <span style={{width:'30px',height:'30px',borderRadius:'50%',backgroundImage:`url(${user.avatar_url})`,backgroundSize:'cover',backgroundPosition:'center',display:'block',flexShrink:0}} />
+            : <span style={{width:'30px',height:'30px',borderRadius:'50%',background:'linear-gradient(135deg,var(--accent2),var(--accent))',display:'flex',alignItems:'center',justifyContent:'center',fontSize:'12px',fontWeight:'800',color:'#08080f',flexShrink:0}}>{initials(user.name)}</span>}
           {shortName(user.name)}
         </a>
         <a href="/dashboard" className="btn-nav">Пройти диагностику</a>
@@ -487,16 +513,10 @@ export default function Landing() {
         <button className="btn-form">Начать диагностику →</button>
 
         <div className="form-divider">или</div>
-        <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:'10px'}}>
-          <button className="btn-secondary" style={{padding:'11px',fontSize:'13px',borderRadius:'8px',display:'flex',alignItems:'center',justifyContent:'center',gap:'8px'}}>
-            <svg width="16" height="16" viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>
-            Google
-          </button>
-          <button className="btn-secondary" style={{padding:'11px',fontSize:'13px',borderRadius:'8px',display:'flex',alignItems:'center',justifyContent:'center',gap:'8px'}}>
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="#4C75A3"><path d="M15.07 2H8.93C3.33 2 2 3.33 2 8.93v6.14C2 20.67 3.33 22 8.93 22h6.14C20.67 22 22 20.67 22 15.07V8.93C22 3.33 20.67 2 15.07 2zm3.08 13.5h-1.64c-.62 0-.81-.49-1.92-1.61-1-.95-1.44-.95-1.68-.95-.34 0-.44.1-.44.59v1.47c0 .42-.13.67-1.24.67-1.82 0-3.84-1.1-5.26-3.16C4.8 9.88 4.25 8.24 4.25 7.84c0-.24.1-.46.59-.46h1.64c.44 0 .61.2.78.67.86 2.49 2.3 4.67 2.89 4.67.22 0 .32-.1.32-.66V9.84c-.07-1.18-.69-1.28-.69-1.7 0-.2.17-.4.44-.4h2.58c.37 0 .5.2.5.62v3.34c0 .37.17.5.27.5.22 0 .41-.13.82-.54 1.27-1.42 2.17-3.6 2.17-3.6.12-.24.32-.46.76-.46h1.64c.49 0 .6.25.49.59-.2 1-.2.95-1.87 3.17l-.73.98c-.12.17-.17.27 0 .47.12.17.54.53.81.85.75.83 1.32 1.52 1.47 2 .15.46-.07.7-.54.7z"/></svg>
-            ВКонтакте
-          </button>
-        </div>
+        <button id="vk-login" className="btn-secondary" style={{width:'100%',padding:'13px',fontSize:'14px',borderRadius:'8px',display:'flex',alignItems:'center',justifyContent:'center',gap:'10px',color:'#fff',background:'#0077FF',border:'none'}}>
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="#fff"><path d="M15.07 2H8.93C3.33 2 2 3.33 2 8.93v6.14C2 20.67 3.33 22 8.93 22h6.14C20.67 22 22 20.67 22 15.07V8.93C22 3.33 20.67 2 15.07 2zm3.08 13.5h-1.64c-.62 0-.81-.49-1.92-1.61-1-.95-1.44-.95-1.68-.95-.34 0-.44.1-.44.59v1.47c0 .42-.13.67-1.24.67-1.82 0-3.84-1.1-5.26-3.16C4.8 9.88 4.25 8.24 4.25 7.84c0-.24.1-.46.59-.46h1.64c.44 0 .61.2.78.67.86 2.49 2.3 4.67 2.89 4.67.22 0 .32-.1.32-.66V9.84c-.07-1.18-.69-1.28-.69-1.7 0-.2.17-.4.44-.4h2.58c.37 0 .5.2.5.62v3.34c0 .37.17.5.27.5.22 0 .41-.13.82-.54 1.27-1.42 2.17-3.6 2.17-3.6.12-.24.32-.46.76-.46h1.64c.49 0 .6.25.49.59-.2 1-.2.95-1.87 3.17l-.73.98c-.12.17-.17.27 0 .47.12.17.54.53.81.85.75.83 1.32 1.52 1.47 2 .15.46-.07.7-.54.7z"/></svg>
+          Войти через ВКонтакте
+        </button>
       </div>
 
       <div className="success-msg" id="success-msg">

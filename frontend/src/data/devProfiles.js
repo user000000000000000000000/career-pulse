@@ -56,6 +56,20 @@ export async function applyDevProfile(key) {
   if (!p) return
   const blank = { answers: [], durationSec: 300 }
 
+  // Синтез детальных данных для диаграмм результатов
+  const readiness_scores = {}
+  ;['HH', 'HT', 'HZ', 'HX', 'HP'].forEach(t => {
+    const strong = p.readiness_top2.includes(t)
+    const ability = strong ? 80 : 45
+    const experience = strong ? 70 : 38
+    readiness_scores[t] = { ability_pct: ability, experience_pct: experience, combined: Math.round(ability * 0.4 + experience * 0.6), gap: 'aligned' }
+  })
+  const se_confidence = {}, se_awareness = {}
+  ;['S', 'I', 'A', 'E', 'C'].forEach(d => {
+    se_confidence[d] = Math.min(95, Math.round((p.holland[d] || 40) * 0.9 + 10))
+    se_awareness[d] = Math.min(90, Math.round((p.holland[d] || 40) * 0.8))
+  })
+
   // Блок 1 — анкета
   await CP.saveBlockResult(1, { ...blank, scores: { career_anxiety: p.anxiety, external_pressure_index: p.pressure, choice_clarity: 'high', context: p.context, flags: [] } })
   await CP.saveUser({ name: p.context.name, role: 'student' })
@@ -73,10 +87,10 @@ export async function applyDevProfile(key) {
   await CP.saveBlockResult(5, { ...blank, scores: { ...p.cognitive, cognitive_top3: p.cognitive_top3, cognitive_archetype: p.cognitive_archetype, vark_dominant: p.vark, flags: [] } })
 
   // Блок 6 — готовность
-  await CP.saveBlockResult(6, { ...blank, scores: { readiness_top2: p.readiness_top2, career_maturity: p.career_maturity, flags: [] } })
+  await CP.saveBlockResult(6, { ...blank, scores: { readiness_top2: p.readiness_top2, readiness_scores, career_maturity: p.career_maturity, flags: [] } })
 
   // Блок 7 — самоэффективность
-  await CP.saveBlockResult(7, { ...blank, scores: { se_general: p.se_general, decisiveness: p.decisiveness, dominant_style: p.decision_style, career_execution: p.career_execution, flags: [] } })
+  await CP.saveBlockResult(7, { ...blank, scores: { se_general: p.se_general, se_confidence, se_awareness, decisiveness: p.decisiveness, dominant_style: p.decision_style, career_execution: p.career_execution, flags: [] } })
 
   // Блок 8 — образ будущего
   await CP.saveBlockResult(8, { ...blank, scores: { work_profile: { stability_vs_growth: 'growth', ambition_level: 'success' }, career_clarity: 4, learning_readiness: 4, long_term_readiness: 4, flags: [] }, openAnswers: [{ questionId: 'role_model', text: 'демо' }, { questionId: 'mission', text: 'демо' }] })
@@ -96,7 +110,7 @@ export async function applyDevProfile(key) {
     values_top3: p.values_top3, motivation_type: p.motivation_type, values_archetype: p.values_archetype,
     personality_scores: p.personality, personality_archetype: p.personality_archetype, sincerity_index: p.sincerity_index,
     cognitive_scores: p.cognitive, cognitive_top3: p.cognitive_top3, cognitive_archetype: p.cognitive_archetype, vark_style: p.vark,
-    readiness_top2: p.readiness_top2, career_maturity: p.career_maturity,
-    se_general: p.se_general, decisiveness: p.decisiveness, decision_style: p.decision_style, career_execution: p.career_execution,
+    readiness_top2: p.readiness_top2, readiness_scores, career_maturity: p.career_maturity,
+    se_general: p.se_general, se_confidence, se_awareness, decisiveness: p.decisiveness, decision_style: p.decision_style, career_execution: p.career_execution,
   })
 }

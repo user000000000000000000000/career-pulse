@@ -36,8 +36,8 @@ export const BLOCKS_META = {
 export const CONSULTATION_REQUIRED = [1, 2, 3, 4, 10]
 export const TOTAL_BLOCKS = 10
 
-// Рекомендуемый порядок прохождения: 1 → 2 → 3 → 4 → 10(письмо) → 5 → 6 → 7 → 8 → 9
-const BLOCK_ORDER = [1, 2, 3, 4, 10, 5, 6, 7, 8, 9]
+// Порядок прохождения — строго по номерам: 1 → 2 → … → 10
+const BLOCK_ORDER = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
 
 // ── низкоуровневые хелперы localStorage ──
 function key(name) { return STORAGE_PREFIX + name }

@@ -20,9 +20,12 @@ import AdConsent from './pages/Legal/AdConsent.jsx'
 import Recomm from './pages/Legal/Recomm.jsx'
 
 import RequireAuth from './components/Layout/RequireAuth.jsx'
+import VkAuthHandler from './components/VkAuthHandler.jsx'
 
 export default function App() {
   return (
+    <>
+    <VkAuthHandler />
     <Routes>
       <Route path="/" element={<Landing />} />
       <Route path="/register" element={<Register />} />
@@ -46,5 +49,6 @@ export default function App() {
 
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
+    </>
   )
 }

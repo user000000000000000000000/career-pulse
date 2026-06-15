@@ -42,6 +42,20 @@ export default function Profile() {
 
   const upd = (k) => (e) => setForm(f => ({ ...f, [k]: e.target.value }))
 
+  // Маска телефона как на лендинге: +7 (XXX) XXX-XX-XX
+  function fmtPhone(v) {
+    let d = (v || '').replace(/\D/g, '')
+    if (d.startsWith('7') || d.startsWith('8')) d = d.slice(1)
+    let f = '+7 '
+    if (d.length > 0) f += '(' + d.slice(0, 3)
+    if (d.length >= 3) f += ') ' + d.slice(3, 6)
+    if (d.length >= 6) f += '-' + d.slice(6, 8)
+    if (d.length >= 8) f += '-' + d.slice(8, 10)
+    return f
+  }
+  const onPhone = (e) => setForm(f => ({ ...f, phone: fmtPhone(e.target.value) }))
+  const fileToDataUrl = (file) => new Promise((res) => { const r = new FileReader(); r.onload = () => res(r.result); r.readAsDataURL(file) })
+
   function onFileChange(e) {
     const file = e.target.files?.[0]
     if (!file) return
@@ -71,8 +85,13 @@ export default function Profile() {
       let avatar_url = preview
 
       if (avatar) {
-        const url = await uploadAvatar(user.id)
-        if (url) avatar_url = url
+        if (isSupabaseConfigured) {
+          const url = await uploadAvatar(user.id)
+          if (url) avatar_url = url
+        } else {
+          // демо-режим: храним фото как data-URL, чтобы оно сохранялось и показывалось
+          avatar_url = await fileToDataUrl(avatar)
+        }
       }
 
       if (isSupabaseConfigured) {
@@ -148,8 +167,8 @@ export default function Profile() {
 
           {/* ── Поля ── */}
           <Input
-            id="p-name" label="Полное имя (ФИО)"
-            placeholder="Иван Иванович Иванов"
+            id="p-name" label="ФИО (Фамилия Имя Отчество)"
+            placeholder="Иванов Иван Иванович"
             value={form.full_name} onChange={upd('full_name')}
           />
           <Input
@@ -163,7 +182,7 @@ export default function Profile() {
           <Input
             id="p-phone" label="Телефон" type="tel"
             placeholder="+7 (___) ___-__-__"
-            value={form.phone} onChange={upd('phone')}
+            value={form.phone} onChange={onPhone}
           />
 
           <Button block onClick={onSave} disabled={saving || uploading} style={{ marginTop: 8 }}>
