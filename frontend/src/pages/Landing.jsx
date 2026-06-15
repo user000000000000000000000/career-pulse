@@ -93,7 +93,7 @@ export default function Landing() {
     root.addEventListener('click', onClick)
     cleanups.push(() => root.removeEventListener('click', onClick))
 
-    // ── Отправка формы регистрации
+    // ── Отправка формы регистрации (С ЗАЩИТОЙ ОТ ПОВТОРНЫХ КЛИКОВ)
     const q = (id) => root.querySelector('#' + id)
     const shake = (id, msg) => {
       const el = q(id); if (!el) return
@@ -102,9 +102,19 @@ export default function Landing() {
       el.placeholder = msg
       setTimeout(() => { el.style.borderColor = ''; el.style.boxShadow = '' }, 2000)
     }
+    
     const btn = root.querySelector('.btn-form')
+    let isSubmitting = false  // ФЛАГ БЛОКИРОВКИ ПОВТОРНЫХ ОТПРАВОК
+
     const onSubmit = async (e) => {
       e.preventDefault()
+      
+      // ЗАЩИТА ОТ ПОВТОРНЫХ КЛИКОВ
+      if (isSubmitting) {
+        console.log('Запрос уже отправляется, подождите...')
+        return
+      }
+      
       const name = q('f-name').value.trim()
       const surname = q('f-surname').value.trim()
       const email = q('f-email').value.trim()
@@ -128,13 +138,15 @@ export default function Landing() {
         return
       }
 
-      // ФИО храним как «Фамилия Имя» (официальный порядок)
-      const fullName = [surname, name].filter(Boolean).join(' ')
+      const fullName = name + (surname ? ' ' + surname : '')
+      
       try {
+        isSubmitting = true  // БЛОКИРУЕМ
         btn.disabled = true
-        const { user: created } = await doRegister({ name: fullName, email, password: pass, role })
-        // Если Supabase включён и email ещё не подтверждён — просим подтвердить почту
-        const needConfirm = isSupabaseConfigured && created && !created.confirmed_at && !created.email_confirmed_at
+        btn.textContent = 'Отправка...'
+        
+        await doRegister({ name: fullName, email, password: pass, role })
+        
         const fc = q('form-content'); if (fc) fc.style.display = 'none'
         const sm = q('success-msg')
         if (sm) {
@@ -148,10 +160,16 @@ export default function Landing() {
         if (!needConfirm) setTimeout(() => window.location.reload(), 1600)
       } catch (err) {
         btn.disabled = false
+        btn.textContent = 'Начать диагностику →'
         shake('f-email', (err && err.message) || 'Ошибка регистрации')
+        isSubmitting = false  // РАЗБЛОКИРУЕМ ПРИ ОШИБКЕ
       }
     }
-    if (btn) { btn.addEventListener('click', onSubmit); cleanups.push(() => btn.removeEventListener('click', onSubmit)) }
+    
+    if (btn) { 
+      btn.addEventListener('click', onSubmit)
+      cleanups.push(() => btn.removeEventListener('click', onSubmit))
+    }
 
     // ── Вход через ВКонтакте (VK ID OAuth) ──
     const vkBtn = root.querySelector('#vk-login')
