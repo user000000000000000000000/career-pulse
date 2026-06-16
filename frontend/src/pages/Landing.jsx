@@ -5,14 +5,19 @@ import { isSupabaseConfigured } from '../services/supabase'
 import { startVkLogin } from '../services/vk'
 import '../styles/landing.css'
 
+// ФИО хранится как «Фамилия Имя Отчество» → показываем «Имя Ф.»
 function shortName(name = '') {
-  const parts = name.trim().split(/\s+/)
-  if (!parts[0]) return 'Профиль'
-  return parts[1] ? `${parts[0]} ${parts[1][0].toUpperCase()}.` : parts[0]
+  const p = name.trim().split(/\s+/).filter(Boolean)
+  if (!p.length) return 'Профиль'
+  const family = p[0]
+  const given = p[1] || p[0]
+  return (p[1] && family !== given) ? `${given} ${family[0].toUpperCase()}.` : given
 }
 function initials(name = '') {
-  const p = name.trim().split(/\s+/)
-  return ((p[0]?.[0] || '') + (p[1]?.[0] || p[0]?.[1] || '')).toUpperCase() || 'И'
+  const p = name.trim().split(/\s+/).filter(Boolean)
+  const family = p[0] || ''
+  const given = p[1] || p[0] || ''
+  return ((given[0] || '') + (family && family !== given ? family[0] : '')).toUpperCase() || 'И'
 }
 
 export default function Landing() {

@@ -69,8 +69,24 @@ Deno.serve(async (req) => {
     if (!infoRes.ok || (!info.user && !info.email)) return json({ error: 'VK user_info: ' + JSON.stringify(info) }, 400)
     const u = info.user || info
     const email = u.email || `vk${u.user_id || u.id}@vk.local`
-    const name = [u.last_name, u.first_name].filter(Boolean).join(' ') || 'Пользователь ВК'
-    const avatar = u.avatar || ''
+    let firstName = u.first_name || ''
+    let lastName = u.last_name || ''
+    let avatar = u.avatar || ''
+
+    // Кириллические имя/фамилия через классический VK API (user_info отдаёт латиницу)
+    try {
+      const apiRes = await fetch(`https://api.vk.com/method/users.get?fields=photo_200&access_token=${accessToken}&v=5.199`)
+      const apiData = await apiRes.json()
+      const r = apiData.response?.[0]
+      if (r) {
+        if (r.first_name) firstName = r.first_name
+        if (r.last_name) lastName = r.last_name
+        if (r.photo_200) avatar = r.photo_200
+      }
+    } catch (_) { /* остаёмся на user_info */ }
+
+    // Порядок «Фамилия Имя» — под формат ФИО в приложении
+    const name = [lastName, firstName].filter(Boolean).join(' ') || 'Пользователь ВК'
     const profile = { email, name, avatar }
 
     // Создание/вход пользователя в Supabase
@@ -84,7 +100,7 @@ Deno.serve(async (req) => {
       }).catch(() => {})
       const { data: list } = await admin.auth.admin.listUsers()
       const found = list?.users?.find((x: any) => x.email === email)
-      if (found) await admin.from('profiles').upsert({ id: found.id, email, full_name: name, avatar_url: avatar, role: 'student' }).catch(() => {})
+      if (found) { try { await admin.from('profiles').upsert({ id: found.id, email, full_name: name, avatar_url: avatar, role: 'student' }) } catch (_) { /* профиль не критичен */ } }
       const { data: linkData, error: linkErr } = await admin.auth.admin.generateLink({ type: 'magiclink', email })
       if (linkErr) return json({ error: 'generateLink: ' + linkErr.message }, 500)
       return json({ profile, token_hash: linkData?.properties?.hashed_token })
