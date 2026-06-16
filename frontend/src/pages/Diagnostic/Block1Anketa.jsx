@@ -1,7 +1,9 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import CP from '../../services/cpStorage'
 import DiagShell, { ResultNav } from './DiagShell'
 import useDiagBlock from './useDiagBlock'
+
+const DRAFT_KEY = 'cp_draft_block1'
 
 const EGE = [
   ['russian', 'Русский язык'], ['math_prof', 'Мат. (проф.)'], ['math_base', 'Мат. (баз.)'], ['society', 'Обществознание'],
@@ -31,6 +33,27 @@ export default function Block1Anketa() {
   const [chips, setChips] = useState({}) // мультивыбор
   const [errors, setErrors] = useState({})
   const [result, setResult] = useState(null)
+
+  // Восстановление черновика анкеты при перезагрузке
+  useEffect(() => {
+    if (!ready) return
+    try {
+      const d = JSON.parse(localStorage.getItem(DRAFT_KEY) || 'null')
+      if (d && (Object.keys(d.a || {}).length || Object.keys(d.chips || {}).length)) {
+        setA(d.a || {})
+        setChips(d.chips || {})
+        if (d.step) setStep(d.step)
+      }
+    } catch { /* ignore */ }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [ready])
+
+  // Автосохранение черновика
+  useEffect(() => {
+    if (!ready || result) return
+    try { localStorage.setItem(DRAFT_KEY, JSON.stringify({ a, chips, step })) } catch { /* ignore */ }
+  }, [a, chips, step, ready, result])
+
   if (!ready) return null
 
   const TOTAL_STEPS = 4
@@ -97,6 +120,7 @@ export default function Block1Anketa() {
     await CP.saveBlockResult(1, { answers: ans, scores: { ...scores, flags, context }, durationSec: dur })
     await CP.updateProfile({ context, choice_clarity: cc, career_anxiety: scores.career_anxiety, external_pressure_index: scores.external_pressure_index, subject_motivation: ans.B2a })
     if (flags.length) await CP.updateExpertData({ flags })
+    try { localStorage.removeItem(DRAFT_KEY) } catch { /* ignore */ }
     setResult({ ...scores, durationSec: dur })
   }
 

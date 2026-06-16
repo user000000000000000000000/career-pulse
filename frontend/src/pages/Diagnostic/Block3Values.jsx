@@ -2,6 +2,7 @@ import { useState } from 'react'
 import CP from '../../services/cpStorage'
 import DiagShell, { ResultNav } from './DiagShell'
 import useDiagBlock from './useDiagBlock'
+import useBlockDraft from './useBlockDraft'
 
 const VNAMES = { KR: 'Креативность', AK: 'Активные контакты', RZ: 'Развитие себя', DU: 'Духовное удовлетворение', PR: 'Собственный престиж', MB: 'Материальное благополучие', DO: 'Достижения', IN: 'Индивидуальность' }
 const QS = [
@@ -52,6 +53,19 @@ export default function Block3Values() {
   const [antiSel, setAntiSel] = useState([])
   const [openText, setOpenText] = useState('')
   const [result, setResult] = useState(null)
+  const clearDraft = useBlockDraft({
+    blockNum: 3, ready,
+    snapshot: () => ({ phase, qIdx, scales, answers, antiSel, openText }),
+    restore: (d) => {
+      if (d.scales) Object.assign(scales, d.scales)
+      if (Array.isArray(d.answers)) { answers.length = 0; d.answers.forEach(x => answers.push(x)) }
+      if (d.phase) setPhase(d.phase)
+      if (typeof d.qIdx === 'number') setQIdx(d.qIdx)
+      if (Array.isArray(d.antiSel)) setAntiSel(d.antiSel)
+      if (typeof d.openText === 'string') setOpenText(d.openText)
+    },
+    deps: [phase, qIdx, antiSel, openText],
+  })
   if (!ready) return null
 
   const pct = result ? 100 : Math.round((phase === 'dilemmas' ? qIdx : phase === 'anti' ? 28 : 29) / TOTAL * 100)
@@ -94,6 +108,7 @@ export default function Block3Values() {
     await CP.saveBlockResult(3, { answers, scores: { ...scores, flags }, durationSec: dur, openAnswers: [{ questionId: 'maturity', text: openText }] })
     await CP.updateProfile({ values_top3: top3, values_antitop2: antiTop2, anti_values_chosen: antiSel, motivation_type: motType, values_archetype: archetype, values_consistency: consistency })
     if (flags.length) await CP.updateExpertData({ flags })
+    clearDraft()
     setResult({ ...scores, durationSec: dur })
   }
 

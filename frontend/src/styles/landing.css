@@ -28,7 +28,7 @@
 .cp-landing ::-webkit-scrollbar-track{ background: var(--black); }
 .cp-landing ::-webkit-scrollbar-thumb{ background: var(--accent2); border-radius: 2px; }
 
-.cp-landing /* ──────────────────────────── ANIMATIONS */
+/* ──────────────────────────── ANIMATIONS */
 @keyframes fadeDown{ from { opacity:0; transform:translateY(-18px); } to { opacity:1; transform:translateY(0); } }
 @keyframes fadeUp{ from { opacity:0; transform:translateY(28px);  } to { opacity:1; transform:translateY(0); } }
 @keyframes fadeIn{ from { opacity:0; } to { opacity:1; } }
@@ -495,26 +495,26 @@ footer{
 .cp-landing .foot-links a:hover{ color: var(--accent); }
 .cp-landing .foot-copy{ font-size: 12px; color: var(--muted2); }
 
-.cp-landing /* ──────────────────────────── MOBILE */
+/* ──────────────────────────── MOBILE */
 @media (max-width: 900px){
-  nav { padding: 16px 24px; }
-  .nav-links { display: none; }
-  .btn-ghost { display: none; }
-  .hero { padding: 110px 24px 60px; }
-  .hero-strip { gap: 0; }
-  .strip-item { min-width: 120px; padding: 0 10px; }
-  .strip-num { font-size: 34px; }
-  .sec { padding: 60px 24px; }
-  .sec-full .sec-inner { padding: 60px 24px; }
-  .pain-grid { grid-template-columns: 1fr; }
-  .product-layout { grid-template-columns: 1fr; }
-  .product-mock { position: static; }
-  .aud-grid { grid-template-columns: 1fr; }
-  .reg-section { padding: 60px 24px; }
-  .reg-inner { grid-template-columns: 1fr; gap: 40px; }
-  .trust-strip { padding: 24px; gap: 24px; }
-  footer { padding: 32px 24px; flex-direction: column; text-align: center; }
-  .foot-links { justify-content: center; }
-  .form-row { grid-template-columns: 1fr; }
-  .roles-grid { grid-template-columns: 1fr 1fr; }
+  .cp-landing nav { padding: 16px 24px; }
+  .cp-landing .nav-links { display: none; }
+  .cp-landing .btn-ghost { display: none; }
+  .cp-landing .hero { padding: 110px 24px 60px; }
+  .cp-landing .hero-strip { gap: 0; }
+  .cp-landing .strip-item { min-width: 120px; padding: 0 10px; }
+  .cp-landing .strip-num { font-size: 34px; }
+  .cp-landing .sec { padding: 60px 24px; }
+  .cp-landing .sec-full .sec-inner { padding: 60px 24px; }
+  .cp-landing .pain-grid { grid-template-columns: 1fr; }
+  .cp-landing .product-layout { grid-template-columns: 1fr; }
+  .cp-landing .product-mock { position: static; }
+  .cp-landing .aud-grid { grid-template-columns: 1fr; }
+  .cp-landing .reg-section { padding: 60px 24px; }
+  .cp-landing .reg-inner { grid-template-columns: 1fr; gap: 40px; }
+  .cp-landing .trust-strip { padding: 24px; gap: 24px; }
+  .cp-landing footer { padding: 32px 24px; flex-direction: column; text-align: center; }
+  .cp-landing .foot-links { justify-content: center; }
+  .cp-landing .form-row { grid-template-columns: 1fr; }
+  .cp-landing .roles-grid { grid-template-columns: 1fr 1fr; }
 }

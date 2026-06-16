@@ -2,6 +2,7 @@ import { useState } from 'react'
 import CP from '../../services/cpStorage'
 import DiagShell, { ResultNav } from './DiagShell'
 import useDiagBlock from './useDiagBlock'
+import useBlockDraft from './useBlockDraft'
 
 const QS = [
   { id: 'B1', t: 'Когда у кого-то неприятности, я хочу помочь — даже если меня не просят', s: 'agreeableness' },
@@ -67,6 +68,12 @@ export default function Block4Personality() {
   const [answers] = useState(() => ({}))
   const [sel, setSel] = useState(null)
   const [result, setResult] = useState(null)
+  const clearDraft = useBlockDraft({
+    blockNum: 4, ready,
+    snapshot: () => ({ qIdx, answers }),
+    restore: (d) => { if (d.answers) Object.assign(answers, d.answers); if (typeof d.qIdx === 'number') setQIdx(d.qIdx) },
+    deps: [qIdx],
+  })
   if (!ready) return null
   const pct = result ? 100 : Math.round(qIdx / TOTAL * 100)
 
@@ -126,6 +133,7 @@ export default function Block4Personality() {
     await CP.saveBlockResult(4, { answers, scores: { ...scoresFlat, personality_archetype: archetype, top3_strengths: top3, sincerity_index: sincerity, social_desirability_flag: sjFlag, flags }, durationSec: dur })
     await CP.updateProfile({ personality_scores: scoresFlat, personality_archetype: archetype, sincerity_index: sincerity, social_desirability_flag: sjFlag, ambiguity_tolerance_pct: scores.ambiguity_tolerance.pct })
     if (flags.length) await CP.updateExpertData({ flags })
+    clearDraft()
     setResult({ sc: scores, archetype, top3, sincerity, durationSec: dur })
   }
 

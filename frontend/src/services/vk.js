@@ -36,11 +36,15 @@ export async function startVkLogin() {
   window.location.href = 'https://id.vk.com/authorize?' + params.toString()
 }
 
+let vkExchangeInFlight = false
+
 /** Обработка возврата от VK: обмен кода через функцию vk-auth (наш verifier). */
 export async function handleVkRedirect(navigate) {
   const sp = new URLSearchParams(window.location.search)
   const code = sp.get('code')
   if (!code) return false
+  if (vkExchangeInFlight) return false   // защита от двойного обмена (код одноразовый)
+  vkExchangeInFlight = true
   const state = sp.get('state')
   const deviceId = sp.get('device_id')
   const verifier = localStorage.getItem('vk_verifier')

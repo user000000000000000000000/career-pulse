@@ -2,6 +2,7 @@ import { useState } from 'react'
 import CP from '../../services/cpStorage'
 import DiagShell, { ResultNav } from './DiagShell'
 import useDiagBlock from './useDiagBlock'
+import useBlockDraft from './useBlockDraft'
 
 const SELF_QS = [
   { id: 'Y1', t: 'Мне нравится читать — книги, статьи, посты — я делаю это в своё удовольствие', s: 'LANG' },
@@ -70,6 +71,18 @@ export default function Block5Cognitive() {
   const [varkAns] = useState(() => [])
   const [sel, setSel] = useState(null)
   const [result, setResult] = useState(null)
+  const clearDraft = useBlockDraft({
+    blockNum: 5, ready,
+    snapshot: () => ({ phase, idx, selfAns, taskAns, varkAns }),
+    restore: (d) => {
+      if (d.selfAns) Object.assign(selfAns, d.selfAns)
+      if (d.taskAns) Object.assign(taskAns, d.taskAns)
+      if (Array.isArray(d.varkAns)) { varkAns.length = 0; d.varkAns.forEach(x => varkAns.push(x)) }
+      if (d.phase) setPhase(d.phase)
+      if (typeof d.idx === 'number') setIdx(d.idx)
+    },
+    deps: [phase, idx],
+  })
   if (!ready) return null
 
   const done = phase === 'self' ? idx : phase === 'tasks' ? SELF_QS.length + idx : SELF_QS.length + TASKS.length + idx
@@ -116,6 +129,7 @@ export default function Block5Cognitive() {
     if (totalTasks >= 6 && Object.values(selfPct).every(v => v < 40)) flags.push({ code: 'strong_underestimate', level: 'info' })
     discrepancies.forEach(d => flags.push({ code: (d.direction === 'overestimate' ? 'overestimate_' : 'underestimate_') + d.type, level: d.direction === 'overestimate' ? 'warning' : 'info' }))
     const scores = { ...finalPct, cognitive_top3: top3, cognitive_archetype: archetype, vark_profile: vark, vark_dominant: domVark, discrepancies, flags }
+    clearDraft()
     await CP.saveBlockResult(5, { answers: { self: selfAns, tasks: taskAns, vark: varkAns }, scores, durationSec: dur })
     await CP.updateProfile({ cognitive_scores: finalPct, cognitive_top3: top3, cognitive_archetype: archetype, vark_style: domVark, vark_profile: vark })
     if (flags.length) await CP.updateExpertData({ flags })

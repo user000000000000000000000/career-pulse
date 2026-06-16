@@ -2,6 +2,7 @@ import { useState } from 'react'
 import CP from '../../services/cpStorage'
 import DiagShell, { ResultNav } from './DiagShell'
 import useDiagBlock from './useDiagBlock'
+import useBlockDraft from './useBlockDraft'
 
 const QS = [
   { id: 'A1', t: 'Знаешь ли ты, кем работают твои родители?', sec: '👨‍👩‍👧 Семья', opts: ['Хорошо знаю', 'В общих чертах', 'Почти не знаю'], enc: [5, 3, 1] },
@@ -41,6 +42,19 @@ export default function Block9Social() {
   const [achieveText, setAchieveText] = useState('')
   const [openTexts, setOpenTexts] = useState(['', ''])
   const [result, setResult] = useState(null)
+  const clearDraft = useBlockDraft({
+    blockNum: 9, ready,
+    snapshot: () => ({ phase, idx, ans, showAchieve, achieveText, openTexts }),
+    restore: (d) => {
+      if (d.ans) Object.assign(ans, d.ans)
+      if (typeof d.showAchieve === 'boolean') setShowAchieve(d.showAchieve)
+      if (typeof d.achieveText === 'string') setAchieveText(d.achieveText)
+      if (Array.isArray(d.openTexts)) setOpenTexts(d.openTexts)
+      if (d.phase) setPhase(d.phase)
+      if (typeof d.idx === 'number') setIdx(d.idx)
+    },
+    deps: [phase, idx, showAchieve, achieveText, openTexts],
+  })
   if (!ready) return null
 
   const total = QS.length + (showAchieve ? 1 : 0) + OPEN.length
@@ -82,6 +96,7 @@ export default function Block9Social() {
     const scores = { family_support: familySupport, social_support: socialSupport, autonomy, experience, pressure, flags }
     const openAns = OPEN.map((o, i) => ({ questionId: o.id, text: openTexts[i] }))
     if (achieveText) openAns.push({ questionId: 'achievement', text: achieveText })
+    clearDraft()
     await CP.saveBlockResult(9, { answers: { ...ans, E1a: achieveText }, scores, durationSec: dur, openAnswers: openAns })
     await CP.updateProfile({ family_support: familySupport, social_support: socialSupport, autonomy_pct: autonomy, experience_pct: experience, pressure_pct: pressure })
     if (flags.length) await CP.updateExpertData({ flags })

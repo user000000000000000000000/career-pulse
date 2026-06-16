@@ -2,6 +2,7 @@ import { useState } from 'react'
 import CP from '../../services/cpStorage'
 import DiagShell, { ResultNav } from './DiagShell'
 import useDiagBlock from './useDiagBlock'
+import useBlockDraft from './useBlockDraft'
 
 const QS = [
   { id: 'BUD1', t: 'Что для тебя важнее в будущей работе?', type: 'radio', opts: ['Стабильность', 'Рост и вызовы', 'Оба одинаково'] },
@@ -32,6 +33,17 @@ export default function Block8Future() {
   const [sel, setSel] = useState(null)
   const [openTexts, setOpenTexts] = useState(['', ''])
   const [result, setResult] = useState(null)
+  const clearDraft = useBlockDraft({
+    blockNum: 8, ready,
+    snapshot: () => ({ phase, idx, ans, openTexts }),
+    restore: (d) => {
+      if (d.ans) Object.assign(ans, d.ans)
+      if (Array.isArray(d.openTexts)) setOpenTexts(d.openTexts)
+      if (d.phase) setPhase(d.phase)
+      if (typeof d.idx === 'number') setIdx(d.idx)
+    },
+    deps: [phase, idx, openTexts],
+  })
   if (!ready) return null
 
   const done = phase === 'closed' ? idx : QS.length + idx

@@ -2,6 +2,7 @@ import { useState } from 'react'
 import CP from '../../services/cpStorage'
 import DiagShell, { ResultNav } from './DiagShell'
 import useDiagBlock from './useDiagBlock'
+import useBlockDraft from './useBlockDraft'
 
 const GEN = [
   { id: 'OSE1', t: 'Если я сталкиваюсь со сложной задачей, обычно нахожу способ её решить' },
@@ -64,6 +65,17 @@ export default function Block7SelfEfficacy() {
   const [caseAns] = useState(() => [])
   const [sel, setSel] = useState(null)
   const [result, setResult] = useState(null)
+  const clearDraft = useBlockDraft({
+    blockNum: 7, ready,
+    snapshot: () => ({ phase, idx, ans, caseAns }),
+    restore: (d) => {
+      if (d.ans) Object.assign(ans, d.ans)
+      if (Array.isArray(d.caseAns)) { caseAns.length = 0; d.caseAns.forEach(x => caseAns.push(x)) }
+      if (d.phase) setPhase(d.phase)
+      if (typeof d.idx === 'number') setIdx(d.idx)
+    },
+    deps: [phase, idx],
+  })
   if (!ready) return null
 
   const done = phase === 'likert' ? idx : ALL_LIKERT.length + caseAns.length
@@ -106,6 +118,7 @@ export default function Block7SelfEfficacy() {
     await CP.saveBlockResult(7, { answers: { likert: ans, cases: caseAns }, scores, durationSec: dur })
     await CP.updateProfile({ se_general: seGen, se_confidence: seConf, se_awareness: seAwar, decisiveness, decision_style: dominant, career_execution: careerExec })
     if (flags.length) await CP.updateExpertData({ flags })
+    clearDraft()
     setResult({ ...scores, durationSec: dur })
   }
 

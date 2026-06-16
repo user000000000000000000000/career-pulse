@@ -2,6 +2,7 @@ import { useState } from 'react'
 import CP from '../../services/cpStorage'
 import DiagShell, { ResultNav } from './DiagShell'
 import useDiagBlock from './useDiagBlock'
+import useBlockDraft from './useBlockDraft'
 
 const TYPES = [
   { code: 'HH', name: 'Человек–Человек', icon: '👥' }, { code: 'HT', name: 'Человек–Техника', icon: '🔧' },
@@ -55,6 +56,17 @@ export default function Block6Readiness() {
   const [sel, setSel] = useState(null)
   const [openTexts, setOpenTexts] = useState(['', ''])
   const [result, setResult] = useState(null)
+  const clearDraft = useBlockDraft({
+    blockNum: 6, ready,
+    snapshot: () => ({ phase, idx, ans, openTexts }),
+    restore: (d) => {
+      if (d.ans) Object.assign(ans, d.ans)
+      if (Array.isArray(d.openTexts)) setOpenTexts(d.openTexts)
+      if (d.phase) setPhase(d.phase)
+      if (typeof d.idx === 'number') setIdx(d.idx)
+    },
+    deps: [phase, idx, openTexts],
+  })
   if (!ready) return null
 
   const done = phase === 'closed' ? idx : phase === 'open1' ? 30 : 31
@@ -101,6 +113,7 @@ export default function Block6Readiness() {
     })
     if (dur < 180) flags.push({ code: 'readiness_too_fast', level: 'warning' })
     const scores = { readiness_scores: readiness, readiness_top2: top2, career_maturity: careerMaturity, flags }
+    clearDraft()
     await CP.saveBlockResult(6, { answers: ans, scores, durationSec: dur, openAnswers: [{ questionId: 'skill', text: openTexts[0] }, { questionId: 'recognition', text: openTexts[1] }] })
     await CP.updateProfile({ readiness_top2: top2, readiness_scores: readiness, career_maturity: careerMaturity })
     if (flags.length) await CP.updateExpertData({ flags })

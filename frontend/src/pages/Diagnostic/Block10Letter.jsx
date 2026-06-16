@@ -1,6 +1,8 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import CP from '../../services/cpStorage'
+
+const DRAFT_KEY = 'cp_draft_block10'
 import DiagShell from './DiagShell'
 import useDiagBlock from './useDiagBlock'
 
@@ -46,6 +48,27 @@ export default function Block10Letter() {
   const [qIdx, setQIdx] = useState(0)
   const [answers, setAnswers] = useState({})
   const [result, setResult] = useState(null)
+
+  // Восстановление черновика при загрузке (после перезагрузки вкладки текст не теряется)
+  useEffect(() => {
+    if (!ready) return
+    try {
+      const d = JSON.parse(localStorage.getItem(DRAFT_KEY) || 'null')
+      if (d && d.answers && Object.keys(d.answers).length) {
+        setAnswers(d.answers)
+        setBlockIdx(Math.min(d.blockIdx || 0, SECTIONS.length - 1))
+        setQIdx(d.qIdx || 0)
+      }
+    } catch { /* ignore */ }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [ready])
+
+  // Автосохранение черновика
+  useEffect(() => {
+    if (!ready || result) return
+    try { localStorage.setItem(DRAFT_KEY, JSON.stringify({ answers, blockIdx, qIdx })) } catch { /* ignore */ }
+  }, [answers, blockIdx, qIdx, ready, result])
+
   if (!ready) return null
 
   const section = SECTIONS[blockIdx]
@@ -87,6 +110,7 @@ export default function Block10Letter() {
     await CP.saveBlockResult(10, { answers, scores, durationSec: dur, openAnswers })
     await CP.saveLetter({ blocks: openAnswers, fullText, wordCount, charCount, agencyRatio })
     await CP.updateProfile({ letter_completed: true, letter_word_count: wordCount, agency_ratio: agencyRatio })
+    try { localStorage.removeItem(DRAFT_KEY) } catch { /* ignore */ }
     setResult({ ...scores, durationSec: dur })
   }
 
