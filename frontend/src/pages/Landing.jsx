@@ -145,8 +145,10 @@ export default function Landing() {
         btn.disabled = true
         btn.textContent = 'Отправка...'
         
-        await doRegister({ name: fullName, email, password: pass, role })
-        
+        const { user: created } = await doRegister({ name: fullName, email, password: pass, role })
+        // Нужно ли подтверждение email (только при настроенном Supabase и неподтверждённом аккаунте)
+        const needConfirm = isSupabaseConfigured && created && !created.confirmed_at && !created.email_confirmed_at
+
         const fc = q('form-content'); if (fc) fc.style.display = 'none'
         const sm = q('success-msg')
         if (sm) {

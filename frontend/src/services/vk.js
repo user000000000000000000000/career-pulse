@@ -39,14 +39,15 @@ export async function handleVkRedirect(navigate) {
   const deviceId = sp.get('device_id')
   if (!code) return false
 
-  // Чистим URL от query
-  window.history.replaceState({}, '', window.location.origin + window.location.pathname + window.location.hash)
-
   const VKID = initVKID()
   if (!VKID) { console.warn('[VK] SDK не загружен'); return false }
 
+  // ВАЖНО: URL с ?code&state НЕ трогаем до exchangeCode — SDK ищет verifier по state из адреса
+  const cleanUrl = () => window.history.replaceState({}, '', window.location.origin + window.location.pathname + window.location.hash)
+
   try {
     const tokens = await VKID.Auth.exchangeCode(code, deviceId)
+    cleanUrl()
     const accessToken = tokens.access_token
     if (!accessToken) throw new Error('VK не вернул access_token')
 
@@ -87,6 +88,7 @@ export async function handleVkRedirect(navigate) {
     navigate('/dashboard')
     return true
   } catch (e) {
+    cleanUrl()
     console.error('[VK] auth error', e)
     alert('Не удалось войти через ВКонтакте: ' + (e.message || e))
     return false
