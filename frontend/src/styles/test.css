@@ -86,9 +86,24 @@
 .q-multi-btn--active .q-multi-check{border-color:var(--violet);background:rgba(123,92,240,.2)}
 .q-multi-text{font-size:15px;color:var(--text);line-height:1.4}
 
-@media(max-width:600px){
+/* ── TABLET (≤1024px) ── */
+@media(max-width:1024px){
+  .test-top{padding:14px 24px}
+  .test-body{padding:32px 24px 120px}
+  .block-nav{padding:0 24px}
+}
+
+/* ── PHONE (≤640px) ── */
+@media(max-width:640px){
+  .test-top{padding:14px 18px}
+  .test-top-row{gap:12px;flex-wrap:wrap}
+  .test-body{padding:24px 18px 130px}
+  .q-text{font-size:18px}
   .q-scale{gap:5px}
   .q-scale-btn{min-width:44px;padding:10px 4px}
   .q-scale-num{font-size:22px}
   .q-pair-btn{padding:14px}
+  .test-footer-bar{padding:14px 18px}
+  .test-footer-inner{gap:10px}
+  .block-nav{padding:0 18px;gap:6px}
 }

@@ -55,6 +55,16 @@
 
 .atlas-empty{text-align:center;padding:80px 24px;color:var(--sub);font-size:15px}
 
-@media(max-width:600px){
-  .atlas-grid{grid-template-columns:1fr}
+/* ── TABLET (≤1024px) ── */
+@media(max-width:1024px){
+  .atlas-hero{padding:104px 24px 36px}
+}
+
+/* ── PHONE (≤640px) ── */
+@media(max-width:640px){
+  .atlas-hero{padding:90px 20px 28px}
+  .atlas-controls{padding:0 20px 28px}
+  .atlas-grid{grid-template-columns:1fr;padding:0 20px}
+  .atlas-filter-row{gap:6px}
+  .atlas-chip{padding:8px 13px;font-size:12px}
 }

@@ -32,3 +32,9 @@
 
 /* hint под полем */
 .input-hint{ font-size: 11px; color: var(--ghost); margin-top: 4px; }
+
+/* ── PHONE (≤640px) ── */
+@media(max-width:640px){
+  .profile-avatar{ width: 84px; height: 84px; font-size: 28px; }
+  .profile-avatar-wrap{ margin-bottom: 22px; }
+}

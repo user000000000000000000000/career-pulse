@@ -222,11 +222,30 @@
 
 @keyframes cpFade { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
 
-@media (max-width: 500px) {
+/* ── TABLET (≤1024px) ── */
+@media (max-width: 1024px) {
+  .cp-diag .topbar { padding: 14px 20px; }
+  .cp-diag .block-title { font-size: 32px; }
+  .cp-diag .opt-grid.cols-3 { grid-template-columns: 1fr 1fr; }
+}
+
+/* ── PHONE (≤640px) ── */
+@media (max-width: 640px) {
   .cp-diag .pair-row { grid-template-columns: 1fr; }
   .cp-diag .r-grid, .cp-diag .result-cards { grid-template-columns: 1fr; }
   .cp-diag .container { padding: 20px 16px 60px; }
+  .cp-diag .block-title { font-size: 28px; letter-spacing: 2px; }
+  .cp-diag .scale-row { gap: 7px; }
   .cp-diag .scale-btn { width: 46px; height: 46px; font-size: 18px; }
   .cp-diag .bar-lbl { width: 90px; font-size: 10px; }
+  .cp-diag .dtrack-lbl { width: 64px; }
   .cp-diag .opt-grid.cols-2, .cp-diag .opt-grid.cols-3 { grid-template-columns: 1fr; }
+  .cp-diag .tb-block { display: none; }
+  .cp-diag .int-row { flex-wrap: wrap; }
+}
+
+/* ── маленькие телефоны (≤360px) — кнопки шкалы ужимаем ── */
+@media (max-width: 360px) {
+  .cp-diag .scale-row { gap: 5px; }
+  .cp-diag .scale-btn { width: 40px; height: 40px; font-size: 16px; }
 }

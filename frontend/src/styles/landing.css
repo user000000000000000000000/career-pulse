@@ -495,26 +495,56 @@ footer{
 .cp-landing .foot-links a:hover{ color: var(--accent); }
 .cp-landing .foot-copy{ font-size: 12px; color: var(--muted2); }
 
-/* ──────────────────────────── MOBILE */
-@media (max-width: 900px){
-  .cp-landing nav { padding: 16px 24px; }
+/* ──────────────────────────── TABLET (≤1024px) */
+@media (max-width: 1024px){
+  .cp-landing nav { padding: 16px 40px; }
+  .cp-landing nav.scrolled { padding: 12px 40px; }
+  .cp-landing .nav-links { gap: 24px; }
+  .cp-landing .hero { padding: 120px 40px 64px; }
+  .cp-landing .sec { padding: 76px 40px; }
+  .cp-landing .sec-full .sec-inner { padding: 76px 40px; }
+  .cp-landing .product-layout { grid-template-columns: 1fr; gap: 44px; }
+  .cp-landing .product-mock { position: static; max-width: 560px; }
+  .cp-landing .reg-section { padding: 76px 40px; }
+  .cp-landing .reg-inner { grid-template-columns: 1fr; gap: 48px; }
+  .cp-landing .trust-strip { padding: 28px 40px; gap: 32px; }
+  .cp-landing footer { padding: 40px; }
+}
+
+/* нав-ссылки прячем заранее — на узких планшетах не помещаются */
+@media (max-width: 860px){
   .cp-landing .nav-links { display: none; }
   .cp-landing .btn-ghost { display: none; }
-  .cp-landing .hero { padding: 110px 24px 60px; }
-  .cp-landing .hero-strip { gap: 0; }
-  .cp-landing .strip-item { min-width: 120px; padding: 0 10px; }
+}
+
+/* ──────────────────────────── PHONE (≤640px) */
+@media (max-width: 640px){
+  .cp-landing nav { padding: 14px 20px; }
+  .cp-landing nav.scrolled { padding: 12px 20px; }
+  .cp-landing .nav-logo { font-size: 22px; letter-spacing: 3px; }
+  .cp-landing .hero { padding: 100px 20px 52px; }
+  .cp-landing .hero-sub { font-size: 16px; margin: 24px auto 36px; }
+  .cp-landing .hero-actions { width: 100%; }
+  .cp-landing .hero-actions .btn-primary,
+  .cp-landing .hero-actions .btn-secondary { flex: 1; min-width: 0; padding: 16px 20px; text-align: center; }
+  .cp-landing .hero-strip { gap: 0; margin-top: 56px; padding-top: 40px; }
+  .cp-landing .strip-item { min-width: 50%; padding: 12px 10px; border-right: none; }
   .cp-landing .strip-num { font-size: 34px; }
-  .cp-landing .sec { padding: 60px 24px; }
-  .cp-landing .sec-full .sec-inner { padding: 60px 24px; }
+  .cp-landing .sec { padding: 56px 20px; }
+  .cp-landing .sec-full .sec-inner { padding: 56px 20px; }
+  .cp-landing .sec-lead { margin-bottom: 40px; }
   .cp-landing .pain-grid { grid-template-columns: 1fr; }
-  .cp-landing .product-layout { grid-template-columns: 1fr; }
-  .cp-landing .product-mock { position: static; }
+  .cp-landing .pain-card { padding: 32px 24px; }
+  .cp-landing .product-layout { gap: 32px; }
+  .cp-landing .product-mock { max-width: 100%; }
   .cp-landing .aud-grid { grid-template-columns: 1fr; }
-  .cp-landing .reg-section { padding: 60px 24px; }
-  .cp-landing .reg-inner { grid-template-columns: 1fr; gap: 40px; }
-  .cp-landing .trust-strip { padding: 24px; gap: 24px; }
-  .cp-landing footer { padding: 32px 24px; flex-direction: column; text-align: center; }
-  .cp-landing .foot-links { justify-content: center; }
+  .cp-landing .aud-card { padding: 28px 24px; }
+  .cp-landing .reg-section { padding: 56px 20px; }
+  .cp-landing .reg-inner { gap: 36px; }
+  .cp-landing .reg-form { padding: 28px 22px; }
+  .cp-landing .trust-strip { padding: 24px 20px; gap: 18px; }
+  .cp-landing footer { padding: 32px 20px; flex-direction: column; text-align: center; }
+  .cp-landing .foot-links { justify-content: center; flex-wrap: wrap; gap: 18px; }
   .cp-landing .form-row { grid-template-columns: 1fr; }
-  .cp-landing .roles-grid { grid-template-columns: 1fr 1fr; }
+  .cp-landing .roles-grid { grid-template-columns: 1fr; }
 }
