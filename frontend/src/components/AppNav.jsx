@@ -4,8 +4,7 @@ import { getCurrentUser, logout as doLogout } from '../services/auth'
 import '../styles/appnav.css'
 
 // Публичные страницы — там своя навигация, глобальное меню не нужно.
-// На /dashboard тоже не показываем: у кабинета есть собственный сайдбар.
-const HIDDEN_EXACT = ['/', '/login', '/register', '/dashboard']
+const HIDDEN_EXACT = ['/', '/login', '/register']
 function isHidden(path) {
   return HIDDEN_EXACT.includes(path) || path.startsWith('/legal')
 }

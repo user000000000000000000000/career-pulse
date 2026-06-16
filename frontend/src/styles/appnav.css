@@ -84,4 +84,16 @@
 
 /* ── Резервируем место под гамбургер в правом верхнем углу страниц с топбаром ── */
 .cp-diag .topbar{ padding-right: 70px; }
+.cp-dashboard .topbar{ padding-right: 70px; }
 .test-top-row{ padding-right: 56px; }
+
+/* На дашборде единым меню заменяем собственный мобильный гамбургер сайдбара
+   и кнопку выхода в шапке — чтобы не было двух меню одновременно. */
+.cp-dashboard .mobile-menu-btn{ display: none !important; }
+.cp-dashboard .topbar-logout-mobile{ display: none !important; }
+
+/* Боковой сайдбар больше не нужен — навигация целиком в глобальном меню.
+   Прячем его и растягиваем контент на всю ширину. */
+.cp-dashboard .sidebar{ display: none !important; }
+.cp-dashboard .main{ margin-left: 0 !important; }
+.cp-dashboard .content{ margin: 0 auto; }
