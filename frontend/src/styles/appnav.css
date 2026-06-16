@@ -1,0 +1,87 @@
+/* ════════════════════════════════════════════════════════════
+   Глобальное меню навигации (гамбургер + выезжающая панель).
+   Доступно на всех страницах приложения, на телефоне/планшете/ПК.
+   ════════════════════════════════════════════════════════════ */
+
+/* ── Кнопка-гамбургер (фиксирована в правом верхнем углу) ── */
+.appnav-burger{
+  position: fixed; top: 14px; right: 16px; z-index: 420;
+  width: 44px; height: 44px; border-radius: 11px;
+  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 5px;
+  background: rgba(17,17,32,0.92); border: 1px solid rgba(255,255,255,0.14);
+  backdrop-filter: blur(12px); cursor: pointer;
+  box-shadow: 0 6px 22px rgba(0,0,0,0.4); transition: border-color .2s, transform .15s;
+}
+.appnav-burger:hover{ border-color: var(--accent, #00e5c8); transform: translateY(-1px); }
+.appnav-burger span{
+  display: block; width: 20px; height: 2px; border-radius: 2px;
+  background: var(--text, #ecedf8); transition: transform .25s ease, opacity .2s ease;
+}
+.appnav-burger.is-open span:nth-child(1){ transform: translateY(7px) rotate(45deg); }
+.appnav-burger.is-open span:nth-child(2){ opacity: 0; }
+.appnav-burger.is-open span:nth-child(3){ transform: translateY(-7px) rotate(-45deg); }
+
+/* ── Затемнение фона ── */
+.appnav-overlay{
+  position: fixed; inset: 0; z-index: 430;
+  background: rgba(0,0,0,0.6); backdrop-filter: blur(3px);
+  animation: appnavFade .2s ease;
+}
+@keyframes appnavFade{ from{opacity:0} to{opacity:1} }
+
+/* ── Выезжающая панель ── */
+.appnav-drawer{
+  position: fixed; top: 0; right: 0; bottom: 0; z-index: 440;
+  width: 290px; max-width: 84vw;
+  background: var(--surface, #0c0c18);
+  border-left: 1px solid rgba(255,255,255,0.1);
+  box-shadow: -16px 0 48px rgba(0,0,0,0.5);
+  transform: translateX(100%); transition: transform .28s cubic-bezier(.4,0,.2,1);
+  display: flex; flex-direction: column;
+  font-family: 'Manrope', sans-serif;
+}
+.appnav-drawer.open{ transform: translateX(0); }
+
+.appnav-head{
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 18px 20px; border-bottom: 1px solid rgba(255,255,255,0.07);
+}
+.appnav-logo{
+  font-family: 'Bebas Neue', sans-serif; font-size: 20px; letter-spacing: 3px;
+  color: var(--text, #ecedf8);
+}
+.appnav-logo span{ color: var(--accent, #00e5c8); }
+.appnav-close{
+  background: none; border: none; color: var(--sub, #9898b8);
+  font-size: 20px; cursor: pointer; padding: 4px 8px; line-height: 1;
+  transition: color .2s;
+}
+.appnav-close:hover{ color: var(--text, #ecedf8); }
+
+.appnav-links{ display: flex; flex-direction: column; gap: 4px; padding: 14px 12px; overflow-y: auto; }
+.appnav-item{
+  display: flex; align-items: center; gap: 12px;
+  padding: 13px 14px; border-radius: 10px;
+  background: none; border: 1px solid transparent;
+  color: var(--sub, #9898b8); font-size: 14px; font-weight: 600;
+  font-family: 'Manrope', sans-serif; text-align: left; cursor: pointer;
+  transition: all .15s; width: 100%;
+}
+.appnav-item:hover{ background: rgba(255,255,255,0.05); color: var(--text, #ecedf8); }
+.appnav-item.active{
+  background: rgba(0,229,200,0.08); color: var(--accent, #00e5c8);
+  border-color: rgba(0,229,200,0.2);
+}
+.appnav-ic{ font-size: 17px; width: 22px; text-align: center; flex-shrink: 0; }
+.appnav-div{ height: 1px; background: rgba(255,255,255,0.07); margin: 8px 6px; }
+.appnav-danger:hover{ color: var(--danger, #ff4d6d); background: rgba(255,77,109,0.07); }
+
+/* На странице теста футер фиксирован снизу — поднимаем гамбургер чуть выше,
+   а на узких экранах слегка ужимаем. */
+@media (max-width: 640px){
+  .appnav-burger{ top: 10px; right: 12px; width: 42px; height: 42px; }
+}
+
+/* ── Резервируем место под гамбургер в правом верхнем углу страниц с топбаром ── */
+.cp-diag .topbar{ padding-right: 70px; }
+.test-top-row{ padding-right: 56px; }

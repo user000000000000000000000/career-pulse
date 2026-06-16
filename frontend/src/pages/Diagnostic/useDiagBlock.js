@@ -45,7 +45,8 @@ export default function useDiagBlock(blockNum) {
 
   const goNext = useCallback(async () => {
     const n = await CP.getNextBlock()
-    navigate(n ? '/test/' + n : '/dashboard')
+    // если остались непройденные блоки — на следующий; иначе сразу на страницу результатов
+    navigate(n ? '/test/' + n : '/diagnostic')
   }, [navigate])
 
   return { ready, timerRef, goNext }
