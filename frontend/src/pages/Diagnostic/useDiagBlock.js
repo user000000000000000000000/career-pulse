@@ -34,6 +34,15 @@ export default function useDiagBlock(blockNum) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [blockNum])
 
+  // Предупреждение при попытке закрыть/перезагрузить вкладку посреди блока,
+  // чтобы случайно не потерять незавершённые ответы (универсально для всех блоков).
+  useEffect(() => {
+    if (!ready) return
+    const handler = (e) => { e.preventDefault(); e.returnValue = '' }
+    window.addEventListener('beforeunload', handler)
+    return () => window.removeEventListener('beforeunload', handler)
+  }, [ready])
+
   const goNext = useCallback(async () => {
     const n = await CP.getNextBlock()
     navigate(n ? '/test/' + n : '/dashboard')

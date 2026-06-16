@@ -103,7 +103,15 @@ export default function Profile() {
       } else {
         // демо-режим: сохраняем в localStorage
         const stored = JSON.parse(localStorage.getItem('cp_user') || '{}')
-        localStorage.setItem('cp_user', JSON.stringify({ ...stored, name: form.full_name, phone: form.phone, role: form.role, avatar_url }))
+        const payload = { ...stored, name: form.full_name, phone: form.phone, role: form.role, avatar_url }
+        try {
+          localStorage.setItem('cp_user', JSON.stringify(payload))
+        } catch (quotaErr) {
+          // Фото слишком большое для localStorage — сохраняем профиль без него
+          console.warn('[Profile] localStorage quota, сохраняем без фото', quotaErr)
+          localStorage.setItem('cp_user', JSON.stringify({ ...payload, avatar_url: stored.avatar_url || '' }))
+          setError('Фото слишком большое для демо-режима — профиль сохранён без него. Подключите Supabase для хранения фото.')
+        }
       }
 
       setMsg('Профиль сохранён ✓')

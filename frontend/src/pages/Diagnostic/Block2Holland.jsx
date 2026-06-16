@@ -2,6 +2,7 @@ import { useState } from 'react'
 import CP from '../../services/cpStorage'
 import DiagShell, { ResultNav } from './DiagShell'
 import useDiagBlock from './useDiagBlock'
+import useBlockDraft from './useBlockDraft'
 
 // ════════════ DATA (порт block-2.html) ════════════
 const PAIRS = [
@@ -77,6 +78,23 @@ export default function Block2Holland() {
   const [openText, setOpenText] = useState('')
   const [result, setResult] = useState(null)
 
+  const clearDraft = useBlockDraft({
+    blockNum: 2, ready,
+    snapshot: () => ({ phase, pairIdx, scales, pairAnswers, matAnswers, antiSel, energySel, explorationVal, openText }),
+    restore: (d) => {
+      if (d.scales) Object.assign(scales, d.scales)
+      if (Array.isArray(d.pairAnswers)) { pairAnswers.length = 0; d.pairAnswers.forEach(x => pairAnswers.push(x)) }
+      if (d.matAnswers) Object.assign(matAnswers, d.matAnswers)
+      if (typeof d.pairIdx === 'number') setPairIdx(d.pairIdx)
+      if (Array.isArray(d.antiSel)) setAntiSel(d.antiSel)
+      if (Array.isArray(d.energySel)) setEnergySel(d.energySel)
+      if (typeof d.explorationVal === 'number') setExplorationVal(d.explorationVal)
+      if (typeof d.openText === 'string') setOpenText(d.openText)
+      if (d.phase) setPhase(d.phase === 'maturity' ? 'pairs' : d.phase)
+    },
+    deps: [phase, pairIdx, antiSel, energySel, explorationVal, openText],
+  })
+
   if (!ready) return null
 
   const progressDone = () => {
@@ -151,6 +169,7 @@ export default function Block2Holland() {
     await CP.saveBlockResult(2, { answers: pairAnswers, scores: { ...scores, flags }, durationSec: dur, openAnswers: [{ questionId: 'open', text: openText }] })
     await CP.updateProfile({ holland_scores: { R: norm.R, I: norm.I, A: norm.A, S: norm.S, E: norm.E, C: norm.C }, holland_top2: top2, holland_code: code, career_archetype: archetype, profile_clarity: clarity, profile_flexibility: flexibility, interest_maturity: matTop, anti_interests: antiSel, energy_sources: energySel, exploration_index: explorationVal })
     if (flags.length) await CP.updateExpertData({ flags })
+    clearDraft()
     setResult({ ...scores, durationSec: dur })
   }
 
