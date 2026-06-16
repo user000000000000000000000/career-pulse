@@ -511,17 +511,24 @@ footer{
   .cp-landing footer { padding: 40px; }
 }
 
-/* нав-ссылки прячем заранее — на узких планшетах не помещаются */
+/* нав-ссылки (якоря на секции) прячем заранее — на узких планшетах не помещаются.
+   Кнопки входа/регистрации/выхода НЕ трогаем — они должны быть доступны всегда. */
 @media (max-width: 860px){
   .cp-landing .nav-links { display: none; }
-  .cp-landing .btn-ghost { display: none; }
 }
 
 /* ──────────────────────────── PHONE (≤640px) */
 @media (max-width: 640px){
-  .cp-landing nav { padding: 14px 20px; }
-  .cp-landing nav.scrolled { padding: 12px 20px; }
-  .cp-landing .nav-logo { font-size: 22px; letter-spacing: 3px; }
+  .cp-landing nav { padding: 12px 16px; gap: 8px; }
+  .cp-landing nav.scrolled { padding: 10px 16px; }
+  .cp-landing .nav-logo { font-size: 20px; letter-spacing: 2px; }
+  .cp-landing .nav-logo-icon { width: 28px; height: 28px; }
+  /* дубли-кнопки убираем, оставляем главные действия (Войти/Выйти/Начать) */
+  .cp-landing .nav-hide-phone { display: none; }
+  .cp-landing .nav-right { gap: 7px; }
+  .cp-landing .nav-user { margin-right: 0 !important; }
+  .cp-landing .btn-nav { padding: 8px 13px; font-size: 12px; letter-spacing: 0.3px; }
+  .cp-landing .btn-ghost { padding: 8px 13px; font-size: 12px; }
   .cp-landing .hero { padding: 100px 20px 52px; }
   .cp-landing .hero-sub { font-size: 16px; margin: 24px auto 36px; }
   .cp-landing .hero-actions { width: 100%; }
