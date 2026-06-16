@@ -20,11 +20,13 @@ import Recomm from './pages/Legal/Recomm.jsx'
 
 import RequireAuth from './components/Layout/RequireAuth.jsx'
 import VkAuthHandler from './components/VkAuthHandler.jsx'
+import AppNav from './components/AppNav.jsx'
 
 export default function App() {
   return (
     <>
     <VkAuthHandler />
+    <AppNav />
     <Routes>
       <Route path="/" element={<Landing />} />
       <Route path="/register" element={<Register />} />

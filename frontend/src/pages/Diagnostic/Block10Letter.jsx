@@ -127,7 +127,10 @@ export default function Block10Letter() {
             <div style={{ fontSize: 12, color: 'var(--gold)', fontWeight: 700, letterSpacing: 1, marginBottom: 8, fontFamily: "'JetBrains Mono',monospace" }}>ЧТО ДАЛЬШЕ</div>
             <div style={{ fontSize: 13, color: 'var(--sub)', lineHeight: 1.7 }}>Наставник получит твоё письмо вместе с результатами всех тестов. ИИ-анализ выделит ключевые мотивы, противоречия и скрытые ресурсы.</div>
           </div>
-          <button className="btn btn-accent" onClick={() => navigate('/dashboard')}>Вернуться в кабинет →</button>
+          <div style={{ display: 'flex', gap: 12, justifyContent: 'center', flexWrap: 'wrap' }}>
+            <button className="btn btn-accent" onClick={() => navigate('/diagnostic')}>Посмотреть результаты 🧠</button>
+            <button className="btn btn-ghost" onClick={() => navigate('/dashboard')}>В кабинет →</button>
+          </div>
         </div>
       </DiagShell>
     )
