@@ -34,17 +34,23 @@ Deno.serve(async (req) => {
 
     let accessToken = body.access_token
 
-    // Legacy: если прислали code (без SDK) — обменяем сами
+    // Обмен кода на токен (PKCE). client_secret добавляем, только если задан.
     if (!accessToken && body.code) {
       const secret = Deno.env.get('VK_CLIENT_SECRET')
-      if (!secret) return json({ error: 'VK_CLIENT_SECRET не задан (нужен для обмена кода)' }, 500)
+      const form: Record<string, string> = {
+        grant_type: 'authorization_code',
+        code: body.code,
+        code_verifier: body.code_verifier || '',
+        client_id: appId,
+        device_id: body.device_id || '',
+        redirect_uri: body.redirect_uri || '',
+        state: body.state || '',
+      }
+      if (secret) form.client_secret = secret
       const tokenRes = await fetch('https://id.vk.com/oauth2/auth', {
         method: 'POST',
         headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-        body: new URLSearchParams({
-          grant_type: 'authorization_code', code: body.code, code_verifier: body.code_verifier || '',
-          client_id: appId, client_secret: secret, device_id: body.device_id || '', redirect_uri: body.redirect_uri || '',
-        }),
+        body: new URLSearchParams(form),
       })
       const td = await tokenRes.json()
       if (!tokenRes.ok || !td.access_token) return json({ error: 'VK token: ' + JSON.stringify(td) }, 400)
