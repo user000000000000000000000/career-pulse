@@ -208,12 +208,12 @@ export default function Landing() {
             : <span style={{width:'30px',height:'30px',borderRadius:'50%',background:'linear-gradient(135deg,var(--accent2),var(--accent))',display:'flex',alignItems:'center',justifyContent:'center',fontSize:'12px',fontWeight:'800',color:'#08080f',flexShrink:0}}>{initials(user.name)}</span>}
           {shortName(user.name)}
         </a>
-        <a href="/dashboard" className="btn-nav">Пройти диагностику</a>
+        <a href="/dashboard" className="btn-nav nav-hide-phone">Пройти диагностику</a>
         <button className="btn-ghost" style={{background:'transparent',cursor:'pointer',fontFamily:'inherit'}} onClick={onLogout}>Выйти</button>
       </>
     ) : (
       <>
-        <a href="#register" className="btn-ghost">Зарегистрироваться</a>
+        <a href="#register" className="btn-ghost nav-hide-phone">Зарегистрироваться</a>
         <a href="/login" className="btn-nav" style={{marginRight:'6px',background:'transparent',color:'var(--text)',border:'1px solid rgba(255,255,255,0.15)'}}>Войти</a><a href="#register" className="btn-nav">Начать бесплатно</a>
       </>
     )}

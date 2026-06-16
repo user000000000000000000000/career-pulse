@@ -207,6 +207,7 @@ export default function Dashboard() {
             <button className="topbar-btn notif-dot">🔔</button>
             <button className="topbar-btn btn-tour">🗺️ Как это работает</button>
             <a href="/" className="topbar-btn">← На главную</a>
+            <button className="topbar-btn sum-danger topbar-logout-mobile">🚪 Выйти</button>
           </div>
         </div>
 
