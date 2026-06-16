@@ -8,7 +8,7 @@
 .res-title{font-family:'Bebas Neue',sans-serif;font-size:clamp(40px,7vw,72px);letter-spacing:1px;
   line-height:.95;margin-bottom:28px}
 .res-grid{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-bottom:18px}
-@media (max-width:720px){.res-grid{grid-template-columns:1fr}}
+@media (max-width:1024px){.res-grid{grid-template-columns:1fr}}
 .res-card-h{display:flex;align-items:center;gap:10px;font-size:13px;font-weight:800;letter-spacing:1px;
   text-transform:uppercase;margin-bottom:16px}
 .res-card-h .dot{width:8px;height:8px;border-radius:50%}
@@ -35,7 +35,14 @@
 
 /* ─── Диаграммы ─── */
 .charts-section{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin:24px 0}
-@media (max-width:720px){.charts-section{grid-template-columns:1fr}}
+@media (max-width:1024px){.charts-section{grid-template-columns:1fr}}
+@media (max-width:640px){
+  .res-page{padding:88px 18px 60px}
+  .res-actions{flex-direction:column}
+  .res-actions .btn,.res-actions a{width:100%;justify-content:center;text-align:center}
+  .res-prof{flex-wrap:wrap}
+  .res-prof__tags{margin:6px 0;order:3;flex-basis:100%}
+}
 .chart-block{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:20px 16px}
 .chart-title{font-size:12px;font-weight:800;letter-spacing:1.5px;text-transform:uppercase;
   color:var(--ghost);margin-bottom:16px}

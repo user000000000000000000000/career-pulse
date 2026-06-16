@@ -21,3 +21,12 @@
 .cp-legal .auth-role--active{border-color:var(--accent);color:var(--accent);background:rgba(0,229,200,.06)}
 .cp-legal .auth-error{background:rgba(255,77,109,.1);border:1px solid rgba(255,77,109,.3);
   color:#ff8da3;border-radius:9px;padding:11px 14px;font-size:13px;margin-bottom:16px}
+
+/* ── PHONE (≤640px) ── */
+@media(max-width:640px){
+  .cp-legal .auth-wrap{padding:96px 18px 48px}
+  .cp-legal .auth-title{font-size:34px}
+}
+@media(max-width:380px){
+  .cp-legal .auth-roles{grid-template-columns:1fr}
+}

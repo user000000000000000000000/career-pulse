@@ -76,9 +76,19 @@ nav.legal-nav{
 .cp-legal .lf-links a{font-size:12px;color:var(--ghost);text-decoration:none;transition:color .2s}
 .cp-legal .lf-links a:hover{color:var(--sub)}
 
-@media(max-width:768px){
+/* ── TABLET (≤1024px) ── */
+@media(max-width:1024px){
+  .cp-legal nav.legal-nav{padding:16px 32px}
+  .cp-legal .legal-footer{padding:40px 32px}
+  .cp-legal .lf-grid{grid-template-columns:1fr 1fr;gap:32px}
+}
+
+/* ── PHONE (≤640px) ── */
+@media(max-width:640px){
   .cp-legal nav.legal-nav{padding:14px 20px}
   .cp-legal .container{padding:0 20px}
+  .cp-legal .legal-page{padding:96px 0 64px}
   .cp-legal .legal-footer{padding:32px 20px}
-  .cp-legal .lf-grid{grid-template-columns:1fr}
+  .cp-legal .lf-grid{grid-template-columns:1fr;gap:28px}
+  .cp-legal .lf-bottom{flex-direction:column;align-items:flex-start;gap:10px}
 }
