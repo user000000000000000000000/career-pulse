@@ -15,6 +15,8 @@
  *   const p = await CP.getProgress()
  */
 
+import { supabase, isSupabaseConfigured } from './supabase'
+
 const STORAGE_PREFIX = 'cp_'
 const DATA_VERSION = '1.0'
 
@@ -66,6 +68,55 @@ function deepMerge(target, source) {
   return result
 }
 
+// ── синхронизация с Supabase (зеркало localStorage ↔ profiles.diagnostic_data) ──
+function collectState() {
+  const state = {}
+  for (const name of ['profile', 'progress', 'expert_data', 'letter']) {
+    const v = get(name); if (v != null) state[name] = v
+  }
+  for (let i = 1; i <= TOTAL_BLOCKS; i++) {
+    const v = get('block_' + i); if (v != null) state['block_' + i] = v
+  }
+  return state
+}
+function applyState(state) {
+  if (!state || typeof state !== 'object') return
+  for (const [k, v] of Object.entries(state)) set(k, v)
+}
+
+let _pushTimer = null
+function pushRemote() {
+  if (!isSupabaseConfigured) return
+  clearTimeout(_pushTimer)
+  _pushTimer = setTimeout(async () => {
+    try {
+      const { data: { user } } = await supabase.auth.getUser()
+      if (!user) return
+      await supabase.from('profiles')
+        .update({ diagnostic_data: collectState(), diagnostic_updated_at: new Date().toISOString() })
+        .eq('id', user.id)
+    } catch (e) { console.warn('CP sync push:', e?.message || e) }
+  }, 800)
+}
+
+let _hydrated = false
+async function hydrateFromRemote() {
+  if (!isSupabaseConfigured || _hydrated) return false
+  _hydrated = true
+  try {
+    const { data: { user } } = await supabase.auth.getUser()
+    if (!user) return false
+    const { data } = await supabase.from('profiles').select('diagnostic_data').eq('id', user.id).maybeSingle()
+    const remote = data?.diagnostic_data
+    if (!remote) return false
+    const localCount = (get('progress')?.completed || []).length
+    const remoteCount = (remote.progress?.completed || []).length
+    // тянем с сервера только если там прогресс «свежее» — чтобы не затереть локальную работу
+    if (remoteCount > localCount) { applyState(remote); return true }
+  } catch (e) { console.warn('CP sync pull:', e?.message || e) }
+  return false
+}
+
 // ── публичный API ──
 const CP = {
   BLOCKS: BLOCKS_META,
@@ -114,6 +165,7 @@ const CP = {
       set('profile', prof)
     }
 
+    pushRemote()
     return result
   },
 
@@ -141,6 +193,7 @@ const CP = {
     const merged = deepMerge(get('profile') || {}, partialData)
     merged._updatedAt = new Date().toISOString()
     set('profile', merged)
+    pushRemote()
     return merged
   },
 
@@ -149,11 +202,13 @@ const CP = {
   async updateExpertData(partialData) {
     const merged = deepMerge(get('expert_data') || { flags: [], riskMap: {} }, partialData)
     set('expert_data', merged)
+    pushRemote()
     return merged
   },
 
   async saveLetter(letterData) {
     set('letter', { ...letterData, savedAt: new Date().toISOString() })
+    pushRemote()
     return true
   },
   async getLetter() { return get('letter') },
@@ -175,8 +230,12 @@ const CP = {
     progress.pct = Math.round((progress.completed.length / TOTAL_BLOCKS) * 100)
     progress.readyForConsultation = CONSULTATION_REQUIRED.every(n => progress.completed.includes(n))
     set('progress', progress)
+    pushRemote()
     return true
   },
+
+  /** Подтянуть состояние диагностики из Supabase в localStorage (один раз за загрузку). */
+  hydrateFromRemote,
 
   /** Таймер прохождения блока: const t = CP.startTimer(); ... t.stop() → секунды */
   startTimer() {

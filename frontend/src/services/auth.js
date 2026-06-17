@@ -70,6 +70,33 @@ export async function login({ email, password }) {
   return { user: data.user }
 }
 
+/** Запрос письма для сброса пароля. */
+export async function requestPasswordReset(email) {
+  if (!isSupabaseConfigured) return
+  const { error } = await supabase.auth.resetPasswordForEmail(email, {
+    redirectTo: window.location.origin + import.meta.env.BASE_URL,
+  })
+  if (error) throw new Error(translateAuthError(error.message))
+}
+
+/** Установить новый пароль (после перехода по ссылке восстановления). */
+export async function updatePassword(newPassword) {
+  if (!isSupabaseConfigured) throw new Error('Supabase не настроен')
+  const { error } = await supabase.auth.updateUser({ password: newPassword })
+  if (error) throw new Error(translateAuthError(error.message))
+}
+
+/** Повторно отправить письмо подтверждения регистрации. */
+export async function resendConfirmation(email) {
+  if (!isSupabaseConfigured) return
+  const { error } = await supabase.auth.resend({
+    type: 'signup',
+    email,
+    options: { emailRedirectTo: window.location.origin + import.meta.env.BASE_URL },
+  })
+  if (error) throw new Error(translateAuthError(error.message))
+}
+
 /** Выход. */
 export async function logout() {
   if (isSupabaseConfigured) await supabase.auth.signOut()

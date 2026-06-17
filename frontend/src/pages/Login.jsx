@@ -4,7 +4,7 @@ import Header from '../components/Layout/Header.jsx'
 import Card from '../components/UI/Card.jsx'
 import Input from '../components/UI/Input.jsx'
 import Button from '../components/UI/Button.jsx'
-import { login as doLogin } from '../services/auth'
+import { login as doLogin, requestPasswordReset } from '../services/auth'
 import '../styles/legal.css'
 import '../styles/auth.css'
 
@@ -14,6 +14,21 @@ export default function Login() {
   const [password, setPassword] = useState('')
   const [error, setError] = useState('')
   const [busy, setBusy] = useState(false)
+  const [resetMsg, setResetMsg] = useState('')
+
+  async function onForgot() {
+    setError(''); setResetMsg('')
+    if (!email.includes('@')) return setError('Введите email в поле выше, затем нажмите «Забыли пароль?»')
+    try {
+      setBusy(true)
+      await requestPasswordReset(email)
+      setResetMsg('Письмо для сброса пароля отправлено на ' + email + '. Проверьте почту (и папку «Спам»).')
+    } catch (err) {
+      setError(err.message || 'Не удалось отправить письмо')
+    } finally {
+      setBusy(false)
+    }
+  }
 
   async function onSubmit() {
     setError('')
@@ -39,6 +54,7 @@ export default function Login() {
           <p className="auth-sub">Войдите, чтобы продолжить карьерную диагностику.</p>
 
           {error && <div className="auth-error">{error}</div>}
+          {resetMsg && <div className="auth-success">{resetMsg}</div>}
 
           <Input
             id="login-email" label="Email" type="email" placeholder="ivan@email.com"
@@ -53,6 +69,12 @@ export default function Login() {
           <Button block onClick={onSubmit} disabled={busy}>
             {busy ? 'Входим…' : 'Войти →'}
           </Button>
+
+          <div style={{ textAlign: 'center', marginTop: 12 }}>
+            <button type="button" className="auth-link-btn" onClick={onForgot} disabled={busy}>
+              Забыли пароль?
+            </button>
+          </div>
 
           <div className="auth-foot">
             Нет аккаунта? <Link to="/register">Зарегистрироваться</Link>
