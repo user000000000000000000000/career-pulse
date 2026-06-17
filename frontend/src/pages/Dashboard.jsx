@@ -3,6 +3,8 @@ import { useNavigate } from 'react-router-dom'
 import { getCurrentUser, logout as doLogout } from '../services/auth'
 import CP from '../services/cpStorage'
 import { DEV_PROFILES, applyDevProfile } from '../data/devProfiles'
+import ContactLinks from '../components/ContactLinks.jsx'
+import SocialIcon from '../components/SocialIcon.jsx'
 import '../styles/dashboard.css'
 
 const BLOCKS = [
@@ -49,16 +51,23 @@ export default function Dashboard() {
   const rootRef = useRef(null)
   const navigate = useNavigate()
   const [completed, setCompleted] = useState([])
+  const [pct, setPct] = useState(0)
+  const [consultOpen, setConsultOpen] = useState(false)
+
+  // Минимум для консультации: блоки 1, 2, 3, 4, 10
+  const consultMissing = [1, 2, 3, 4, 10].filter(n => !completed.includes(n))
+  const consultReady = consultMissing.length === 0
+
+  // Фото наставника: положи файл в frontend/public/mentor-nikita.jpg.
+  // Если файла нет — img не загрузится и останутся инициалы «НС».
+  const mentorPhoto = import.meta.env.BASE_URL + 'mentor-nikita.jpg'
 
   useEffect(() => {
     let progAlive = true
     CP.getProgress().then((p) => {
       if (!progAlive) return
       setCompleted(p.completed || [])
-      const root = rootRef.current
-      if (!root) return
-      const el = root.querySelector('#progress-pct'); if (el) el.textContent = (p.pct || 0) + '%'
-      const fill = root.querySelector('#pb-fill'); if (fill) fill.style.width = (p.pct || 0) + '%'
+      setPct(p.pct || 0)
     })
     return () => { progAlive = false }
   }, [])
@@ -204,7 +213,6 @@ export default function Dashboard() {
             <div className="page-crumb">CareerPulse / <span>Дашборд диагностики</span></div>
           </div>
           <div className="topbar-right">
-            <button className="topbar-btn notif-dot">🔔</button>
             <button className="topbar-btn btn-tour">🗺️ Как это работает</button>
             <a href="/" className="topbar-btn">← На главную</a>
             <button className="topbar-btn sum-danger topbar-logout-mobile">🚪 Выйти</button>
@@ -229,15 +237,35 @@ export default function Dashboard() {
           <div className="progress-block">
             <div className="pb-header">
               <div className="pb-title">Прогресс профориентационной диагностики</div>
-              <div className="pb-pct" id="progress-pct">0%</div>
+              <div className="pb-pct-wrap">
+                <span className="pb-pct">{pct}%</span>
+                <span className="pb-pct-sub">пройдено</span>
+              </div>
             </div>
-            <div className="pb-milestones">
-              <div className="pb-milestone" style={{left:'10%'}}><div className="pm-dot"></div><div className="pm-label">Блок 1<br/>10%</div></div>
-              <div className="pb-milestone" style={{left:'45%'}}><div className="pm-dot"></div><div className="pm-label">Блоки 2–4<br/>45%</div></div>
-              <div className="pb-milestone" style={{left:'65%'}}><div className="pm-dot pm-key"></div><div className="pm-label">+ Письмо<br/>65%</div></div>
-              <div className="pb-milestone" style={{left:'100%'}}><div className="pm-dot"></div><div className="pm-label">Всё<br/>100%</div></div>
+            <div className="pb-bar">
+              <div className="pb-track"><div className="pb-fill" style={{ width: pct + '%' }}></div></div>
+              {[
+                { pos: 10, label: 'Блок 1' },
+                { pos: 45, label: 'Блоки 2–4' },
+                { pos: 65, label: '+ Письмо', key: true },
+                { pos: 100, label: 'Всё' },
+              ].map(m => {
+                const reached = pct >= m.pos
+                return (
+                  <div
+                    key={m.pos}
+                    className={'pb-mark' + (reached ? ' reached' : '') + (m.key ? ' key' : '')}
+                    style={{ left: m.pos + '%' }}
+                  >
+                    <span className="pb-mark-dot">{reached ? '✓' : ''}</span>
+                    <span className="pb-mark-label">
+                      <b>{m.pos}%</b>
+                      <span>{m.label}</span>
+                    </span>
+                  </div>
+                )
+              })}
             </div>
-            <div className="pb-track"><div className="pb-fill" id="pb-fill" style={{width:'0%'}}></div></div>
             <div className="pb-hint">Минимум для первой консультации — блоки 1, 2, 3, 4 + Письмо в будущее (блок 10)</div>
           </div>
 
@@ -263,13 +291,10 @@ export default function Dashboard() {
               {BLOCKS.map((blk) => {
                 const done = completed.includes(blk.n)
                 return (
-                  <div key={blk.n} className={['block-card', blk.special && 'block-card--special', done && 'block-card--available'].filter(Boolean).join(' ')}>
+                  <div key={blk.n} className={['block-card', done && 'block-card--done'].filter(Boolean).join(' ')}>
                     <div className="bc-top">
                       <div className="bc-num">{blk.num}</div>
-                      <div className="bc-axis" style={{color: blk.axisColor, borderColor: blk.axisColor + '44', background: blk.axisColor + '11'}}>{blk.axis}</div>
-                      {done && <div className="bc-badge bc-badge--special" style={{color:'var(--ok)',borderColor:'rgba(34,217,122,.3)',background:'rgba(34,217,122,.08)'}}>✓ Пройден</div>}
-                      {!done && blk.required && <div className="bc-badge bc-badge--req">Первым</div>}
-                      {!done && blk.special && <div className="bc-badge bc-badge--special">★ Ключевой</div>}
+                      {blk.special && <div className="bc-star" title="Ключевой блок">★</div>}
                     </div>
                     <div className="bc-title">{blk.title}</div>
                     <div className="bc-desc">{blk.desc}</div>
@@ -278,8 +303,8 @@ export default function Dashboard() {
                       <span>⏱ ~{blk.time} мин</span>
                       <span style={{marginLeft:'auto',color:'var(--ghost)'}}>+{blk.weight}% профиля</span>
                     </div>
-                    <a href={'/test/' + blk.n} className="btn btn-outline bc-btn">
-                      {done ? 'Пройти заново ↻' : 'Начать →'}
+                    <a href={'/test/' + blk.n} className={'btn bc-btn ' + (done ? 'bc-btn--redo' : 'bc-btn--start')}>
+                      {done ? '↻ Пройти заново' : 'Начать →'}
                     </a>
                   </div>
                 )
@@ -292,14 +317,14 @@ export default function Dashboard() {
             <div className="panel">
               <div className="panel-title">Мой наставник и эксперт</div>
               <div className="mentor-card">
-                <div className="m-av" style={{background:'linear-gradient(135deg,var(--violet),var(--accent))'}}>НС</div>
+                <div className="m-av" style={{background:'linear-gradient(135deg,var(--violet),var(--accent))'}}>НС<img src={mentorPhoto} alt="Никита Соколов" className="m-av-img" onError={(e) => { e.currentTarget.style.display = 'none' }} /></div>
                 <div style={{flex:'1'}}>
                   <div className="m-name">Никита Соколов</div>
                   <div className="m-spec">Профориентолог-наставник</div>
                   <div className="m-stars">★★★★★ · 10+ лет · 2000+ консультаций</div>
                   <div style={{fontSize:'11px',color:'var(--ghost)',marginTop:'4px'}}>9 лет в вузах · Санкт-Петербург</div>
                 </div>
-                <a href="https://t.me/SokolovNYU" target="_blank" className="m-btn" style={{textDecoration:'none'}}>Записаться</a>
+                <button className="m-btn" onClick={() => setConsultOpen(true)}>Записаться</button>
               </div>
               <div style={{marginTop:'12px',fontSize:'12px',color:'var(--ghost)',lineHeight:'1.6'}}>
                 После прохождения диагностики Никита разберёт твой полный профиль и поможет выстроить маршрут. Бесплатно получишь предварительные рекомендации после блоков 1–4.
@@ -364,11 +389,7 @@ export default function Dashboard() {
             <div className="footer-col">
               <h4>Контакты</h4>
               <ul>
-                <li><a href="https://t.me/SokolovNYU" target="_blank">✈️ Telegram</a></li>
-                <li><a href="https://vk.ru/sokolovnyu" target="_blank">🔵 ВКонтакте</a></li>
-                <li><a href="https://youtube.com/@SokolovNYU" target="_blank">▶️ YouTube</a></li>
-                <li><a href="https://rutube.ru/channel/SokolovNYU" target="_blank">📺 Rutube</a></li>
-                <li><a href="mailto:SokolovNYu@mail.ru">✉️ SokolovNYu@mail.ru</a></li>
+                <ContactLinks emailLabel="SokolovNYu@mail.ru" />
               </ul>
             </div>
           </div>
@@ -404,6 +425,44 @@ export default function Dashboard() {
             style={{ background: 'transparent', color: 'var(--sub)', border: '1px solid var(--line2)', borderRadius: 8, padding: '6px 14px', fontSize: 11, fontWeight: 700, cursor: 'pointer', fontFamily: "'Manrope',sans-serif" }}>
             🗑 Сбросить диагностику
           </button>
+        </div>
+      )}
+
+      {/* ── МОДАЛ ЗАПИСИ НА КОНСУЛЬТАЦИЮ ── */}
+      {consultOpen && (
+        <div className="modal-overlay show" onClick={(e) => { if (e.target.classList.contains('modal-overlay')) setConsultOpen(false) }}>
+          <div className="modal-box" style={{ maxWidth: 520 }}>
+            <div className="modal-head">
+              <h3>ЗАПИСЬ НА КОНСУЛЬТАЦИЮ</h3>
+              <button className="modal-close" onClick={() => setConsultOpen(false)}>✕</button>
+            </div>
+            <div className="modal-body">
+              <div className="mentor-card" style={{ marginBottom: 16 }}>
+                <div className="m-av" style={{ background: 'linear-gradient(135deg,var(--violet),var(--accent))' }}>НС<img src={mentorPhoto} alt="Никита Соколов" className="m-av-img" onError={(e) => { e.currentTarget.style.display = 'none' }} /></div>
+                <div style={{ flex: 1 }}>
+                  <div className="m-name">Никита Соколов</div>
+                  <div className="m-spec">Профориентолог-наставник</div>
+                  <div className="m-stars">★★★★★ · 10+ лет · 2000+ консультаций</div>
+                </div>
+              </div>
+              <p style={{ fontSize: 14, color: 'var(--sub)', lineHeight: 1.6, marginBottom: 14 }}>
+                Первая ознакомительная консультация — <strong style={{ color: 'var(--text)' }}>бесплатно, 30 минут</strong>. Никита разберёт твой профиль и поможет наметить карьерный маршрут.
+              </p>
+              <div className={'consult-status ' + (consultReady ? 'ok' : 'wait')}>
+                {consultReady
+                  ? '✅ Профиль готов к разбору — все ключевые блоки пройдены.'
+                  : `⏳ Для предварительных рекомендаций пройди ещё блоки: ${consultMissing.join(', ')} (нужны 1–4 и 10).`}
+              </div>
+              <div className="consult-actions">
+                <a className="btn btn-accent" href="https://t.me/SokolovNYU" target="_blank" rel="noopener"><SocialIcon name="telegram" style={{ marginRight: 7, verticalAlign: '-4px' }} /> Написать в Telegram</a>
+                <a className="btn btn-outline" href="https://vk.com/sokolovnyu" target="_blank" rel="noopener"><SocialIcon name="vk" style={{ marginRight: 7, verticalAlign: '-4px' }} /> ВКонтакте</a>
+                <a className="btn btn-outline" href="mailto:SokolovNYU@mail.ru?subject=Запись%20на%20консультацию%20CareerPulse&body=Здравствуйте!%20Хочу%20записаться%20на%20профориентационную%20консультацию."><SocialIcon name="email" style={{ marginRight: 7, verticalAlign: '-4px' }} /> Email</a>
+              </div>
+              <div style={{ fontSize: 11, color: 'var(--ghost)', marginTop: 14, lineHeight: 1.6 }}>
+                Напиши удобным способом — Никита ответит и подберёт время. Telegram отвечает быстрее всего.
+              </div>
+            </div>
+          </div>
         </div>
       )}
 

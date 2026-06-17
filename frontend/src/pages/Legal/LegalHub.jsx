@@ -1,4 +1,5 @@
 import LegalShell from './LegalShell.jsx'
+import SocialIcon from '../../components/SocialIcon.jsx'
 
 export default function LegalHub() {
   return (
@@ -55,7 +56,14 @@ export default function LegalHub() {
         <div className="dc-desc">Уведомление об использовании алгоритмов персонализации. Основание: ФЗ-236.</div>
         <div className="dc-link">Читать документ →</div>
       </a>
-      <a href="#" className="doc-card dc6">
+      <a
+        href="#"
+        className="doc-card dc6"
+        onClick={(e) => {
+          e.preventDefault()
+          alert('CareerPulse использует только технические cookie, необходимые для работы сайта и авторизации. Аналитических и рекламных cookie нет.\n\nОтключить технические cookie можно в настройках вашего браузера (раздел «Конфиденциальность») — но тогда вход в личный кабинет работать не будет.')
+        }}
+      >
         <div className="dc-icon">🍪</div>
         <div className="dc-title">Настройки Cookie</div>
         <div className="dc-desc">Управление файлами cookie. Можно отключить в настройках браузера или через расширение.</div>
@@ -66,23 +74,23 @@ export default function LegalHub() {
     <div className="section-title">КОНТАКТЫ</div>
     <div className="contacts-grid">
       <a href="https://t.me/SokolovNYU" target="_blank" className="contact-card">
-        <div className="cc-icon">✈️</div>
+        <div className="cc-icon"><SocialIcon name="telegram" size={24} /></div>
         <div><div className="cc-name">Telegram</div><div className="cc-handle">@SokolovNYU</div></div>
       </a>
       <a href="https://vk.ru/sokolovnyu" target="_blank" className="contact-card">
-        <div className="cc-icon">🔵</div>
+        <div className="cc-icon"><SocialIcon name="vk" size={24} /></div>
         <div><div className="cc-name">ВКонтакте</div><div className="cc-handle">vk.ru/sokolovnyu</div></div>
       </a>
       <a href="https://youtube.com/@SokolovNYU" target="_blank" className="contact-card">
-        <div className="cc-icon">▶️</div>
+        <div className="cc-icon"><SocialIcon name="youtube" size={24} /></div>
         <div><div className="cc-name">YouTube</div><div className="cc-handle">@SokolovNYU</div></div>
       </a>
       <a href="https://rutube.ru/channel/SokolovNYU" target="_blank" className="contact-card">
-        <div className="cc-icon">📺</div>
+        <div className="cc-icon"><SocialIcon name="rutube" size={24} /></div>
         <div><div className="cc-name">Rutube</div><div className="cc-handle">SokolovNYU</div></div>
       </a>
       <a href="mailto:SokolovNYu@mail.ru" className="contact-card">
-        <div className="cc-icon">✉️</div>
+        <div className="cc-icon"><SocialIcon name="email" size={24} /></div>
         <div><div className="cc-name">Email</div><div className="cc-handle">SokolovNYu@mail.ru</div></div>
       </a>
       <a href="tel:+79531687580" className="contact-card">

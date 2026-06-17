@@ -464,7 +464,7 @@ export default function Landing() {
     <div className="reg-form reveal d2" id="reg-form-wrap">
       <div id="form-content">
         <div className="reg-form-title">Создать аккаунт</div>
-        <div className="reg-form-sub">Уже есть аккаунт? <a href="#" style={{color:'var(--accent)'}}>Войти</a></div>
+        <div className="reg-form-sub">Уже есть аккаунт? <a href="/login" style={{color:'var(--accent)'}}>Войти</a></div>
 
         
         <div style={{marginBottom:'18px'}}>

@@ -30,21 +30,18 @@ export async function register({ name, email, password, role }) {
   const { data, error } = await supabase.auth.signUp({
     email,
     password,
-    options: { data: { full_name: name, role } }
+    options: {
+      data: { full_name: name, role },
+      // Куда вернуть пользователя после клика по ссылке в письме.
+      // Должен совпадать с одним из Redirect URLs в настройках Supabase Auth.
+      emailRedirectTo: window.location.origin + import.meta.env.BASE_URL,
+    }
   })
   if (error) throw new Error(translateAuthError(error.message))
 
-  // Профиль (таблица public.profiles). Может создаваться и триггером в БД —
-  // upsert безопасен в обоих случаях.
-  if (data.user) {
-    await supabase.from('profiles').upsert({
-      id: data.user.id,
-      email,
-      full_name: name,
-      role,
-      has_passed_test: false
-    })
-  }
+  // ВАЖНО: при включённом подтверждении почты у signUp ещё НЕТ сессии,
+  // поэтому запись в profiles здесь упёрлась бы в RLS (403). Профиль
+  // создаётся лениво в getCurrentUser() — уже после входа, когда есть JWT.
   return { user: data.user }
 }
 
@@ -85,11 +82,29 @@ export async function getCurrentUser() {
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) return null
 
-  const { data: profile } = await supabase
+  let { data: profile } = await supabase
     .from('profiles')
     .select('full_name, role, has_passed_test, email, phone, avatar_url')
     .eq('id', user.id)
     .maybeSingle()
+
+  // Профиля ещё нет (например, первый вход после подтверждения почты) —
+  // создаём его здесь, уже с действующей сессией пользователя (без 403).
+  if (!profile) {
+    const seed = {
+      id: user.id,
+      email: user.email,
+      full_name: user.user_metadata?.full_name || '',
+      role: user.user_metadata?.role || 'specialist',
+      has_passed_test: false,
+    }
+    const { data: created } = await supabase
+      .from('profiles')
+      .upsert(seed)
+      .select('full_name, role, has_passed_test, email, phone, avatar_url')
+      .maybeSingle()
+    profile = created || seed
+  }
 
   return {
     id: user.id,
