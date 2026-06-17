@@ -4,7 +4,7 @@ import Header from '../components/Layout/Header.jsx'
 import Card from '../components/UI/Card.jsx'
 import Input from '../components/UI/Input.jsx'
 import Button from '../components/UI/Button.jsx'
-import { register as doRegister } from '../services/auth'
+import { register as doRegister, resendConfirmation } from '../services/auth'
 import { isSupabaseConfigured } from '../services/supabase'
 import '../styles/legal.css'
 import '../styles/auth.css'
@@ -24,6 +24,17 @@ export default function Register() {
   const [error, setError]         = useState('')
   const [busy, setBusy]           = useState(false)
   const [confirmed, setConfirmed] = useState(false)
+  const [resendMsg, setResendMsg] = useState('')
+
+  async function onResend() {
+    setResendMsg('')
+    try {
+      await resendConfirmation(form.email)
+      setResendMsg('Письмо отправлено повторно на ' + form.email + '. Проверьте почту и «Спам».')
+    } catch (err) {
+      setResendMsg(err.message || 'Не удалось отправить письмо повторно (возможно, лимит — подождите немного).')
+    }
+  }
 
   const upd = (k) => (e) => setForm({ ...form, [k]: e.target.value })
 
@@ -62,8 +73,14 @@ export default function Register() {
               Мы отправили письмо на <strong>{form.email}</strong>.<br />
               Перейдите по ссылке в письме, чтобы активировать аккаунт.
             </p>
+            {resendMsg && <div className="auth-success" style={{ marginTop: 18 }}>{resendMsg}</div>}
             <div style={{ marginTop: 24 }}>
               <Button block onClick={() => navigate('/login')}>Перейти ко входу →</Button>
+            </div>
+            <div style={{ textAlign: 'center', marginTop: 12 }}>
+              <button type="button" className="auth-link-btn" onClick={onResend}>
+                Не пришло письмо? Отправить ещё раз
+              </button>
             </div>
           </div>
         </Card>

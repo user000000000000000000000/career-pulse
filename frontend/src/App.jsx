@@ -3,6 +3,7 @@ import { Routes, Route, Navigate } from 'react-router-dom'
 import Landing from './pages/Landing.jsx'
 import Register from './pages/Register.jsx'
 import Login from './pages/Login.jsx'
+import ResetPassword from './pages/ResetPassword.jsx'
 import Dashboard from './pages/Dashboard.jsx'
 import DiagnosticBlock from './pages/Diagnostic/DiagnosticBlock.jsx'
 import DiagResults from './pages/Diagnostic/DiagResults.jsx'
@@ -20,17 +21,20 @@ import Recomm from './pages/Legal/Recomm.jsx'
 
 import RequireAuth from './components/Layout/RequireAuth.jsx'
 import VkAuthHandler from './components/VkAuthHandler.jsx'
+import AuthRecoveryHandler from './components/AuthRecoveryHandler.jsx'
 import AppNav from './components/AppNav.jsx'
 
 export default function App() {
   return (
     <>
     <VkAuthHandler />
+    <AuthRecoveryHandler />
     <AppNav />
     <Routes>
       <Route path="/" element={<Landing />} />
       <Route path="/register" element={<Register />} />
       <Route path="/login" element={<Login />} />
+      <Route path="/reset-password" element={<ResetPassword />} />
 
       <Route path="/dashboard" element={<RequireAuth><Dashboard /></RequireAuth>} />
       <Route path="/test"        element={<Navigate to="/test/1" replace />} />

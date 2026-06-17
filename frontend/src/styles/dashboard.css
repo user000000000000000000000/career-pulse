@@ -311,7 +311,27 @@
 .cp-dashboard .consult-status.ok{background:rgba(34,217,122,.08);border:1px solid rgba(34,217,122,.25);color:var(--ok)}
 .cp-dashboard .consult-status.wait{background:rgba(245,200,66,.08);border:1px solid rgba(245,200,66,.25);color:var(--gold)}
 .cp-dashboard .consult-actions{display:flex;gap:10px;flex-wrap:wrap}
-.cp-dashboard .consult-actions .btn{flex:1;min-width:140px;justify-content:center;text-decoration:none}
+.cp-dashboard .consult-actions .btn{flex:1;min-width:120px;justify-content:center;text-decoration:none}
 @media(max-width:640px){
   .cp-dashboard .consult-actions .btn{flex-basis:100%}
 }
+
+/* форма заявки */
+.cp-dashboard .consult-field{display:flex;flex-direction:column;gap:5px;margin-bottom:12px}
+.cp-dashboard .consult-field label{font-size:12px;font-weight:700;color:var(--sub)}
+.cp-dashboard .consult-input,
+.cp-dashboard .consult-textarea{
+  width:100%;background:var(--card2);border:1px solid var(--line2);border-radius:8px;
+  color:var(--text);padding:11px 13px;font-size:14px;font-family:'Manrope',sans-serif;
+  outline:none;transition:border-color .2s;resize:vertical;
+}
+.cp-dashboard .consult-input:focus,
+.cp-dashboard .consult-textarea:focus{border-color:var(--accent)}
+.cp-dashboard .consult-input::placeholder,
+.cp-dashboard .consult-textarea::placeholder{color:var(--ghost)}
+.cp-dashboard .consult-divider{
+  display:flex;align-items:center;gap:12px;margin:18px 0 14px;
+  font-size:11px;color:var(--ghost);text-transform:uppercase;letter-spacing:1px;
+}
+.cp-dashboard .consult-divider::before,
+.cp-dashboard .consult-divider::after{content:'';flex:1;height:1px;background:var(--line)}

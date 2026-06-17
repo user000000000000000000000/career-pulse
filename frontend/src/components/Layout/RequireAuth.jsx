@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { Navigate } from 'react-router-dom'
 import { getCurrentUser } from '../../services/auth'
+import CP from '../../services/cpStorage'
 
 /** Защищает маршрут: пускает только авторизованных. */
 export default function RequireAuth({ children }) {
@@ -8,9 +9,17 @@ export default function RequireAuth({ children }) {
 
   useEffect(() => {
     let alive = true
-    getCurrentUser()
-      .then(user => { if (alive) setState({ loading: false, user }) })
-      .catch(() => { if (alive) setState({ loading: false, user: null }) })
+    ;(async () => {
+      try {
+        const user = await getCurrentUser()
+        // Подтягиваем результаты диагностики из базы (если на сервере свежее),
+        // чтобы они были доступны с любого устройства.
+        if (user) { try { await CP.hydrateFromRemote() } catch { /* не критично */ } }
+        if (alive) setState({ loading: false, user })
+      } catch {
+        if (alive) setState({ loading: false, user: null })
+      }
+    })()
     return () => { alive = false }
   }, [])
 

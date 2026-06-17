@@ -31,7 +31,7 @@ function HollandRadar({ scores }) {
   })
   const dots = types.map((t, i) => { const [x, y] = pt(i, (scores[t] || 0) / 100); return <circle key={i} cx={x.toFixed(1)} cy={y.toFixed(1)} r="4" fill="#00e5c8" /> })
   return (
-    <svg viewBox="0 0 260 270" style={{ width: '100%', maxWidth: 280 }} xmlns="http://www.w3.org/2000/svg">
+    <svg viewBox="-48 -6 356 290" style={{ width: '100%', maxWidth: 320 }} xmlns="http://www.w3.org/2000/svg">
       <defs><linearGradient id="rg" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stopColor="#7b5cf0" stopOpacity="0.3" /><stop offset="100%" stopColor="#00e5c8" stopOpacity="0.3" /></linearGradient></defs>
       {rings}{axes}
       <polygon points={poly} fill="url(#rg)" stroke="#00e5c8" strokeWidth="2" />

@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import { getCurrentUser, logout as doLogout } from '../services/auth'
 import CP from '../services/cpStorage'
 import { DEV_PROFILES, applyDevProfile } from '../data/devProfiles'
+import { submitConsultRequest } from '../services/consult'
 import ContactLinks from '../components/ContactLinks.jsx'
 import SocialIcon from '../components/SocialIcon.jsx'
 import '../styles/dashboard.css'
@@ -52,7 +53,31 @@ export default function Dashboard() {
   const navigate = useNavigate()
   const [completed, setCompleted] = useState([])
   const [pct, setPct] = useState(0)
+  const [me, setMe] = useState({ name: '', phone: '' })
   const [consultOpen, setConsultOpen] = useState(false)
+  const [consultForm, setConsultForm] = useState({ name: '', contact: '', message: '' })
+  const [consultBusy, setConsultBusy] = useState(false)
+  const [consultErr, setConsultErr] = useState('')
+  const [consultSent, setConsultSent] = useState(false)
+
+  function openConsult() {
+    setConsultForm({ name: me.name || '', contact: me.phone || '', message: '' })
+    setConsultErr(''); setConsultSent(false); setConsultOpen(true)
+  }
+  async function sendConsult() {
+    setConsultErr('')
+    if (!consultForm.name.trim()) return setConsultErr('Укажите имя')
+    if (!consultForm.contact.trim()) return setConsultErr('Укажите контакт для связи (телефон, Telegram или email)')
+    try {
+      setConsultBusy(true)
+      await submitConsultRequest(consultForm)
+      setConsultSent(true)
+    } catch (e) {
+      setConsultErr(e.message || 'Не удалось отправить заявку. Попробуйте написать напрямую ниже.')
+    } finally {
+      setConsultBusy(false)
+    }
+  }
 
   // Минимум для консультации: блоки 1, 2, 3, 4, 10
   const consultMissing = [1, 2, 3, 4, 10].filter(n => !completed.includes(n))
@@ -82,6 +107,7 @@ export default function Dashboard() {
     let alive = true
     getCurrentUser().then((u) => {
       if (!alive || !u) return
+      setMe({ name: u.name || '', phone: u.phone || '' })
       // ФИО хранится как «Фамилия Имя [Отчество]» → имя = 2-е слово
       const parts = (u.name || '').trim().split(/\s+/).filter(Boolean)
       const family = parts[0] || ''
@@ -324,7 +350,7 @@ export default function Dashboard() {
                   <div className="m-stars">★★★★★ · 10+ лет · 2000+ консультаций</div>
                   <div style={{fontSize:'11px',color:'var(--ghost)',marginTop:'4px'}}>9 лет в вузах · Санкт-Петербург</div>
                 </div>
-                <button className="m-btn" onClick={() => setConsultOpen(true)}>Записаться</button>
+                <button className="m-btn" onClick={openConsult}>Записаться</button>
               </div>
               <div style={{marginTop:'12px',fontSize:'12px',color:'var(--ghost)',lineHeight:'1.6'}}>
                 После прохождения диагностики Никита разберёт твой полный профиль и поможет выстроить маршрут. Бесплатно получишь предварительные рекомендации после блоков 1–4.
@@ -453,13 +479,44 @@ export default function Dashboard() {
                   ? '✅ Профиль готов к разбору — все ключевые блоки пройдены.'
                   : `⏳ Для предварительных рекомендаций пройди ещё блоки: ${consultMissing.join(', ')} (нужны 1–4 и 10).`}
               </div>
+
+              {consultSent ? (
+                <div className="consult-status ok" style={{ textAlign: 'center', padding: '18px 14px' }}>
+                  ✅ Заявка отправлена! Никита свяжется с тобой по указанному контакту. Если хочешь быстрее — напиши сам в Telegram ниже.
+                </div>
+              ) : (
+                <>
+                  <div className="consult-field">
+                    <label>Имя</label>
+                    <input className="consult-input" value={consultForm.name}
+                      onChange={e => setConsultForm(f => ({ ...f, name: e.target.value }))}
+                      placeholder="Как к тебе обращаться" />
+                  </div>
+                  <div className="consult-field">
+                    <label>Контакт для связи</label>
+                    <input className="consult-input" value={consultForm.contact}
+                      onChange={e => setConsultForm(f => ({ ...f, contact: e.target.value }))}
+                      placeholder="Телефон, @telegram или email" />
+                  </div>
+                  <div className="consult-field">
+                    <label>Сообщение <span style={{ color: 'var(--ghost)' }}>(необязательно)</span></label>
+                    <textarea className="consult-textarea" rows={2} value={consultForm.message}
+                      onChange={e => setConsultForm(f => ({ ...f, message: e.target.value }))}
+                      placeholder="Удобное время, вопросы…" />
+                  </div>
+                  {consultErr && <div className="consult-status wait" style={{ marginBottom: 12 }}>{consultErr}</div>}
+                  <button className="btn btn-accent" style={{ width: '100%', justifyContent: 'center' }}
+                    onClick={sendConsult} disabled={consultBusy}>
+                    {consultBusy ? 'Отправляем…' : 'Отправить заявку'}
+                  </button>
+                </>
+              )}
+
+              <div className="consult-divider"><span>или напиши напрямую</span></div>
               <div className="consult-actions">
-                <a className="btn btn-accent" href="https://t.me/SokolovNYU" target="_blank" rel="noopener"><SocialIcon name="telegram" style={{ marginRight: 7, verticalAlign: '-4px' }} /> Написать в Telegram</a>
+                <a className="btn btn-outline" href="https://t.me/SokolovNYU" target="_blank" rel="noopener"><SocialIcon name="telegram" style={{ marginRight: 7, verticalAlign: '-4px' }} /> Telegram</a>
                 <a className="btn btn-outline" href="https://vk.com/sokolovnyu" target="_blank" rel="noopener"><SocialIcon name="vk" style={{ marginRight: 7, verticalAlign: '-4px' }} /> ВКонтакте</a>
-                <a className="btn btn-outline" href="mailto:SokolovNYU@mail.ru?subject=Запись%20на%20консультацию%20CareerPulse&body=Здравствуйте!%20Хочу%20записаться%20на%20профориентационную%20консультацию."><SocialIcon name="email" style={{ marginRight: 7, verticalAlign: '-4px' }} /> Email</a>
-              </div>
-              <div style={{ fontSize: 11, color: 'var(--ghost)', marginTop: 14, lineHeight: 1.6 }}>
-                Напиши удобным способом — Никита ответит и подберёт время. Telegram отвечает быстрее всего.
+                <a className="btn btn-outline" href="mailto:SokolovNYU@mail.ru?subject=Запись%20на%20консультацию%20CareerPulse"><SocialIcon name="email" style={{ marginRight: 7, verticalAlign: '-4px' }} /> Email</a>
               </div>
             </div>
           </div>
