@@ -1,4 +1,5 @@
 import { Link } from 'react-router-dom'
+import ContactLinks from '../ContactLinks.jsx'
 import '../../styles/legal.css'
 
 /** Подвал в стиле правовых страниц (бренд + документы + контакты). */
@@ -25,11 +26,7 @@ export default function Footer() {
           <div className="lf-col">
             <h4>Контакты</h4>
             <ul>
-              <li><a href="https://t.me/SokolovNYU" target="_blank" rel="noreferrer">✈️ Telegram</a></li>
-              <li><a href="https://vk.ru/sokolovnyu" target="_blank" rel="noreferrer">🔵 ВКонтакте</a></li>
-              <li><a href="https://youtube.com/@SokolovNYU" target="_blank" rel="noreferrer">▶️ YouTube</a></li>
-              <li><a href="https://rutube.ru/channel/SokolovNYU" target="_blank" rel="noreferrer">📺 Rutube</a></li>
-              <li><a href="mailto:SokolovNYu@mail.ru">✉️ Email</a></li>
+              <ContactLinks />
             </ul>
           </div>
         </div>

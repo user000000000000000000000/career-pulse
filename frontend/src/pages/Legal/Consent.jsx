@@ -87,11 +87,7 @@ export default function Consent() {
       <div className="lf-col">
         <h4>Контакты</h4>
         <ul>
-          <li><a href="https://t.me/SokolovNYU" target="_blank">✈️ Telegram</a></li>
-          <li><a href="https://vk.ru/sokolovnyu" target="_blank">🔵 ВКонтакте</a></li>
-          <li><a href="https://youtube.com/@SokolovNYU" target="_blank">▶️ YouTube</a></li>
-          <li><a href="https://rutube.ru/channel/SokolovNYU" target="_blank">📺 Rutube</a></li>
-          <li><a href="mailto:SokolovNYu@mail.ru">✉️ Email</a></li>
+          <ContactLinks />
         </ul>
       </div>
     </div>
