@@ -39,6 +39,13 @@ export async function register({ name, email, password, role }) {
   })
   if (error) throw new Error(translateAuthError(error.message))
 
+  // Если email уже зарегистрирован, Supabase (для защиты от перебора) возвращает
+  // "пустого" пользователя без identities и НЕ шлёт письмо. Ловим это явно,
+  // чтобы не показывать ложное «письмо отправлено».
+  if (data.user && Array.isArray(data.user.identities) && data.user.identities.length === 0) {
+    throw new Error('Этот email уже зарегистрирован. Войдите в аккаунт или восстановите пароль.')
+  }
+
   // ВАЖНО: при включённом подтверждении почты у signUp ещё НЕТ сессии,
   // поэтому запись в profiles здесь упёрлась бы в RLS (403). Профиль
   // создаётся лениво в getCurrentUser() — уже после входа, когда есть JWT.
