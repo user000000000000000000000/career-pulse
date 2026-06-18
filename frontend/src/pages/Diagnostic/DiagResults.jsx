@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import CP from '../../services/cpStorage'
 import { analyzeDiagnostic } from '../../services/diagnosticAPI'
+import { matchProfessions } from '../../data/professions.js'
 import '../../styles/diagnostic.css'
 
 const TYPE_NAMES = { R: 'Реалистичный', I: 'Исследоват.', A: 'Артистичный', S: 'Социальный', E: 'Предприимч.', C: 'Конвенц.' }
@@ -67,6 +68,8 @@ export default function DiagResults() {
 
   if (!profile) return null
   const has = progress.completed.length > 0
+  // Подходящие профессии берём ИЗ АТЛАСА по Holland-профилю (всё на русском, с привязкой к атласу)
+  const atlasProfs = matchProfessions(profile, 7)
 
   if (!has) {
     return (
@@ -131,14 +134,18 @@ export default function DiagResults() {
               )}
             </div>
           )}
-          {!repLoading && report?.recommended_professions?.length > 0 && (
+          {atlasProfs.length > 0 && (
             <div style={{ marginTop: 16 }}>
-              <div className="r-label" style={{ color: 'var(--accent)', marginBottom: 8 }}>Подходящие профессии</div>
+              <div className="r-label" style={{ color: 'var(--accent)', marginBottom: 8 }}>Подходящие профессии <span style={{ color: 'var(--ghost)', fontWeight: 400 }}>· из атласа</span></div>
               <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
-                {report.recommended_professions.map((p, i) => (
-                  <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 10, fontSize: 13 }}>
-                    <span style={{ flex: 1 }}>{p.name}</span>
-                    {typeof p.match === 'number' && <span style={{ fontFamily: "'JetBrains Mono',monospace", fontWeight: 700, color: 'var(--accent)' }}>{p.match}%</span>}
+                {atlasProfs.map((p) => (
+                  <div key={p.id}
+                    onClick={() => navigate('/atlas', { state: { q: p.name } })}
+                    style={{ display: 'flex', alignItems: 'center', gap: 10, fontSize: 13, cursor: 'pointer', padding: '6px 8px', borderRadius: 8, transition: 'background .15s' }}
+                    onMouseEnter={e => e.currentTarget.style.background = 'rgba(255,255,255,.04)'}
+                    onMouseLeave={e => e.currentTarget.style.background = 'transparent'}>
+                    <span style={{ flex: 1 }}>{p.name} <span style={{ color: 'var(--ghost)', fontSize: 11 }}>→ в атласе</span></span>
+                    <span style={{ fontFamily: "'JetBrains Mono',monospace", fontWeight: 700, color: 'var(--accent)' }}>{p.match}%</span>
                   </div>
                 ))}
               </div>

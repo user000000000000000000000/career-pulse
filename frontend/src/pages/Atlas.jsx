@@ -1,5 +1,5 @@
 import { useState, useMemo } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, useLocation } from 'react-router-dom'
 import { PROFESSIONS, PROFESSION_CATEGORIES } from '../data/professions.js'
 import Header from '../components/Layout/Header.jsx'
 import '../styles/atlas.css'
@@ -9,7 +9,9 @@ const HOLLAND_COLOR = { R: '#ff6b35', I: '#00e5c8', A: '#7b5cf0', S: '#3b82f6', 
 
 export default function Atlas() {
   const navigate = useNavigate()
-  const [search, setSearch] = useState('')
+  const location = useLocation()
+  // если пришли из результатов/маршрута с конкретной профессией — сразу ищем её
+  const [search, setSearch] = useState(location.state?.q || '')
   const [activeCategory, setActiveCategory] = useState('Все')
   const [activeHolland, setActiveHolland] = useState('')
   const [expanded, setExpanded] = useState(null)
