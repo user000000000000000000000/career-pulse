@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import { register as doRegister, getCurrentUser, logout as doLogout } from '../services/auth'
 import { isSupabaseConfigured } from '../services/supabase'
 import { startVkLogin } from '../services/vk'
+import { confirmDialog } from '../components/Dialog.jsx'
 import '../styles/landing.css'
 
 // ФИО хранится как «Фамилия Имя Отчество» → показываем «Имя Ф.»
@@ -32,6 +33,8 @@ export default function Landing() {
   }, [])
 
   async function onLogout() {
+    const ok = await confirmDialog({ title: 'Выход', message: 'Выйти из аккаунта?', confirmText: 'Выйти', danger: true })
+    if (!ok) return
     await doLogout()
     setUser(null)
   }
@@ -208,9 +211,10 @@ export default function Landing() {
           {user.avatar_url
             ? <span style={{width:'30px',height:'30px',borderRadius:'50%',backgroundImage:`url(${user.avatar_url})`,backgroundSize:'cover',backgroundPosition:'center',display:'block',flexShrink:0}} />
             : <span style={{width:'30px',height:'30px',borderRadius:'50%',background:'linear-gradient(135deg,var(--accent2),var(--accent))',display:'flex',alignItems:'center',justifyContent:'center',fontSize:'12px',fontWeight:'800',color:'#08080f',flexShrink:0}}>{initials(user.name)}</span>}
-          {shortName(user.name)}
+          <span className="nav-hide-phone">{shortName(user.name)}</span>
         </a>
         <a href="/dashboard" className="btn-nav nav-hide-phone">Пройти диагностику</a>
+        <a href="/dashboard" className="btn-nav nav-phone-only">К тестам</a>
         <button className="btn-ghost" style={{background:'transparent',cursor:'pointer',fontFamily:'inherit'}} onClick={onLogout}>Выйти</button>
       </>
     ) : (

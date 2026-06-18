@@ -23,6 +23,7 @@ import RequireAuth from './components/Layout/RequireAuth.jsx'
 import VkAuthHandler from './components/VkAuthHandler.jsx'
 import AuthRecoveryHandler from './components/AuthRecoveryHandler.jsx'
 import AppNav from './components/AppNav.jsx'
+import { DialogHost } from './components/Dialog.jsx'
 
 export default function App() {
   return (
@@ -30,6 +31,7 @@ export default function App() {
     <VkAuthHandler />
     <AuthRecoveryHandler />
     <AppNav />
+    <DialogHost />
     <Routes>
       <Route path="/" element={<Landing />} />
       <Route path="/register" element={<Register />} />

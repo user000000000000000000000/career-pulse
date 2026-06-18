@@ -32,7 +32,7 @@ export default function ResetPassword() {
 
   if (done) return (
     <div className="cp-legal">
-      <Header backTo="/" backLabel="← На главную" />
+      <Header backTo="/" backLabel="← На главную" reserveRight />
       <div className="auth-wrap">
         <Card accent className="auth-card">
           <div style={{ textAlign: 'center', padding: '20px 0' }}>
@@ -51,7 +51,7 @@ export default function ResetPassword() {
 
   return (
     <div className="cp-legal">
-      <Header backTo="/" backLabel="← На главную" />
+      <Header backTo="/" backLabel="← На главную" reserveRight />
       <div className="auth-wrap">
         <Card accent className="auth-card">
           <div className="auth-eyebrow">Восстановление</div>

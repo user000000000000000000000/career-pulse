@@ -6,6 +6,7 @@ import { DEV_PROFILES, applyDevProfile } from '../data/devProfiles'
 import { submitConsultRequest } from '../services/consult'
 import ContactLinks from '../components/ContactLinks.jsx'
 import SocialIcon from '../components/SocialIcon.jsx'
+import { confirmDialog, alertDialog } from '../components/Dialog.jsx'
 import '../styles/dashboard.css'
 
 const BLOCKS = [
@@ -157,7 +158,8 @@ export default function Dashboard() {
       const danger = e.target.closest('.sum-danger')
       if (danger) {
         e.preventDefault()
-        if (confirm('Выйти из личного кабинета?')) { doLogout().finally(() => navigate('/')) }
+        confirmDialog({ title: 'Выход', message: 'Выйти из личного кабинета?', confirmText: 'Выйти', danger: true })
+          .then(ok => { if (ok) doLogout().finally(() => navigate('/')) })
         return
       }
       if (a) {
@@ -172,7 +174,7 @@ export default function Dashboard() {
       }
       if (e.target.closest('#cookie-settings')) {
         e.preventDefault()
-        alert('Для управления cookie отключите их в настройках браузера.')
+        alertDialog({ title: 'Cookie', message: 'CareerPulse использует только технические cookie для работы сайта и входа. Отключить их можно в настройках браузера (раздел «Конфиденциальность»), но тогда вход в кабинет работать не будет.' })
       }
     }
     root.addEventListener('click', onClick)
