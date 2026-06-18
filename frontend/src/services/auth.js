@@ -113,7 +113,10 @@ export async function getCurrentUser() {
     return u ? { id: 'demo', ...u } : null
   }
 
-  const { data: { user } } = await supabase.auth.getUser()
+  // getSession() читает сессию локально (без сетевого запроса к auth-серверу) —
+  // это заметно быстрее getUser() на каждой защищённой странице.
+  const { data: { session } } = await supabase.auth.getSession()
+  const user = session?.user
   if (!user) return null
 
   let { data: profile } = await supabase

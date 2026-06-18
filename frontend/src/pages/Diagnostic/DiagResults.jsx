@@ -111,7 +111,11 @@ export default function DiagResults() {
           </div>
           {repLoading && <div style={{ color: 'var(--sub)', fontSize: 14 }}>Нейросеть пишет разбор… ⏳</div>}
           {!repLoading && report?.full_report && (
-            <div style={{ fontSize: 14.5, lineHeight: 1.8, color: 'var(--text)', whiteSpace: 'pre-line' }}>{report.full_report}</div>
+            <div style={{ fontSize: 14.5, lineHeight: 1.8, color: 'var(--text)' }}>
+              {String(report.full_report).split(/\n+/).map(s => s.trim()).filter(Boolean).map((para, i) => (
+                <p key={i} style={{ margin: i === 0 ? 0 : '12px 0 0' }}>{para}</p>
+              ))}
+            </div>
           )}
           {!repLoading && !report?.full_report && <div style={{ color: 'var(--sub)', fontSize: 14 }}>Разбор пока недоступен.</div>}
 

@@ -1,7 +1,9 @@
+import { useState } from 'react'
 import LegalShell from './LegalShell.jsx'
 import SocialIcon from '../../components/SocialIcon.jsx'
 
 export default function LegalHub() {
+  const [showCookie, setShowCookie] = useState(false)
   return (
     <LegalShell>
       <>
@@ -59,17 +61,21 @@ export default function LegalHub() {
       <a
         href="#"
         className="doc-card dc6"
-        onClick={(e) => {
-          e.preventDefault()
-          alert('CareerPulse использует только технические cookie, необходимые для работы сайта и авторизации. Аналитических и рекламных cookie нет.\n\nОтключить технические cookie можно в настройках вашего браузера (раздел «Конфиденциальность») — но тогда вход в личный кабинет работать не будет.')
-        }}
+        onClick={(e) => { e.preventDefault(); setShowCookie(s => !s) }}
       >
         <div className="dc-icon">🍪</div>
         <div className="dc-title">Настройки Cookie</div>
         <div className="dc-desc">Управление файлами cookie. Можно отключить в настройках браузера или через расширение.</div>
-        <div className="dc-link">Управлять настройками →</div>
+        <div className="dc-link">{showCookie ? 'Скрыть ↑' : 'Подробнее ↓'}</div>
       </a>
     </div>
+
+    {showCookie && (
+      <div className="legal-highlight" style={{ marginBottom: 40 }}>
+        <p><strong>Какие cookie мы используем.</strong> CareerPulse использует только технические cookie, необходимые для работы сайта и авторизации (хранение сессии входа). Аналитических и рекламных cookie нет, данные третьим лицам не передаются.</p>
+        <p style={{ marginTop: 10 }}>Отключить технические cookie можно в настройках браузера (раздел «Конфиденциальность и безопасность») — но тогда вход в личный кабинет работать не будет. Подробнее об обработке данных — в <a href="/legal/privacy">Политике конфиденциальности</a>.</p>
+      </div>
+    )}
 
     <div className="section-title">КОНТАКТЫ</div>
     <div className="contacts-grid">
