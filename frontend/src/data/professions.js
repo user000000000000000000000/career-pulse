@@ -156,3 +156,27 @@ export function getProfessionsByHolland(codes = []) {
 export function getProfessionById(id) {
   return PROFESSIONS.find(p => p.id === id)
 }
+
+/**
+ * Подбор подходящих профессий ИЗ АТЛАСА по Holland-профилю пользователя.
+ * Считает совпадение как средний балл пользователя по Holland-кодам профессии
+ * (первый код профессии весит больше). Возвращает топ с полем match (0–100).
+ *
+ * @param {object} profile  агрегированный профиль (нужен holland_scores)
+ * @param {number} limit    сколько вернуть
+ */
+export function matchProfessions(profile = {}, limit = 8) {
+  const scores = profile.holland_scores || {}
+  if (!Object.keys(scores).length) return []
+  const W = [1, 0.7, 0.45] // веса по позиции кода в профессии
+  const ranked = PROFESSIONS.map(p => {
+    let sum = 0, wsum = 0
+    p.holland.forEach((code, i) => {
+      const w = W[i] ?? 0.3
+      sum += (scores[code] || 0) * w
+      wsum += w
+    })
+    return { ...p, match: wsum ? Math.round(sum / wsum) : 0 }
+  }).sort((a, b) => b.match - a.match)
+  return ranked.slice(0, limit)
+}

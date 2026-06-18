@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import CP from '../../services/cpStorage'
-import { analyzeDiagnostic } from '../../services/diagnosticAPI'
+import { matchProfessions } from '../../data/professions.js'
 import { generateRoadmap } from '../../services/roadmapAPI'
 import '../../styles/diagnostic.css'
 
@@ -24,15 +24,9 @@ export default function Roadmap() {
       if (!alive) return
       setProfile(p); setCompletedCount(pr.completed?.length || 0)
       if (p.roadmap && p.chosen_professions) { setRoadmap(p.roadmap); setChosen(p.chosen_professions) }
-      // источник профессий: кэш ai_report или генерация
-      let report = p.ai_report
-      if (!report && (pr.completed?.length || 0) > 0) {
-        report = await analyzeDiagnostic(p)
-        await CP.updateProfile({ ai_report: report })
-      }
       if (alive) {
-        const list = (report?.recommended_professions || []).map(x => (typeof x === 'string' ? { name: x } : x))
-        setProfs(list)
+        // профессии берём из атласа по Holland-профилю (русские, курированные)
+        setProfs(matchProfessions(p, 8))
         setLoading(false)
       }
     })()
