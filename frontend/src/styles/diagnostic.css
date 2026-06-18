@@ -78,6 +78,28 @@
 .cp-diag .int-btn:hover { border-color: rgba(255,255,255,.2); color: var(--text); }
 .cp-diag .int-btn.sel { border-color: var(--accent); background: rgba(0,229,200,.1); color: var(--accent); }
 
+/* интенсивность внутри карточки, сила — цветом (блок 2) */
+.cp-diag .pair-card.dim { opacity: .4; }
+.cp-diag .pair-card.sel { cursor: default; }
+.cp-diag .ii { width: 100%; margin-top: 14px; padding-top: 12px; border-top: 1px solid var(--line); animation: cpFade .2s ease; }
+.cp-diag .ii-label { font-size: 11px; color: var(--ghost); margin-bottom: 7px; }
+.cp-diag .ii-row { display: flex; gap: 6px; }
+.cp-diag .ii-btn {
+  flex: 1; padding: 10px 4px; border-radius: 8px;
+  border: 1px solid transparent; font-size: 11px; font-weight: 700;
+  cursor: pointer; transition: transform .12s, filter .12s;
+  font-family: 'Manrope', sans-serif; color: var(--text);
+}
+.cp-diag .ii-btn:hover { transform: translateY(-2px); filter: brightness(1.12); }
+/* сила = насыщенность цвета: бледный → насыщенный */
+.cp-diag .ii-A.lvl1 { background: rgba(0,229,200,.16); }
+.cp-diag .ii-A.lvl2 { background: rgba(0,229,200,.45); }
+.cp-diag .ii-A.lvl3 { background: rgba(0,229,200,.95); color: var(--ink); }
+.cp-diag .ii-B.lvl1 { background: rgba(123,92,240,.18); }
+.cp-diag .ii-B.lvl2 { background: rgba(123,92,240,.5); }
+.cp-diag .ii-B.lvl3 { background: rgba(123,92,240,.95); color: #fff; }
+.cp-diag .ii-hint { text-align: center; font-size: 11px; color: var(--ghost); margin-top: 12px; }
+
 /* maturity / option cards */
 .cp-diag .mat-card, .cp-diag .opt-card { background: var(--card); border: 1px solid var(--line); border-radius: 10px; padding: 14px 16px; cursor: pointer; transition: all .2s; margin-bottom: 8px; font-size: 13px; display: flex; align-items: flex-start; gap: 10px; }
 .cp-diag .mat-card:hover, .cp-diag .opt-card:hover { border-color: rgba(255,255,255,.15); }
