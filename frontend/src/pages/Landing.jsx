@@ -143,7 +143,9 @@ export default function Landing() {
         return
       }
 
-      const fullName = name + (surname ? ' ' + surname : '')
+      // Храним в порядке «Фамилия Имя» (как и в остальном приложении),
+      // чтобы отображение имени работало одинаково везде.
+      const fullName = (surname ? surname + ' ' : '') + name
       
       try {
         isSubmitting = true  // БЛОКИРУЕМ
