@@ -21,6 +21,8 @@ export default function Register() {
   const navigate = useNavigate()
   const [form, setForm] = useState({ name: '', email: '', password: '', role: 'parent' })
   const [agree, setAgree]         = useState(false)
+  const [adult, setAdult]         = useState(false)
+  const [parent, setParent]       = useState({ name: '', email: '' })
   const [error, setError]         = useState('')
   const [busy, setBusy]           = useState(false)
   const [confirmed, setConfirmed] = useState(false)
@@ -43,10 +45,18 @@ export default function Register() {
     if (!form.name.trim()) return setError('Введите имя')
     if (!form.email.includes('@')) return setError('Введите корректный email')
     if (form.password.length < 8) return setError('Пароль минимум 8 символов')
+    if (!adult && (!parent.name.trim() || !parent.email.includes('@'))) {
+      return setError('Если тебе меньше 18 — укажи ФИО и email родителя/представителя')
+    }
     if (!agree) return setError('Примите условия использования')
     try {
       setBusy(true)
-      const { user } = await doRegister(form)
+      const { user } = await doRegister({
+        ...form,
+        isMinor: !adult,
+        parentName: adult ? '' : parent.name.trim(),
+        parentEmail: adult ? '' : parent.email.trim(),
+      })
       // Supabase требует подтверждения email — у сессии не будет токена сразу.
       // В демо-режиме (без Supabase) подтверждать нечего — сразу на лендинг.
       if (isSupabaseConfigured && user && !user.confirmed_at && !user.email_confirmed_at) {
@@ -116,11 +126,26 @@ export default function Register() {
           <Input id="reg-email" label="Email" type="email" placeholder="ivan@email.com" value={form.email} onChange={upd('email')} />
           <Input id="reg-pass" label="Пароль" type="password" placeholder="Минимум 8 символов" value={form.password} onChange={upd('password')} />
 
-          <label style={{ display: 'flex', gap: 10, alignItems: 'flex-start', fontSize: 13, color: 'var(--sub)', margin: '4px 0 18px', cursor: 'pointer' }}>
+          <label style={{ display: 'flex', gap: 10, alignItems: 'center', fontSize: 13, color: 'var(--sub)', margin: '6px 0 4px', cursor: 'pointer' }}>
+            <input type="checkbox" checked={adult} onChange={(e) => setAdult(e.target.checked)} />
+            <span>Мне есть 18 лет</span>
+          </label>
+          {!adult && (
+            <div style={{ background: 'var(--card2)', border: '1px solid var(--line)', borderRadius: 10, padding: '12px 14px', marginBottom: 4 }}>
+              <div style={{ fontSize: 12, color: 'var(--sub)', lineHeight: 1.5, marginBottom: 10 }}>
+                Тебе меньше 18 — по закону (ст. 26 ГК РФ) нужно согласие родителя или законного представителя. Укажи его данные:
+              </div>
+              <Input id="reg-parent-name" label="ФИО родителя / представителя" placeholder="Иванов Иван Иванович" value={parent.name} onChange={(e) => setParent({ ...parent, name: e.target.value })} />
+              <Input id="reg-parent-email" label="Email родителя" type="email" placeholder="parent@email.com" value={parent.email} onChange={(e) => setParent({ ...parent, email: e.target.value })} />
+            </div>
+          )}
+
+          <label style={{ display: 'flex', gap: 10, alignItems: 'flex-start', fontSize: 13, color: 'var(--sub)', margin: '10px 0 18px', cursor: 'pointer' }}>
             <input type="checkbox" checked={agree} onChange={(e) => setAgree(e.target.checked)} style={{ marginTop: 3 }} />
             <span>
               Я принимаю <Link to="/legal/terms" style={{ color: 'var(--accent)' }}>Условия</Link> и{' '}
-              <Link to="/legal/privacy" style={{ color: 'var(--accent)' }}>Политику конфиденциальности</Link>
+              <Link to="/legal/privacy" style={{ color: 'var(--accent)' }}>Политику конфиденциальности</Link>,{' '}
+              а также даю <Link to="/legal/consent" style={{ color: 'var(--accent)' }}>согласие на обработку персональных данных</Link>
             </span>
           </label>
 

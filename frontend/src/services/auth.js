@@ -20,9 +20,18 @@ function lsClear() {
  * Регистрация. { name, email, password, role }
  * Возвращает { user } или бросает Error с .message на русском.
  */
-export async function register({ name, email, password, role }) {
+export async function register({ name, email, password, role, isMinor = false, parentName = '', parentEmail = '' }) {
+  // Фиксируем факт и версию согласия — доказательство получения согласия по 152-ФЗ
+  const consent = {
+    consent_at: new Date().toISOString(),
+    consent_version: '2026-06-01',
+    is_minor: !!isMinor,
+    parent_name: isMinor ? parentName : '',
+    parent_email: isMinor ? parentEmail : '',
+  }
+
   if (!isSupabaseConfigured) {
-    const user = { name, email, role, testDone: false }
+    const user = { name, email, role, testDone: false, ...consent }
     lsSet(user)
     return { user }
   }
@@ -31,7 +40,7 @@ export async function register({ name, email, password, role }) {
     email,
     password,
     options: {
-      data: { full_name: name, role },
+      data: { full_name: name, role, ...consent },
       // Куда вернуть пользователя после клика по ссылке в письме.
       // Должен совпадать с одним из Redirect URLs в настройках Supabase Auth.
       emailRedirectTo: window.location.origin + import.meta.env.BASE_URL,

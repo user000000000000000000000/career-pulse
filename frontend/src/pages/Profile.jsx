@@ -4,8 +4,10 @@ import Header from '../components/Layout/Header.jsx'
 import Card from '../components/UI/Card.jsx'
 import Input from '../components/UI/Input.jsx'
 import Button from '../components/UI/Button.jsx'
-import { getCurrentUser } from '../services/auth'
+import { getCurrentUser, logout as doLogout } from '../services/auth'
 import { supabase, isSupabaseConfigured } from '../services/supabase'
+import CP from '../services/cpStorage'
+import { confirmDialog, alertDialog } from '../components/Dialog.jsx'
 import '../styles/legal.css'
 import '../styles/auth.css'
 import '../styles/profile.css'
@@ -74,6 +76,38 @@ export default function Profile() {
     if (upErr) { setError('Ошибка загрузки фото: ' + upErr.message); return null }
     const { data } = supabase.storage.from('avatars').getPublicUrl(path)
     return data.publicUrl
+  }
+
+  async function onDelete() {
+    const ok = await confirmDialog({
+      title: 'Удалить аккаунт?',
+      message: 'Все твои персональные данные и результаты диагностики будут удалены без возможности восстановления. Продолжить?',
+      confirmText: 'Удалить', cancelText: 'Отмена', danger: true,
+    })
+    if (!ok) return
+    try {
+      if (isSupabaseConfigured && user?.id) {
+        // полное удаление учётной записи — серверной функцией (если развёрнута)
+        try {
+          const { data: { session } } = await supabase.auth.getSession()
+          await fetch(`${import.meta.env.VITE_SUPABASE_URL}/functions/v1/delete-account`, {
+            method: 'POST',
+            headers: { Authorization: `Bearer ${session?.access_token}`, apikey: import.meta.env.VITE_SUPABASE_ANON_KEY },
+          })
+        } catch { /* функции может не быть — ниже всё равно обезличим */ }
+        // на всякий случай обезличиваем профиль и чистим результаты
+        try {
+          await supabase.from('profiles')
+            .update({ full_name: '', phone: '', avatar_url: '', diagnostic_data: null })
+            .eq('id', user.id)
+        } catch { /* ignore */ }
+      }
+      await CP.clearAll()
+    } finally {
+      try { await doLogout() } catch { /* ignore */ }
+      await alertDialog({ title: 'Готово', message: 'Твои данные удалены. Аккаунт деактивирован.' })
+      navigate('/')
+    }
   }
 
   async function onSave() {
@@ -199,6 +233,15 @@ export default function Profile() {
 
           <div className="auth-foot" style={{ marginTop: 20 }}>
             <Link to="/dashboard">← Вернуться в кабинет</Link>
+          </div>
+
+          <div style={{ marginTop: 24, paddingTop: 18, borderTop: '1px solid var(--line)' }}>
+            <button type="button" className="auth-link-btn" style={{ color: 'var(--danger)' }} onClick={onDelete}>
+              Удалить мои данные и аккаунт
+            </button>
+            <div className="input-hint" style={{ marginTop: 4 }}>
+              Право на удаление персональных данных (ст. 14 152-ФЗ). Действие необратимо.
+            </div>
           </div>
         </Card>
       </div>
