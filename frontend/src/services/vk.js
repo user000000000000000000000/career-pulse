@@ -1,4 +1,5 @@
 import { supabase, isSupabaseConfigured } from './supabase'
+import { alertDialog } from '../components/Dialog.jsx'
 
 // ── PKCE (управляем сами — SDK теряет verifier, issue VKCOM/vkid-web-sdk#24) ──
 function b64url(buf) {
@@ -18,7 +19,7 @@ export function vkRedirectUri() {
 /** Старт входа через VK ID (ручной OAuth 2.1 + PKCE). */
 export async function startVkLogin() {
   const appId = import.meta.env.VITE_VK_APP_ID
-  if (!appId) { alert('Вход через ВКонтакте не настроен (нет VITE_VK_APP_ID).'); return }
+  if (!appId) { alertDialog({ title: 'ВКонтакте', message: 'Вход через ВКонтакте не настроен (нет VITE_VK_APP_ID).' }); return }
   const verifier = rand(64)
   const challenge = b64url(await sha256(verifier))
   const state = rand(24)
@@ -53,14 +54,14 @@ export async function handleVkRedirect(navigate) {
   // Чистим URL (verifier берём из localStorage, не из адреса)
   window.history.replaceState({}, '', window.location.origin + window.location.pathname + window.location.hash)
 
-  if (!verifier) { alert('Сессия входа через ВК потеряна — попробуй ещё раз.'); return false }
+  if (!verifier) { alertDialog({ title: 'ВКонтакте', message: 'Сессия входа через ВК потеряна — попробуй ещё раз.' }); return false }
   if (state && savedState && state !== savedState) { console.warn('[VK] state mismatch') }
   localStorage.removeItem('vk_verifier')
   localStorage.removeItem('vk_state')
 
   const fnUrl = import.meta.env.VITE_VK_AUTH_URL ||
     (import.meta.env.VITE_SUPABASE_URL ? `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/vk-auth` : '')
-  if (!fnUrl) { alert('Вход через ВК требует функцию vk-auth (нет URL).'); return false }
+  if (!fnUrl) { alertDialog({ title: 'ВКонтакте', message: 'Вход через ВК требует функцию vk-auth (нет URL).' }); return false }
 
   try {
     const anon = import.meta.env.VITE_SUPABASE_ANON_KEY || ''
@@ -88,7 +89,7 @@ export async function handleVkRedirect(navigate) {
     return true
   } catch (e) {
     console.error('[VK] auth error', e)
-    alert('Не удалось войти через ВКонтакте: ' + (e.message || e))
+    alertDialog({ title: 'ВКонтакте', message: 'Не удалось войти через ВКонтакте: ' + (e.message || e) })
     return false
   }
 }

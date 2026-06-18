@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import CP from '../../services/cpStorage'
 import { matchProfessions } from '../../data/professions.js'
 import { generateRoadmap } from '../../services/roadmapAPI'
+import { confirmDialog } from '../../components/Dialog.jsx'
 import '../../styles/diagnostic.css'
 
 const NODE_COLORS = ['#00e5c8', '#7b5cf0', '#ff6b35', '#f5c842', '#22d97a', '#00a8e0', '#a480f8', '#ff4d6d']
@@ -44,7 +45,18 @@ export default function Roadmap() {
     await CP.updateProfile({ roadmap: r, chosen_professions: chosen })
     setBuilding(false)
   }
-  function reset() { setRoadmap(null); CP.updateProfile({ roadmap: null }) }
+  async function reset() {
+    const ok = await confirmDialog({
+      title: 'Выбрать другие профессии?',
+      message: 'Текущий маршрут будет сброшен. Чтобы построить новый, нейросеть сгенерирует его заново. Продолжить?',
+      confirmText: 'Да, выбрать заново',
+      cancelText: 'Оставить маршрут',
+      danger: true,
+    })
+    if (!ok) return
+    setRoadmap(null)
+    CP.updateProfile({ roadmap: null })
+  }
 
   const Shell = ({ children }) => (
     <div className="cp-diag">

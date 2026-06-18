@@ -86,6 +86,8 @@
 .cp-diag .topbar{ padding-right: 70px; }
 .cp-dashboard .topbar{ padding-right: 70px; }
 .test-top-row{ padding-right: 56px; }
+/* шапка Header (атлас, профиль, результат, сброс пароля) — чтобы «← В кабинет» не лез под гамбургер */
+.cp-legal nav.legal-nav.nav-reserve-right{ padding-right: 74px; }
 
 /* На дашборде единым меню заменяем собственный мобильный гамбургер сайдбара
    и кнопку выхода в шапке — чтобы не было двух меню одновременно. */

@@ -517,6 +517,9 @@ footer{
   .cp-landing .nav-links { display: none; }
 }
 
+/* элементы только для телефона (по умолчанию скрыты) */
+.cp-landing .nav-phone-only { display: none; }
+
 /* ──────────────────────────── PHONE (≤640px) */
 @media (max-width: 640px){
   .cp-landing nav { padding: 12px 16px; gap: 8px; }
@@ -525,6 +528,7 @@ footer{
   .cp-landing .nav-logo-icon { width: 28px; height: 28px; }
   /* дубли-кнопки убираем, оставляем главные действия (Войти/Выйти/Начать) */
   .cp-landing .nav-hide-phone { display: none; }
+  .cp-landing .nav-phone-only { display: inline-flex; align-items: center; }
   .cp-landing .nav-right { gap: 7px; }
   .cp-landing .nav-user { margin-right: 0 !important; }
   .cp-landing .btn-nav { padding: 8px 13px; font-size: 12px; letter-spacing: 0.3px; }

@@ -129,7 +129,7 @@ export default function Profile() {
 
   return (
     <div className="cp-legal">
-      <Header backTo="/dashboard" backLabel="← В кабинет" />
+      <Header backTo="/dashboard" backLabel="← В кабинет" reserveRight />
       <div className="auth-wrap" style={{ paddingTop: 40 }}>
         <Card accent className="profile-card">
           <div className="auth-eyebrow">Личный кабинет</div>

@@ -30,7 +30,7 @@ export default function Atlas() {
 
   return (
     <div className="atlas-page cp-legal">
-      <Header backTo="/dashboard" backLabel="← В кабинет" />
+      <Header backTo="/dashboard" backLabel="← В кабинет" reserveRight />
 
       <div className="atlas-hero">
         <div className="atlas-eyebrow">CareerPulse</div>

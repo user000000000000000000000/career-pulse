@@ -1,6 +1,7 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { useNavigate, useLocation } from 'react-router-dom'
 import { getCurrentUser, logout as doLogout } from '../services/auth'
+import { confirmDialog } from './Dialog.jsx'
 import '../styles/appnav.css'
 
 // Публичные страницы — там своя навигация, глобальное меню не нужно.
@@ -23,6 +24,7 @@ export default function AppNav() {
   const location = useLocation()
   const [open, setOpen] = useState(false)
   const [authed, setAuthed] = useState(false)
+  const drawerRef = useRef(null)
 
   useEffect(() => {
     let alive = true
@@ -33,12 +35,26 @@ export default function AppNav() {
   // при переходе на другую страницу закрываем меню
   useEffect(() => { setOpen(false) }, [location.pathname])
 
+  // Закрытую панель делаем inert: убираем из фокуса и от скринридеров без
+  // конфликта aria-hidden с сфокусированным элементом внутри.
+  useEffect(() => {
+    const el = drawerRef.current
+    if (!el) return
+    if (open) { el.removeAttribute('inert') }
+    else {
+      if (el.contains(document.activeElement)) document.activeElement.blur()
+      el.setAttribute('inert', '')
+    }
+  }, [open])
+
   if (isHidden(location.pathname) || !authed) return null
 
   const go = (to) => { setOpen(false); navigate(to) }
   const onLogout = async () => {
     setOpen(false)
-    if (window.confirm('Выйти из аккаунта?')) { try { await doLogout() } finally { navigate('/') } }
+    if (await confirmDialog({ title: 'Выход', message: 'Выйти из аккаунта?', confirmText: 'Выйти', danger: true })) {
+      try { await doLogout() } finally { navigate('/') }
+    }
   }
   const isActive = (to) =>
     location.pathname === to || (to === '/test' && location.pathname.startsWith('/test'))
@@ -55,7 +71,7 @@ export default function AppNav() {
 
       {open && <div className="appnav-overlay" onClick={() => setOpen(false)} />}
 
-      <nav className={'appnav-drawer' + (open ? ' open' : '')} aria-hidden={!open}>
+      <nav ref={drawerRef} className={'appnav-drawer' + (open ? ' open' : '')}>
         <div className="appnav-head">
           <div className="appnav-logo">CAREER<span>PULSE</span></div>
           <button className="appnav-close" aria-label="Закрыть" onClick={() => setOpen(false)}>✕</button>

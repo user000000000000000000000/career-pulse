@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState, useCallback } from 'react'
 import { useNavigate } from 'react-router-dom'
 import CP from '../../services/cpStorage'
+import { confirmDialog } from '../../components/Dialog.jsx'
 
 /**
  * Общая логика старта диагностического блока (порт init-IIFE из block-N.html):
@@ -20,7 +21,8 @@ export default function useDiagBlock(blockNum) {
     ;(async () => {
       const ex = await CP.getBlockResult(blockNum)
       if (ex && ex.status === 'completed') {
-        if (!window.confirm('Блок уже пройден. Пройти заново?')) {
+        const again = await confirmDialog({ title: 'Блок уже пройден', message: 'Этот блок уже пройден. Пройти заново? Прежние ответы по нему перезапишутся.', confirmText: 'Пройти заново', cancelText: 'В кабинет' })
+        if (!again) {
           navigate('/dashboard')
           return
         }

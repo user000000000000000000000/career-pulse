@@ -45,7 +45,7 @@ export default function Result() {
 
   const wrap = (children) => (
     <div className="cp-legal">
-      <Header backTo="/dashboard" backLabel="← В кабинет" />
+      <Header backTo="/dashboard" backLabel="← В кабинет" reserveRight />
       <div className="res-bg" />
       {children}
     </div>
