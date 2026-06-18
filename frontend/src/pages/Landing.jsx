@@ -128,12 +128,16 @@ export default function Landing() {
       const email = q('f-email').value.trim()
       const pass = q('f-pass').value
       const agree = q('f-agree').checked
+      const adult = q('f-adult') ? q('f-adult').checked : true
+      const parentName = q('f-parent-name') ? q('f-parent-name').value.trim() : ''
+      const parentEmail = q('f-parent-email') ? q('f-parent-email').value.trim() : ''
       const roleEl = root.querySelector('.role-opt.active input')
       const role = roleEl ? roleEl.value : 'specialist'
 
       if (!name) return shake('f-name', 'Введите имя')
       if (!email || !email.includes('@')) return shake('f-email', 'Введите корректный email')
       if (pass.length < 8) return shake('f-pass', 'Пароль минимум 8 символов')
+      if (!adult && (!parentName || !parentEmail.includes('@'))) return shake('f-parent-name', 'Укажите данные родителя')
       if (!agree) {
         const wrap = root.querySelector('.form-agree')
         if (wrap) {
@@ -155,7 +159,7 @@ export default function Landing() {
         btn.disabled = true
         btn.textContent = 'Отправка...'
         
-        const { user: created } = await doRegister({ name: fullName, email, password: pass, role })
+        const { user: created } = await doRegister({ name: fullName, email, password: pass, role, isMinor: !adult, parentName: adult ? '' : parentName, parentEmail: adult ? '' : parentEmail })
         // Нужно ли подтверждение email (только при настроенном Supabase и неподтверждённом аккаунте)
         const needConfirm = isSupabaseConfigured && created && !created.confirmed_at && !created.email_confirmed_at
 
@@ -518,9 +522,24 @@ export default function Landing() {
           <input className="form-input" id="f-pass" type="password" placeholder="Минимум 8 символов" />
         </div>
 
+        <div className="form-agree" style={{marginBottom:'10px'}}>
+          <input type="checkbox" id="f-adult" onChange={(e)=>{ const b=document.getElementById('f-parent-block'); if(b) b.style.display=e.target.checked?'none':'block' }} />
+          <label htmlFor="f-adult">Мне есть 18 лет</label>
+        </div>
+        <div id="f-parent-block">
+          <div className="form-group">
+            <label>ФИО родителя / представителя (если младше 18)</label>
+            <input className="form-input" id="f-parent-name" type="text" placeholder="Иванов Иван Иванович" />
+          </div>
+          <div className="form-group">
+            <label>Email родителя</label>
+            <input className="form-input" id="f-parent-email" type="email" placeholder="parent@email.com" />
+          </div>
+        </div>
+
         <div className="form-agree">
           <input type="checkbox" id="f-agree" />
-          <label htmlFor="f-agree">Я принимаю <a href="/legal/terms" target="_blank" style={{color:'var(--accent)'}}>Условия использования</a> и <a href="/legal/privacy" target="_blank" style={{color:'var(--accent)'}}>Политику конфиденциальности</a></label>
+          <label htmlFor="f-agree">Я принимаю <a href="/legal/terms" target="_blank" style={{color:'var(--accent)'}}>Условия использования</a> и <a href="/legal/privacy" target="_blank" style={{color:'var(--accent)'}}>Политику конфиденциальности</a>, а также даю <a href="/legal/consent" target="_blank" style={{color:'var(--accent)'}}>согласие на обработку персональных данных</a></label>
         </div>
 
         <button className="btn-form">Начать диагностику →</button>
