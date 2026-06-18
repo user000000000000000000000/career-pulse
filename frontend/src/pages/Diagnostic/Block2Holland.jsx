@@ -69,7 +69,6 @@ export default function Block2Holland() {
   const [pairAnswers] = useState(() => [])
   const [matAnswers] = useState(() => ({}))
   const [curChoice, setCurChoice] = useState(null)
-  const [curIntensity, setCurIntensity] = useState(0)
   const [curMatIdx, setCurMatIdx] = useState(0)
   const [matSel, setMatSel] = useState(null)
   const [antiSel, setAntiSel] = useState([])
@@ -108,16 +107,15 @@ export default function Block2Holland() {
   }
   const pct = result ? 100 : Math.round(progressDone() / TOTAL_STEPS * 100)
 
-  function nextPair(intensityArg) {
-    const intensity = intensityArg || curIntensity
-    if (!curChoice || !intensity) return
+  // Биполярная шкала: один тап = и сторона (A/Б), и сила (1–3)
+  function choosePair(choice, intensity) {
     const p = PAIRS[pairIdx]
-    const type = curChoice === 'A' ? p.tA : p.tB
+    const type = choice === 'A' ? p.tA : p.tB
     scales[type] += intensity
-    pairAnswers.push({ qId: p.id, choice: curChoice, intensity, type })
+    pairAnswers.push({ qId: p.id, choice, intensity, type })
     const ni = pairIdx + 1
     setPairIdx(ni)
-    setCurChoice(null); setCurIntensity(0)
+    setCurChoice(null)
     if (ni % 5 === 0 && ni <= 30) {
       const matIdx = ni / 5 - 1
       if (matIdx < 6) { setCurMatIdx(matIdx); setMatSel(null); setPhase('maturity'); return }
@@ -203,20 +201,33 @@ export default function Block2Holland() {
         <div className="q-counter">Вопрос {pairIdx + 1} из 30</div>
         <div className="q-text">Что тебе ближе?</div>
         <div className="pair-row">
-          <div className={'pair-card' + (curChoice === 'A' ? ' sel' : '')} onClick={() => { setCurChoice('A'); setCurIntensity(0) }}><div className="pair-label">А</div><div className="pair-text">{p.a}</div></div>
-          <div className={'pair-card' + (curChoice === 'B' ? ' sel' : '')} onClick={() => { setCurChoice('B'); setCurIntensity(0) }}><div className="pair-label">Б</div><div className="pair-text">{p.b}</div></div>
+          {['A', 'B'].map(side => {
+            const sel = curChoice === side
+            return (
+              <div key={side}
+                className={'pair-card' + (sel ? ' sel' : '') + (curChoice && !sel ? ' dim' : '')}
+                onClick={() => { if (!sel) setCurChoice(side) }}>
+                <div className="pair-label">{side === 'A' ? 'А' : 'Б'}</div>
+                <div className="pair-text">{side === 'A' ? p.a : p.b}</div>
+                {sel && (
+                  <div className="ii">
+                    <div className="ii-label">насколько ближе?</div>
+                    <div className="ii-row">
+                      {[1, 2, 3].map(lvl => (
+                        <button key={lvl}
+                          className={`ii-btn ii-${side} lvl${lvl}`}
+                          onClick={(e) => { e.stopPropagation(); choosePair(side, lvl) }}>
+                          {['Немного', 'Заметно', 'Намного'][lvl - 1]}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </div>
+            )
+          })}
         </div>
-        {curChoice && (
-          <div className="intensity">
-            <div className="int-label">Насколько выбранный вариант ближе?</div>
-            <div className="int-row">
-              {[1, 2, 3].map((v, i) => (
-                <div key={v} className={'int-btn' + (curIntensity === v ? ' sel' : '')}
-                  onClick={() => { setCurIntensity(v); setTimeout(() => nextPair(v), 200) }}>{['Немного', 'Заметно', 'Намного'][i]}</div>
-              ))}
-            </div>
-          </div>
-        )}
+        {curChoice && <div className="ii-hint">цвет показывает силу: бледный — немного, насыщенный — намного</div>}
       </>
     )
   } else if (phase === 'maturity') {

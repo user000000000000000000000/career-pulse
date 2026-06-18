@@ -13,15 +13,21 @@ export default function Atlas() {
   // если пришли из результатов/маршрута с конкретной профессией — сразу ищем её
   const [search, setSearch] = useState(location.state?.q || '')
   const [activeCategory, setActiveCategory] = useState('Все')
-  const [activeHolland, setActiveHolland] = useState('')
+  const [activeHolland, setActiveHolland] = useState([]) // до 3 кодов, логика «И»
   const [expanded, setExpanded] = useState(null)
 
   const categories = ['Все', ...PROFESSION_CATEGORIES]
+  const MAX_HOLLAND = 3
+
+  const toggleHolland = (k) => setActiveHolland(prev =>
+    prev.includes(k) ? prev.filter(x => x !== k) : prev.length < MAX_HOLLAND ? [...prev, k] : prev
+  )
 
   const filtered = useMemo(() => {
     return PROFESSIONS.filter(p => {
       const matchCat = activeCategory === 'Все' || p.category === activeCategory
-      const matchHolland = !activeHolland || p.holland.includes(activeHolland)
+      // профессия должна содержать ВСЕ выбранные качества (связка)
+      const matchHolland = activeHolland.length === 0 || activeHolland.every(c => p.holland.includes(c))
       const q = search.toLowerCase()
       const matchSearch = !q || p.name.toLowerCase().includes(q) || p.desc.toLowerCase().includes(q) || p.category.toLowerCase().includes(q)
       return matchCat && matchHolland && matchSearch
@@ -58,14 +64,26 @@ export default function Atlas() {
           </div>
           <div className="atlas-filter-row">
             <span className="atlas-filter-label">Holland:</span>
-            {Object.entries(HOLLAND_LABEL).map(([k, label]) => (
-              <button
-                key={k}
-                className={['atlas-chip atlas-chip--holland', activeHolland === k && 'active'].filter(Boolean).join(' ')}
-                style={{ '--hc': HOLLAND_COLOR[k] }}
-                onClick={() => setActiveHolland(prev => prev === k ? '' : k)}
-              >{k} — {label}</button>
-            ))}
+            {Object.entries(HOLLAND_LABEL).map(([k, label]) => {
+              const on = activeHolland.includes(k)
+              const dim = !on && activeHolland.length >= MAX_HOLLAND
+              return (
+                <button
+                  key={k}
+                  className={['atlas-chip atlas-chip--holland', on && 'active'].filter(Boolean).join(' ')}
+                  style={{ '--hc': HOLLAND_COLOR[k], opacity: dim ? 0.4 : 1 }}
+                  onClick={() => toggleHolland(k)}
+                >{k} — {label}</button>
+              )
+            })}
+            {activeHolland.length > 0 && (
+              <button className="atlas-chip" onClick={() => setActiveHolland([])}>× сбросить</button>
+            )}
+          </div>
+          <div className="atlas-filter-hint">
+            {activeHolland.length === 0
+              ? `Можно выбрать до ${MAX_HOLLAND} качеств — покажем профессии, где есть все выбранные (связка).`
+              : `Связка: ${activeHolland.map(c => HOLLAND_LABEL[c]).join(' + ')} — профессии, где есть все эти качества${activeHolland.length >= MAX_HOLLAND ? ' (максимум 3)' : ''}.`}
           </div>
         </div>
 
