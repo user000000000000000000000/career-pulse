@@ -92,3 +92,42 @@ nav.legal-nav{
   .cp-legal .lf-grid{grid-template-columns:1fr;gap:28px}
   .cp-legal .lf-bottom{flex-direction:column;align-items:flex-start;gap:10px}
 }
+
+/* ─────────── ХАБ ПРАВОВЫХ ДОКУМЕНТОВ (/legal) ─────────── */
+.cp-legal .docs-grid{
+  display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:14px;margin:8px 0 48px;
+}
+.cp-legal .doc-card{
+  display:flex;flex-direction:column;gap:8px;
+  background:var(--card);border:1px solid var(--line);border-radius:14px;padding:22px;
+  text-decoration:none;color:var(--text);position:relative;overflow:hidden;
+  transition:border-color .2s,transform .2s,background .2s;
+}
+.cp-legal .doc-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;
+  background:linear-gradient(90deg,var(--violet),var(--accent));opacity:.7}
+.cp-legal .doc-card:hover{border-color:rgba(0,229,200,.3);transform:translateY(-3px);background:var(--card2)}
+.cp-legal .dc-icon{font-size:30px;line-height:1;margin-bottom:4px}
+.cp-legal .dc-title{font-size:16px;font-weight:800;line-height:1.3}
+.cp-legal .dc-desc{font-size:13px;color:var(--sub);line-height:1.6;flex:1}
+.cp-legal .dc-link{font-size:13px;font-weight:700;color:var(--accent);margin-top:6px}
+
+.cp-legal .section-title{
+  font-family:'JetBrains Mono',monospace;font-size:12px;font-weight:700;letter-spacing:3px;
+  text-transform:uppercase;color:var(--ghost);margin:0 0 16px;
+}
+.cp-legal .contacts-grid{
+  display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:12px;margin-bottom:24px;
+}
+.cp-legal .contact-card{
+  display:flex;align-items:center;gap:12px;
+  background:var(--card);border:1px solid var(--line);border-radius:12px;padding:14px 16px;
+  text-decoration:none;color:var(--text);transition:border-color .2s,background .2s;
+}
+.cp-legal .contact-card:hover{border-color:rgba(0,229,200,.3);background:var(--card2)}
+.cp-legal .cc-icon{
+  width:40px;height:40px;border-radius:10px;flex-shrink:0;
+  display:flex;align-items:center;justify-content:center;font-size:20px;
+  background:rgba(255,255,255,.05);
+}
+.cp-legal .cc-name{font-size:14px;font-weight:700}
+.cp-legal .cc-handle{font-size:12px;color:var(--sub);font-family:'JetBrains Mono',monospace}

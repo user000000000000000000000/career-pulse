@@ -90,7 +90,8 @@ function pushRemote() {
   clearTimeout(_pushTimer)
   _pushTimer = setTimeout(async () => {
     try {
-      const { data: { user } } = await supabase.auth.getUser()
+      const { data: { session } } = await supabase.auth.getSession()
+      const user = session?.user
       if (!user) return
       await supabase.from('profiles')
         .update({ diagnostic_data: collectState(), diagnostic_updated_at: new Date().toISOString() })
@@ -104,7 +105,8 @@ async function hydrateFromRemote() {
   if (!isSupabaseConfigured || _hydrated) return false
   _hydrated = true
   try {
-    const { data: { user } } = await supabase.auth.getUser()
+    const { data: { session } } = await supabase.auth.getSession()
+    const user = session?.user
     if (!user) return false
     const { data } = await supabase.from('profiles').select('diagnostic_data').eq('id', user.id).maybeSingle()
     const remote = data?.diagnostic_data

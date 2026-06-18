@@ -1,4 +1,5 @@
 import LegalShell from './LegalShell.jsx'
+import ContactLinks from '../../components/ContactLinks.jsx'
 
 export default function Consent() {
   return (
