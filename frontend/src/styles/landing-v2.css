@@ -1,0 +1,276 @@
+/* ════════════════════════════════════════════════════════════════
+   CareerPulse — Landing V2 (по дизайн-макету Vic)
+   Светлая тема · сиренево-голубые градиенты · стекло · Unbounded
+   Изолировано под .cp-lv2 — не пересекается со старым landing.css
+   ════════════════════════════════════════════════════════════════ */
+
+.cp-lv2 {
+  --lv-blue:   #5B93E8;
+  --lv-blue2:  #8FB3F5;
+  --lv-lilac:  #C9A6F5;
+  --lv-pink:   #F5B8E0;
+  --lv-ink:    #241F5C;   /* заголовки */
+  --lv-ink2:   #2B2A4A;
+  --lv-body:   #4A4970;   /* основной текст */
+  --lv-muted:  #5A5980;
+  --lv-faint:  #63628A;
+  --lv-surface:#EEF0FB;
+  --lv-radius: 20px;
+
+  font-family: 'Manrope', system-ui, sans-serif;
+  color: var(--lv-ink);
+  background: var(--lv-surface);
+  min-height: 100vh;
+  overflow-x: hidden;
+  line-height: 1.5;
+}
+.cp-lv2 *,
+.cp-lv2 *::before,
+.cp-lv2 *::after { box-sizing: border-box; }
+
+.cp-lv2 .display { font-family: 'Unbounded', sans-serif; }
+.cp-lv2 .accent {
+  font-family: 'Instrument Serif', serif; font-style: italic; font-weight: 400;
+  color: var(--lv-blue); font-size: 1.32em; line-height: .8;
+  vertical-align: -0.06em; display: inline-block;
+}
+
+/* ── декоративные элементы ── */
+.cp-lv2 .blob { position: absolute; filter: blur(60px); z-index: 0; pointer-events: none; }
+.cp-lv2 .ring { position: absolute; border-radius: 50%; border: 1.5px solid rgba(91,147,232,.32); z-index: 0; pointer-events: none; }
+.cp-lv2 .ring2 { position: absolute; border-radius: 50%; border: 1.5px solid rgba(139,47,232,.28); z-index: 0; pointer-events: none; }
+.cp-lv2 .dotgrid {
+  position: absolute; inset: 0; z-index: 0; opacity: .5; pointer-events: none;
+  background-image: radial-gradient(circle, rgba(43,42,74,.14) 1px, transparent 1.4px);
+  background-size: 24px 24px;
+}
+.cp-lv2 .grain {
+  position: absolute; inset: 0; z-index: 2; pointer-events: none; opacity: .05; mix-blend-mode: overlay;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  background-size: 140px 140px;
+}
+.cp-lv2 .plus { position: absolute; width: 18px; height: 18px; z-index: 0; pointer-events: none; }
+.cp-lv2 .plus::before, .cp-lv2 .plus::after { content: ''; position: absolute; background: rgba(91,147,232,.45); }
+.cp-lv2 .plus::before { width: 100%; height: 2px; top: 8px; left: 0; }
+.cp-lv2 .plus::after  { width: 2px; height: 100%; left: 8px; top: 0; }
+
+.cp-lv2 .glass {
+  backdrop-filter: blur(26px) saturate(190%);
+  -webkit-backdrop-filter: blur(26px) saturate(190%);
+  background: rgba(255,255,255,.5);
+  border: 1px solid rgba(255,255,255,.75);
+  box-shadow: 0 1px 0 rgba(255,255,255,.8) inset, 0 20px 40px -20px rgba(43,42,74,.35);
+}
+.cp-lv2 .glass-dark {
+  backdrop-filter: blur(24px) saturate(160%);
+  -webkit-backdrop-filter: blur(24px) saturate(160%);
+  background: rgba(255,255,255,.16);
+  border: 1px solid rgba(255,255,255,.4);
+}
+
+@keyframes lvMorphA { 0%{transform:translate(0,0) scale(1) rotate(0);border-radius:62% 38% 45% 55%/55% 40% 60% 45%} 33%{transform:translate(50px,-60px) scale(1.15) rotate(22deg);border-radius:40% 60% 62% 38%/45% 55% 45% 55%} 66%{transform:translate(-30px,25px) scale(.9) rotate(-16deg);border-radius:55% 45% 38% 62%/60% 45% 55% 40%} 100%{transform:translate(0,0) scale(1) rotate(0);border-radius:62% 38% 45% 55%/55% 40% 60% 45%} }
+@keyframes lvMorphB { 0%{transform:translate(0,0) scale(1) rotate(0);border-radius:45% 55% 60% 40%/40% 60% 45% 55%} 40%{transform:translate(-60px,40px) scale(1.18) rotate(-20deg);border-radius:60% 40% 40% 60%/55% 45% 60% 40%} 70%{transform:translate(25px,-35px) scale(.88) rotate(12deg);border-radius:38% 62% 55% 45%/50% 50% 40% 60%} 100%{transform:translate(0,0) scale(1) rotate(0);border-radius:45% 55% 60% 40%/40% 60% 45% 55%} }
+@keyframes lvMorphC { 0%{transform:translate(0,0) scale(1) rotate(0);border-radius:50% 50% 35% 65%/60% 40% 60% 40%} 50%{transform:translate(35px,45px) scale(1.12) rotate(26deg);border-radius:65% 35% 55% 45%/40% 60% 35% 65%} 100%{transform:translate(0,0) scale(1) rotate(0);border-radius:50% 50% 35% 65%/60% 40% 60% 40%} }
+@keyframes lvSpin { from{transform:rotate(0)} to{transform:rotate(360deg)} }
+@keyframes lvSpinRev { from{transform:rotate(360deg)} to{transform:rotate(0)} }
+@keyframes lvFloat { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-10px)} }
+@keyframes lvReveal { from{opacity:0;transform:translateY(24px)} to{opacity:1;transform:translateY(0)} }
+
+.cp-lv2 .a-morphA { animation: lvMorphA 20s ease-in-out infinite; }
+.cp-lv2 .a-morphB { animation: lvMorphB 24s ease-in-out infinite; }
+.cp-lv2 .a-morphC { animation: lvMorphC 19s ease-in-out infinite; }
+.cp-lv2 .a-spin   { animation: lvSpin 40s linear infinite; }
+.cp-lv2 .a-spinRev{ animation: lvSpinRev 30s linear infinite; }
+.cp-lv2 .a-float  { animation: lvFloat 7s ease-in-out infinite; }
+
+.cp-lv2 .reveal { opacity: 0; }
+.cp-lv2 .reveal.visible { animation: lvReveal .7s cubic-bezier(.2,.7,.2,1) forwards; }
+
+/* ── общий контейнер ── */
+.cp-lv2 .wrap { max-width: 1200px; margin: 0 auto; }
+.cp-lv2 .clickable { cursor: pointer; user-select: none; }
+
+/* ── навбар ── */
+.cp-lv2 .lv-nav {
+  position: relative; z-index: 3;
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 24px clamp(20px, 4vw, 64px);
+}
+.cp-lv2 .lv-nav-pill {
+  border-radius: 100px; padding: 10px 22px;
+  display: flex; align-items: center; gap: 28px;
+}
+.cp-lv2 .lv-logo { font-family: 'Unbounded', sans-serif; font-weight: 800; font-size: 16px; color: var(--lv-ink2); }
+.cp-lv2 .lv-nav-links { display: flex; gap: 22px; font-size: 14px; color: #4A4970; }
+.cp-lv2 .lv-nav-links span { cursor: pointer; transition: color .2s; }
+.cp-lv2 .lv-nav-links span:hover { color: var(--lv-blue); }
+.cp-lv2 .lv-cta-pill {
+  padding: 12px 24px; border-radius: 100px;
+  background: linear-gradient(135deg, var(--lv-blue), var(--lv-blue2));
+  color: #fff; font-size: 14px; font-weight: 700; border: none;
+  font-family: inherit; cursor: pointer;
+  box-shadow: 0 14px 30px rgba(91,147,232,.5);
+  transition: transform .2s, box-shadow .2s;
+}
+.cp-lv2 .lv-cta-pill:hover { transform: translateY(-2px); box-shadow: 0 18px 36px rgba(91,147,232,.6); }
+
+/* блок авторизации в навбаре */
+.cp-lv2 .lv-nav-auth { display: flex; align-items: center; gap: 12px; }
+.cp-lv2 .lv-nav-login {
+  padding: 11px 20px; border-radius: 100px; border: 1px solid rgba(43,42,74,.16);
+  background: rgba(255,255,255,.55); color: #2B2A4A; font-size: 14px; font-weight: 700;
+  font-family: inherit; cursor: pointer; transition: border-color .2s, color .2s;
+}
+.cp-lv2 .lv-nav-login:hover { border-color: var(--lv-blue); color: var(--lv-blue); }
+.cp-lv2 .lv-nav-user { display: flex; align-items: center; gap: 9px; color: #2B2A4A; font-weight: 700; font-size: 13px; }
+.cp-lv2 .lv-nav-ava {
+  width: 30px; height: 30px; border-radius: 50%; flex-shrink: 0; display: block;
+  background-size: cover; background-position: center;
+}
+.cp-lv2 .lv-nav-ava-init {
+  display: flex; align-items: center; justify-content: center;
+  background: linear-gradient(135deg, var(--lv-blue), var(--lv-lilac));
+  color: #fff; font-size: 12px; font-weight: 800;
+}
+@media (max-width: 620px) {
+  .cp-lv2 .lv-nav-uname { display: none; }
+  .cp-lv2 .lv-nav-login { padding: 10px 14px; }
+}
+
+/* ── HERO ── */
+.cp-lv2 .lv-hero {
+  position: relative; overflow: hidden;
+  background: radial-gradient(120% 100% at 10% 0%, #F1EEFC, #EEF0FB 60%);
+}
+.cp-lv2 .lv-hero-inner {
+  position: relative; z-index: 1;
+  display: flex; gap: 24px; align-items: center;
+  padding: 40px clamp(20px, 4vw, 64px) 96px;
+  max-width: 1200px; margin: 0 auto;
+}
+.cp-lv2 .lv-hero-left { flex: 1.1; display: flex; flex-direction: column; gap: 24px; }
+.cp-lv2 .lv-badge {
+  align-self: flex-start; border-radius: 100px; padding: 8px 18px;
+  font-size: 12px; font-weight: 700; color: #5B4A9E; letter-spacing: .02em;
+}
+.cp-lv2 .lv-hero-title {
+  font-family: 'Unbounded', sans-serif; font-size: clamp(40px, 7vw, 72px);
+  font-weight: 800; line-height: 1.02; color: #241F5C; letter-spacing: -.01em;
+}
+.cp-lv2 .lv-hero-sub { font-size: clamp(16px, 2vw, 18px); line-height: 1.6; color: #4A4970; max-width: 440px; }
+.cp-lv2 .lv-hero-actions { display: flex; gap: 16px; margin-top: 8px; align-items: center; flex-wrap: wrap; }
+.cp-lv2 .lv-btn-primary {
+  padding: 17px 32px; border-radius: 16px; border: none; font-family: inherit; cursor: pointer;
+  background: linear-gradient(135deg, var(--lv-blue), var(--lv-blue2));
+  color: #fff; font-weight: 700; font-size: 15px;
+  box-shadow: 0 16px 32px rgba(91,147,232,.5);
+  transition: transform .2s, box-shadow .2s;
+}
+.cp-lv2 .lv-btn-primary:hover { transform: translateY(-2px); box-shadow: 0 20px 40px rgba(91,147,232,.6); }
+.cp-lv2 .lv-hero-note { font-size: 14px; font-weight: 700; color: #4A4970; }
+
+/* профиль-карточка */
+.cp-lv2 .lv-hero-right { flex: .9; position: relative; display: flex; justify-content: center; }
+.cp-lv2 .lv-profile-card {
+  width: 340px; max-width: 100%; border-radius: 24px; padding: 24px;
+  display: flex; flex-direction: column; gap: 20px; transform: rotate(-4deg);
+  box-shadow: 0 50px 80px -30px rgba(43,42,74,.5);
+}
+.cp-lv2 .lv-pc-head { display: flex; justify-content: space-between; align-items: center; }
+.cp-lv2 .lv-pc-title { font-weight: 700; font-size: 14px; color: #241F5C; }
+.cp-lv2 .lv-pc-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--lv-blue); }
+.cp-lv2 .lv-pc-rings { display: flex; gap: 16px; }
+.cp-lv2 .lv-ringstat { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 8px; }
+.cp-lv2 .lv-ringstat .disc { width: 64px; height: 64px; border-radius: 50%; display: flex; align-items: center; justify-content: center; }
+.cp-lv2 .lv-ringstat .disc > div {
+  width: 48px; height: 48px; border-radius: 50%; background: rgba(255,255,255,.95);
+  display: flex; align-items: center; justify-content: center;
+  font-family: 'Unbounded', sans-serif; font-weight: 700; font-size: 11px; color: #241F5C;
+}
+.cp-lv2 .lv-ringstat .lbl { font-size: 10.5px; font-weight: 700; color: #4A4970; text-align: center; }
+.cp-lv2 .lv-pc-sep { height: 1px; background: rgba(43,42,74,.1); }
+.cp-lv2 .lv-pc-cap { font-size: 12px; color: #5A5980; }
+.cp-lv2 .lv-pc-prof { display: flex; justify-content: space-between; align-items: center; }
+.cp-lv2 .lv-pc-prof b { font-weight: 700; font-size: 16px; color: #241F5C; }
+.cp-lv2 .lv-pc-prof span { font-size: 13px; font-weight: 800; color: var(--lv-blue); }
+.cp-lv2 .lv-chip-float {
+  position: absolute; top: -16px; right: 0; padding: 10px 16px; border-radius: 14px;
+  font-size: 12px; font-weight: 700; color: #5B4A9E;
+}
+
+/* ── секция «как это работает» ── */
+.cp-lv2 .lv-how { background: #fff; padding: clamp(48px, 8vw, 88px) clamp(20px, 4vw, 64px); }
+.cp-lv2 .lv-how-inner { max-width: 1200px; margin: 0 auto; display: flex; flex-direction: column; gap: 40px; }
+.cp-lv2 .lv-eyebrow { font-size: 13px; font-weight: 700; color: var(--lv-blue); letter-spacing: .04em; text-transform: uppercase; }
+.cp-lv2 .lv-h2 { font-family: 'Unbounded', sans-serif; font-size: clamp(28px, 4.5vw, 40px); font-weight: 700; color: #241F5C; }
+.cp-lv2 .lv-steps { position: relative; display: flex; gap: 20px; }
+.cp-lv2 .lv-steps-line { position: absolute; top: 18px; left: 18px; right: 18px; height: 2px; z-index: 0;
+  background: linear-gradient(90deg, #C9CEF2, #8FB3F5, #C9CEF2); }
+.cp-lv2 .lv-step { flex: 1; display: flex; flex-direction: column; gap: 16px; position: relative; z-index: 1; }
+.cp-lv2 .lv-step.up { transform: translateY(-14px); }
+.cp-lv2 .lv-step-num {
+  width: 36px; height: 36px; border-radius: 50%;
+  background: linear-gradient(135deg, var(--lv-blue), var(--lv-blue2));
+  color: #fff; display: flex; align-items: center; justify-content: center;
+  font-family: 'Unbounded', sans-serif; font-weight: 700; font-size: 13px;
+  box-shadow: 0 10px 20px rgba(91,147,232,.45);
+}
+.cp-lv2 .lv-step-card { background: var(--lv-surface); border-radius: 16px; padding: 20px 16px; display: flex; flex-direction: column; gap: 8px; }
+.cp-lv2 .lv-step-card b { font-weight: 700; font-size: 14.5px; color: #241F5C; }
+.cp-lv2 .lv-step-card p { font-size: 12.5px; color: #5A5980; line-height: 1.45; margin: 0; }
+
+/* ── профессии ── */
+.cp-lv2 .lv-prof { position: relative; overflow: hidden; background: var(--lv-surface); padding: clamp(48px,8vw,88px) clamp(20px,4vw,64px); }
+.cp-lv2 .lv-prof-inner { position: relative; z-index: 1; max-width: 1200px; margin: 0 auto; display: flex; flex-direction: column; gap: 32px; }
+.cp-lv2 .lv-prof-grid { display: flex; gap: 20px; flex-wrap: wrap; }
+.cp-lv2 .lv-prof-card { flex: 1 1 260px; border-radius: 20px; padding: 24px; display: flex; flex-direction: column; gap: 12px; }
+.cp-lv2 .lv-prof-ic { width: 38px; height: 38px; border-radius: 12px; background: linear-gradient(135deg, var(--lv-blue), var(--lv-lilac)); }
+.cp-lv2 .lv-prof-card b { font-weight: 700; font-size: 16px; color: #241F5C; }
+.cp-lv2 .lv-prof-card p { font-size: 13px; color: #5A5980; line-height: 1.45; margin: 0; }
+.cp-lv2 .lv-prof-match { font-size: 13px; font-weight: 800; color: var(--lv-blue); }
+
+/* ── CTA ── */
+.cp-lv2 .lv-ctaband {
+  position: relative; overflow: hidden; text-align: center;
+  padding: clamp(56px,9vw,96px) clamp(20px,4vw,64px);
+  background: linear-gradient(135deg, var(--lv-blue), var(--lv-blue2), var(--lv-lilac));
+}
+.cp-lv2 .lv-ctaband-inner { position: relative; z-index: 1; display: flex; flex-direction: column; align-items: center; gap: 24px; }
+.cp-lv2 .lv-ctaband h2 { font-family: 'Unbounded', sans-serif; font-size: clamp(26px,4.5vw,38px); font-weight: 800; color: #fff; max-width: 600px; }
+.cp-lv2 .lv-ctaband-btn { border-radius: 16px; padding: 18px 36px; color: #fff; font-weight: 700; font-size: 16px; border: none; font-family: inherit; cursor: pointer; transition: transform .2s; }
+.cp-lv2 .lv-ctaband-btn:hover { transform: translateY(-2px); }
+
+/* ── футер ── */
+.cp-lv2 .lv-foot {
+  background: #241F5C; padding: 40px clamp(20px,4vw,64px);
+  display: flex; justify-content: space-between; align-items: flex-start; gap: 24px; flex-wrap: wrap;
+  font-size: 13px; color: #B9BCE0;
+}
+.cp-lv2 .lv-foot-brand { display: flex; flex-direction: column; gap: 8px; }
+.cp-lv2 .lv-foot-brand .b { color: #fff; font-family: 'Unbounded', sans-serif; font-weight: 700; font-size: 15px; }
+.cp-lv2 .lv-foot-brand p { max-width: 220px; line-height: 1.5; margin: 0; }
+.cp-lv2 .lv-foot-cols { display: flex; gap: 56px; flex-wrap: wrap; }
+.cp-lv2 .lv-foot-col { display: flex; flex-direction: column; gap: 10px; }
+.cp-lv2 .lv-foot-col .h { color: #fff; font-weight: 700; margin-bottom: 2px; }
+.cp-lv2 .lv-foot-col span { cursor: pointer; }
+.cp-lv2 .lv-foot-col span:hover { color: #fff; }
+
+/* ── адаптив ── */
+@media (max-width: 900px) {
+  .cp-lv2 .lv-hero-inner { flex-direction: column; align-items: stretch; }
+  .cp-lv2 .lv-hero-right { margin-top: 24px; }
+  .cp-lv2 .lv-steps { flex-wrap: wrap; }
+  .cp-lv2 .lv-step { flex: 1 1 140px; }
+  .cp-lv2 .lv-step.up { transform: none; }
+  .cp-lv2 .lv-steps-line { display: none; }
+}
+@media (max-width: 620px) {
+  .cp-lv2 .lv-nav-links { display: none; }
+  .cp-lv2 .lv-profile-card { transform: rotate(-2deg); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cp-lv2 .a-morphA, .cp-lv2 .a-morphB, .cp-lv2 .a-morphC,
+  .cp-lv2 .a-spin, .cp-lv2 .a-spinRev, .cp-lv2 .a-float { animation: none; }
+  .cp-lv2 .reveal, .cp-lv2 .reveal.visible { opacity: 1; animation: none; }
+}
