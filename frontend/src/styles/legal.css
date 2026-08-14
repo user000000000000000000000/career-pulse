@@ -1,13 +1,13 @@
 :root{
-  --ink:#07070e; --surface:#0c0c18; --card:#111120; --card2:#161626;
-  --accent:#00e5c8; --violet:#7b5cf0; --ember:#ff6b35;
-  --text:#ecedf8; --sub:#9898b8; --ghost:#55557a;
-  --line:rgba(255,255,255,0.07); --line2:rgba(255,255,255,0.12);
-  --ok:#22d97a;
+  --ink:#eef0fb; --surface:rgba(255,255,255,0.45); --card:rgba(255,255,255,0.62); --card2:rgba(255,255,255,0.52);
+  --accent:#5b93e8; --violet:#a78bf5; --ember:#ec6fa8;
+  --text:#241f5c; --sub:#5a5980; --ghost:#8c8cab;
+  --line:rgba(43,42,74,0.07); --line2:rgba(43,42,74,0.12);
+  --ok:#1fa46a;
 }
 .cp-legal *{margin:0;padding:0;box-sizing:border-box}
 .cp-legal{scroll-behavior:smooth}
-.cp-legal{background:var(--ink);color:var(--text);font-family:'Manrope',sans-serif;font-size:16px;line-height:1.7;-webkit-font-smoothing:antialiased}
+.cp-legal{background:transparent;color:var(--text);font-family:'Manrope',sans-serif;font-size:16px;line-height:1.7;-webkit-font-smoothing:antialiased}
 .cp-legal ::-webkit-scrollbar{width:3px}
 .cp-legal ::-webkit-scrollbar-thumb{background:var(--violet);border-radius:2px}
 
@@ -16,7 +16,7 @@ nav.legal-nav{
   position:fixed;top:0;left:0;right:0;z-index:200;
   display:flex;align-items:center;justify-content:space-between;
   padding:16px 64px;
-  background:rgba(7,7,14,.88);backdrop-filter:blur(20px);
+  background:rgba(238,240,251,.88);backdrop-filter:blur(20px);
   border-bottom:1px solid var(--line);
 }
 .cp-legal .nav-logo-link{display:flex;align-items:center;gap:9px;text-decoration:none}
@@ -39,7 +39,7 @@ nav.legal-nav{
 .cp-legal .legal-meta a{color:var(--accent);text-decoration:none}
 
 .cp-legal /* HIGHLIGHT */
-.legal-highlight{background:rgba(0,229,200,.06);border:1px solid rgba(0,229,200,.18);border-left:3px solid var(--accent);border-radius:10px;padding:18px 22px;margin:0 0 32px}
+.legal-highlight{background:rgba(91,147,232,.06);border:1px solid rgba(91,147,232,.18);border-left:3px solid var(--accent);border-radius:10px;padding:18px 22px;margin:0 0 32px}
 .cp-legal .legal-highlight p{margin:0;font-size:14px;color:var(--sub);line-height:1.6}
 
 .cp-legal /* BODY */
@@ -105,7 +105,7 @@ nav.legal-nav{
 }
 .cp-legal .doc-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;
   background:linear-gradient(90deg,var(--violet),var(--accent));opacity:.7}
-.cp-legal .doc-card:hover{border-color:rgba(0,229,200,.3);transform:translateY(-3px);background:var(--card2)}
+.cp-legal .doc-card:hover{border-color:rgba(91,147,232,.3);transform:translateY(-3px);background:var(--card2)}
 .cp-legal .dc-icon{font-size:30px;line-height:1;margin-bottom:4px}
 .cp-legal .dc-title{font-size:16px;font-weight:800;line-height:1.3}
 .cp-legal .dc-desc{font-size:13px;color:var(--sub);line-height:1.6;flex:1}
@@ -123,11 +123,11 @@ nav.legal-nav{
   background:var(--card);border:1px solid var(--line);border-radius:12px;padding:14px 16px;
   text-decoration:none;color:var(--text);transition:border-color .2s,background .2s;
 }
-.cp-legal .contact-card:hover{border-color:rgba(0,229,200,.3);background:var(--card2)}
+.cp-legal .contact-card:hover{border-color:rgba(91,147,232,.3);background:var(--card2)}
 .cp-legal .cc-icon{
   width:40px;height:40px;border-radius:10px;flex-shrink:0;
   display:flex;align-items:center;justify-content:center;font-size:20px;
-  background:rgba(255,255,255,.05);
+  background:rgba(43,42,74,.05);
 }
 .cp-legal .cc-name{font-size:14px;font-weight:700}
 .cp-legal .cc-handle{font-size:12px;color:var(--sub);font-family:'JetBrains Mono',monospace}

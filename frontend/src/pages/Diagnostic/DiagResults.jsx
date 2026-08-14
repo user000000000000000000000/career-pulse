@@ -23,19 +23,19 @@ function HollandRadar({ scores }) {
   const pt = (i, v) => { const ang = (Math.PI * 2 * i / 6) - Math.PI / 2; return [cx + R * v * Math.cos(ang), cy + R * v * Math.sin(ang)] }
   const poly = types.map((t, i) => pt(i, (scores[t] || 0) / 100).map(n => n.toFixed(1)).join(',')).join(' ')
   const rings = [1, 0.66, 0.33].map((s, k) => (
-    <polygon key={k} points={types.map((_, i) => pt(i, s).map(n => n.toFixed(1)).join(',')).join(' ')} fill="none" stroke={`rgba(255,255,255,${0.06 * s})`} strokeWidth="1" />
+    <polygon key={k} points={types.map((_, i) => pt(i, s).map(n => n.toFixed(1)).join(',')).join(' ')} fill="none" stroke={`rgba(43,42,74,${0.10 * s})`} strokeWidth="1" />
   ))
-  const axes = types.map((_, i) => { const [x, y] = pt(i, 1); return <line key={i} x1={cx} y1={cy} x2={x.toFixed(1)} y2={y.toFixed(1)} stroke="rgba(255,255,255,0.04)" /> })
+  const axes = types.map((_, i) => { const [x, y] = pt(i, 1); return <line key={i} x1={cx} y1={cy} x2={x.toFixed(1)} y2={y.toFixed(1)} stroke="rgba(43,42,74,0.07)" /> })
   const labels = types.map((t, i) => {
     const [lx, ly] = pt(i, 1.18); const anchor = lx < cx - 5 ? 'end' : lx > cx + 5 ? 'start' : 'middle'
-    return <text key={i} x={lx.toFixed(1)} y={(ly + 4).toFixed(1)} textAnchor={anchor} fill="#9898b8" fontSize="10" fontFamily="Manrope">{TYPE_NAMES[t]}</text>
+    return <text key={i} x={lx.toFixed(1)} y={(ly + 4).toFixed(1)} textAnchor={anchor} fill="#5a5980" fontSize="10" fontFamily="Manrope">{TYPE_NAMES[t]}</text>
   })
-  const dots = types.map((t, i) => { const [x, y] = pt(i, (scores[t] || 0) / 100); return <circle key={i} cx={x.toFixed(1)} cy={y.toFixed(1)} r="4" fill="#00e5c8" /> })
+  const dots = types.map((t, i) => { const [x, y] = pt(i, (scores[t] || 0) / 100); return <circle key={i} cx={x.toFixed(1)} cy={y.toFixed(1)} r="4" fill="#5b93e8" /> })
   return (
-    <svg viewBox="-48 -6 356 290" style={{ width: '100%', maxWidth: 320 }} xmlns="http://www.w3.org/2000/svg">
-      <defs><linearGradient id="rg" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stopColor="#7b5cf0" stopOpacity="0.3" /><stop offset="100%" stopColor="#00e5c8" stopOpacity="0.3" /></linearGradient></defs>
+    <svg viewBox="-48 -6 356 290" style={{ width: '100%', maxWidth: 440, display: 'block', margin: '0 auto' }} xmlns="http://www.w3.org/2000/svg">
+      <defs><linearGradient id="rg" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stopColor="#5b93e8" stopOpacity="0.28" /><stop offset="100%" stopColor="#a78bf5" stopOpacity="0.24" /></linearGradient></defs>
       {rings}{axes}
-      <polygon points={poly} fill="url(#rg)" stroke="#00e5c8" strokeWidth="2" />
+      <polygon points={poly} fill="url(#rg)" stroke="#5b93e8" strokeWidth="2" />
       {dots}{labels}
     </svg>
   )
@@ -102,6 +102,10 @@ export default function DiagResults() {
         <button className="tb-btn" onClick={() => navigate('/dashboard')}>← В кабинет</button>
       </div>
       <div className="container" style={{ maxWidth: 820 }}>
+        <div className="print-only print-header">
+          <div className="ph-logo">CAREER<span>PULSE</span></div>
+          <div className="ph-meta">Профориентационный отчёт · {new Date().toLocaleDateString('ru-RU')}</div>
+        </div>
         <div className="block-num">РЕЗУЛЬТАТ ДИАГНОСТИКИ</div>
         <div className="block-title">ТВОЙ ПРОФИЛЬ</div>
         <div className="block-desc">Пройдено блоков: {progress.completed.length} / 10. Каждый блок добавляет слой.</div>
@@ -235,8 +239,9 @@ export default function DiagResults() {
           {profile.readiness_top2 && <div className="r-card"><div className="r-label">Готовность (топ-2)</div><div className="r-val">{profile.readiness_top2.join(' · ')}</div></div>}
         </div>
 
-        <div className="nav-row" style={{ marginTop: 28 }}>
+        <div className="nav-row no-print" style={{ marginTop: 28 }}>
           <button className="btn btn-ghost" onClick={() => navigate('/dashboard')}>← В кабинет</button>
+          <button className="btn btn-ghost" onClick={() => window.print()}>🖨 Скачать PDF</button>
           <button className="btn btn-violet" onClick={() => navigate('/atlas')}>Атлас профессий</button>
           <button className="btn btn-accent" onClick={() => navigate('/roadmap')}>🗺️ Построить маршрут →</button>
         </div>

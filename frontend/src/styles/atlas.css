@@ -24,11 +24,11 @@
   color:var(--sub);font-size:13px;font-weight:700;padding:9px 16px;cursor:pointer;
   transition:all .15s;white-space:nowrap;font-family:'Manrope',sans-serif}
 .atlas-chip:hover{border-color:var(--accent);color:var(--text);transform:translateY(-1px)}
-.atlas-chip.active{background:var(--accent);border-color:var(--accent);color:#07070e}
+.atlas-chip.active{background:var(--accent);border-color:var(--accent);color:#eef0fb}
 
 .atlas-chip--holland{border-color:var(--hc,var(--line));color:var(--hc,var(--sub))}
 .atlas-chip--holland:hover{background:color-mix(in srgb,var(--hc,transparent) 12%,transparent)}
-.atlas-chip--holland.active{background:var(--hc,var(--accent));border-color:var(--hc,var(--accent));color:#07070e}
+.atlas-chip--holland.active{background:var(--hc,var(--accent));border-color:var(--hc,var(--accent));color:#eef0fb}
 
 .atlas-filter-hint{font-size:12px;color:var(--ghost);line-height:1.5;margin-top:2px}
 .atlas-count{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--ghost);
@@ -39,8 +39,8 @@
 
 .atlas-card{background:var(--card);border:1px solid var(--line);border-radius:14px;
   padding:16px;cursor:pointer;transition:border-color .2s,background .2s;position:relative}
-.atlas-card:hover{border-color:rgba(255,255,255,.18)}
-.atlas-card--open{border-color:var(--accent);background:rgba(0,229,200,.04)}
+.atlas-card:hover{border-color:rgba(43,42,74,.18)}
+.atlas-card--open{border-color:var(--accent);background:rgba(91,147,232,.04)}
 
 .ac-top{display:flex;justify-content:space-between;align-items:flex-start;gap:8px;margin-bottom:8px}
 .ac-category{font-size:10px;font-weight:800;letter-spacing:1px;text-transform:uppercase;

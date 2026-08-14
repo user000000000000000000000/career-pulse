@@ -3,29 +3,29 @@
    (объединяет палитру всех исходных макетов)
    ─────────────────────────────────────────────── */
 :root {
-  --ink:     #07070e;
-  --black:   #08080f;
-  --deep:    #0d0d1a;
-  --surface: #0c0c18;
-  --card:    #111120;
-  --card2:   #161626;
-  --accent:  #00e5c8;
-  --accent2: #7b5cf0;
-  --violet:  #7b5cf0;
-  --accent3: #ff6b35;
-  --ember:   #ff6b35;
-  --gold:    #f5c842;
-  --text:    #ecedf8;
-  --sub:     #9898b8;
-  --muted:   #686888;
-  --muted2:  #9898b8;
-  --ghost:   #55557a;
-  --line:    rgba(255,255,255,0.07);
-  --line2:   rgba(255,255,255,0.12);
-  --border:  rgba(255,255,255,0.07);
-  --border2: rgba(255,255,255,0.13);
-  --ok:      #22d97a;
-  --danger:  #ff4d6d;
+  --ink:     #eef0fb;
+  --black:   #eef0fb;
+  --deep:    #e6eaf7;
+  --surface: rgba(255,255,255,0.45);
+  --card:    rgba(255,255,255,0.62);
+  --card2:   rgba(255,255,255,0.52);
+  --accent:  #5b93e8;
+  --accent2: #a78bf5;
+  --violet:  #a78bf5;
+  --accent3: #ec6fa8;
+  --ember:   #ec6fa8;
+  --gold:    #c6971f;
+  --text:    #241f5c;
+  --sub:     #5a5980;
+  --muted:   #63628a;
+  --muted2:  #5a5980;
+  --ghost:   #8c8cab;
+  --line:    rgba(43,42,74,0.07);
+  --line2:   rgba(43,42,74,0.12);
+  --border:  rgba(43,42,74,0.07);
+  --border2: rgba(43,42,74,0.13);
+  --ok:      #1fa46a;
+  --danger:  #e23d5b;
 }
 
 * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -54,3 +54,40 @@ a { color: inherit; }
   }
 }
 :focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+/* ══════════════════════════════════════════════════════════════
+   Единый стеклянный стиль на всех страницах (как на новой Главной):
+   мягкий аврора-фон за контентом + полупрозрачные поверхности + блюр.
+   Поверхности уже translucent через --card/--card2/--surface.
+   ══════════════════════════════════════════════════════════════ */
+body::before {
+  content: ''; position: fixed; inset: 0; z-index: -2; pointer-events: none;
+  background:
+    radial-gradient(58% 48% at 12% -8%, rgba(201,166,245,.45), transparent 62%),
+    radial-gradient(52% 44% at 88% 2%,  rgba(143,179,245,.42), transparent 62%),
+    radial-gradient(50% 46% at 72% 106%, rgba(245,184,224,.30), transparent 62%),
+    linear-gradient(180deg, #f1eefc, #eef0fb 42%);
+}
+body::after {
+  content: ''; position: fixed; inset: 0; z-index: -2; pointer-events: none; opacity: .45;
+  background-image: radial-gradient(circle, rgba(43,42,74,.10) 1px, transparent 1.4px);
+  background-size: 24px 24px;
+}
+
+/* Блюр поверхностей — стекло. (Фон у них уже полупрозрачный через токены.) */
+.cp-card, .atlas-card, .atlas-search, .chart-block, .progress-block,
+.cp-dashboard .axis-card, .cp-dashboard .block-card, .cp-dashboard .stat-card,
+.cp-dashboard .panel, .cp-dashboard .modal-box, .cp-dashboard .topbar,
+.cp-diag .topbar, .cp-diag .pair-card, .cp-diag .mat-card, .cp-diag .opt-card,
+.cp-diag .r-card, .cp-diag .rm-card, .cp-diag .prof-opt, .cp-diag .q-input,
+.cp-diag .q-textarea, .cp-diag .chip, .cp-diag .int-btn, .cp-diag .scale-btn,
+.appnav-drawer, .cp-legal .auth-card, .profile-card {
+  backdrop-filter: blur(18px) saturate(165%);
+  -webkit-backdrop-filter: blur(18px) saturate(165%);
+}
+
+/* Заголовки — Unbounded, в тон Главной */
+h1, h2 { font-family: 'Unbounded', sans-serif; }
+
+/* Скроллбар-трек прозрачный (чтобы аврора не перекрывалась) */
+::-webkit-scrollbar-track { background: transparent; }
