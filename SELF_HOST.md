@@ -1,17 +1,17 @@
 # Self-host Supabase на Yandex Cloud (РФ, под 152-ФЗ)
 
+> **Статус проекта:** облачного Supabase-проекта ещё не было, БД пустая — переноса данных (Фаза 3 / `pg_dump`) не требуется, стартуем сразу с `schema.sql` на self-host. Фронтенд сейчас на GitHub Pages, деплой автоматизирован в `.github/workflows/deploy.yml` — после смены `.env`-значений на self-host просто обновите Secrets репозитория (Settings → Secrets and variables → Actions): `VITE_SUPABASE_URL`, `VITE_SUPABASE_ANON_KEY`, `VITE_VK_APP_ID`, `VITE_VK_AUTH_URL`.
+>
+> Готовые скрипты: `supabase/selfhost/setup.sh` (устанавливает Docker + Supabase на VM), `supabase/selfhost/Caddyfile` (reverse-proxy + авто-TLS).
+
 ## ✅ Чеклист ПЕРЕД переносом
-1. **Применить `supabase/schema.sql`** на текущем облаке (SQL Editor) — чтобы дамп был полным и схема воспроизводима. Это источник правды по таблицам/политикам.
-2. **Задеплоить все edge-функции** (финальные версии): `vk-auth`, `analyze-diagnostic`, `analyze-test`, `career-roadmap`, `delete-account`.
-   `npx supabase functions deploy` (все сразу).
-3. **Прогнать полный сценарий** на текущем сетапе как «эталон»: регистрация → подтверждение почты → вход → ВК-вход → диагностика → синхронизация → запись на консультацию → удаление аккаунта.
-4. **Инвентарь секретов** (понадобятся на self-host, значения НЕ хранить в git):
-   - функции: `AI_API_KEY` (или `YANDEX_API_KEY`), `YANDEX_FOLDER_ID`, `AI_PROVIDER=yandex`, `VK_CLIENT_SECRET`
-   - авто: `SUPABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY`, `SUPABASE_ANON_KEY`
-   - SMTP (почта): host/port/user/pass
-5. **Решить по данным:** реальных аккаунтов мало → можно стартовать с чистой БД (только `schema.sql`), без переноса `auth`. Иначе — дамп `public`+`auth`.
-6. **Готовая строка подключения** к текущей БД (Supabase → Project Settings → Database) для `pg_dump`.
-7. **Влить `dev` → `main`** — чтобы прод-фронт соответствовал.
+1. Создать VM в Yandex Cloud (см. Фаза 0), зайти по SSH, скопировать туда `supabase/selfhost/setup.sh` и запустить — он ставит Docker/Caddy и клонирует репозиторий Supabase.
+2. Заполнить `supabase/docker/.env` на VM (пароли, JWT_SECRET, SMTP) — см. Фаза 1.
+3. Накатить `supabase/schema.sql` в поднятый Postgres (пустая БД, `auth`-схему разворачивает сам GoTrue-контейнер).
+4. Скопировать `supabase/functions/*` в `volumes/functions/<имя>/index.ts` self-host стека и задать секреты функций.
+5. Поднять `api.careerpulse.ru` через Caddy (Фаза 2), обновить DNS A-запись на IP VM.
+6. Обновить GitHub Secrets репозитория новыми `VITE_SUPABASE_URL=https://api.careerpulse.ru` и `VITE_SUPABASE_ANON_KEY`, задеплоить фронт (workflow сам соберёт и выложит на Pages).
+7. Прогнать сквозной сценарий (Фаза 6): регистрация → письмо подтверждения → вход → ВК-вход → диагностика → синхронизация → запись на консультацию → удаление аккаунта.
 
 ---
 
@@ -24,7 +24,38 @@
 ---
 
 ## Фаза 0. Сервер
-Yandex Cloud → Compute Cloud → создать ВМ:
+Через консоль (Compute Cloud → создать ВМ) или через `yc` CLI:
+
+```bash
+# один раз: установить и авторизовать yc CLI
+curl -sSL https://storage.yandexcloud.net/yandexcloud-yc/install.sh | bash
+yc init   # выбрать/создать облако, каталог (folder), зону по умолчанию (ru-central1-a)
+
+# сеть с публичным IP и группой безопасности (открыт только 22 и 443)
+yc vpc network create --name careerpulse-net
+yc vpc subnet create --name careerpulse-subnet \
+  --network-name careerpulse-net --zone ru-central1-a --range 10.0.0.0/24
+yc vpc security-group create --name careerpulse-sg --network-name careerpulse-net \
+  --rule "direction=ingress,port=22,protocol=tcp,v4-cidrs=[0.0.0.0/0]" \
+  --rule "direction=ingress,port=443,protocol=tcp,v4-cidrs=[0.0.0.0/0]" \
+  --rule "direction=egress,port=any,protocol=any,v4-cidrs=[0.0.0.0/0]"
+
+# сама ВМ: 4 vCPU / 8 ГБ RAM, SSD 50 ГБ, Ubuntu 22.04, публичный IP
+yc compute instance create \
+  --name careerpulse-vm \
+  --zone ru-central1-a \
+  --network-interface subnet-name=careerpulse-subnet,nat-ip-version=ipv4,security-group-ids=$(yc vpc security-group get careerpulse-sg --format json | grep '"id"' | head -1 | grep -o '"[a-z0-9]*"$' | tr -d '"') \
+  --create-boot-disk image-folder-id=standard-images,image-family=ubuntu-2204-lts,size=50,type=network-ssd \
+  --cores=4 --memory=8GB \
+  --ssh-key ~/.ssh/id_rsa.pub
+
+# узнать публичный IP для DNS A-записи и SSH
+yc compute instance get careerpulse-vm --format json | grep -A2 "one_to_one_nat"
+```
+
+Дальше — по SSH на этот IP, дальнейшие шаги (Docker/Supabase) те же, что ниже.
+
+Спецификация ВМ:
 - ОС: **Ubuntu 22.04 LTS**
 - vCPU/RAM: **2–4 vCPU / 8 ГБ** (Supabase поднимает ~10 контейнеров, на 4 ГБ тесно)
 - Диск: SSD **40–60 ГБ**
@@ -75,19 +106,12 @@ api.careerpulse.ru {
    `sudo apt install caddy` → `sudo systemctl restart caddy`. Сертификат Let's Encrypt поднимется сам.
 3. Итог: API доступно по `https://api.careerpulse.ru`.
 
-## Фаза 3. Перенос данных со старого Supabase
-На старом проекте (Project Settings → Database → Connection string) берём строку подключения.
+## Фаза 3. Схема БД (чистый старт — данных для переноса нет)
 ```bash
-# дамп нужных схем со старого облака
-pg_dump "postgresql://postgres:PWD@db.gsxpapwpchbtyoxipuwf.supabase.co:5432/postgres" \
-  --schema=public --schema=auth --no-owner --no-privileges -f cp_dump.sql
-
-# восстановление в self-host (порт проброшен внутри docker-сети)
-psql "postgresql://postgres:НОВЫЙ_PWD@localhost:5432/postgres" -f cp_dump.sql
+psql "postgresql://postgres:НОВЫЙ_PWD@localhost:5432/postgres" -f schema.sql
 ```
-- `public` тянет наши таблицы + RLS-политики (profiles, consultation_requests, diagnostic_data).
-- `auth` тянет пользователей (хэши паролей переедут, т.к. GoTrue тот же bcrypt).
-- **Альтернатива для MVP:** реальных аккаунтов мало → можно не тащить `auth`, а попросить перерегистрироваться. Тогда дампим только `public`.
+`auth`-схему создаёт сам GoTrue-контейнер при первом старте — руками её накатывать не нужно.
+`public` получит наши таблицы + RLS-политики (profiles, consultation_requests, diagnostic_data) с нуля.
 
 ## Фаза 4. Edge Functions
 Наши функции (`vk-auth`, `analyze-diagnostic`, `analyze-test`, `career-roadmap`) кладём в
@@ -99,13 +123,16 @@ psql "postgresql://postgres:НОВЫЙ_PWD@localhost:5432/postgres" -f cp_dump.s
 
 Перезапустить: `docker compose restart functions`.
 
-## Фаза 5. Поменять во фронтенде (это я сделаю в коде)
-- `frontend/.env`:
-  - `VITE_SUPABASE_URL=https://api.careerpulse.ru`
-  - `VITE_SUPABASE_ANON_KEY=<новый ANON_KEY>`
-- `.github/workflows/deploy.yml` — те же два значения.
-- `VITE_VK_AUTH_URL` (если задан) → на новый адрес функции.
-- Пересобрать и задеплоить фронт.
+## Фаза 5. Поменять во фронтенде
+Код не трогаем — только GitHub Secrets репозитория (Settings → Secrets and variables → Actions),
+которые читает `.github/workflows/deploy.yml`:
+- `VITE_SUPABASE_URL=https://api.careerpulse.ru`
+- `VITE_SUPABASE_ANON_KEY=<новый ANON_KEY>`
+- `VITE_VK_APP_ID`, `VITE_VK_AUTH_URL=https://api.careerpulse.ru/functions/v1/vk-auth`
+
+Локально для разработки — те же значения в `frontend/.env` (см. `.env.example`).
+Пуш в `main` (или Actions → Run workflow) автоматически пересоберёт и задеплоит на GitHub Pages.
+В настройках репозитория Pages → Source должен быть выставлен **GitHub Actions** (не "Deploy from a branch").
 
 ## Фаза 6. Проверка
 Регистрация → письмо подтверждения → вход → ВК-вход → прохождение блока →

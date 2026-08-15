@@ -1,0 +1,232 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8" />
+<title>CareerPulse — превью главной страницы (статично, без сервера)</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Unbounded:wght@400;500;600;700;800&family=Manrope:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="frontend/src/index.css" />
+<link rel="stylesheet" href="frontend/src/styles/landing.css" />
+<style>
+  /* Статичная замена IntersectionObserver — в реальном приложении .reveal появляется при скролле,
+     здесь просто сразу видимо, чтобы ничего не пряталось без JS-обсёрвера. */
+  .cp-landing .reveal { opacity: 1 !important; transform: none !important; }
+  /* Плашка "это статичное превью" поверх всего */
+  #preview-banner {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 9999;
+    background: var(--accent2); color: #fff; font-family: 'JetBrains Mono', monospace;
+    font-size: 12px; text-align: center; padding: 6px 10px; letter-spacing: .04em;
+  }
+  .cp-landing { padding-top: 28px; }
+</style>
+</head>
+<body>
+<div id="preview-banner">📸 Статичное превью — реальный React-роутинг/формы не работают, только визуал. Открыто напрямую из файла, без npm.</div>
+
+<div class="cp-landing">
+<nav id="nav">
+  <a href="#" class="nav-logo" style="text-decoration:none">
+    <div class="nav-logo-icon">⚡</div>
+    <div class="nav-logo-text">CAREER<span>PULSE</span></div>
+  </a>
+  <ul class="nav-links">
+    <li><a href="#pain">Проблема</a></li>
+    <li><a href="#product">Продукт</a></li>
+    <li><a href="#audience">Для кого</a></li>
+    <li><a href="#register">Записаться</a></li>
+  </ul>
+  <div class="nav-right">
+    <button type="button" id="theme-toggle-btn" aria-label="Переключить тему" title="Переключить тему"
+      style="width:36px;height:36px;border-radius:50%;border:1px solid var(--line);background:var(--card2);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:16px;flex-shrink:0;">🌙</button>
+    <a href="#register" class="btn-ghost nav-hide-phone">Зарегистрироваться</a>
+    <a href="#login" class="btn-nav" style="margin-right:6px;background:transparent;color:var(--text);border:1px solid var(--border2)">Войти</a><a href="#register" class="btn-nav">Начать бесплатно</a>
+  </div>
+</nav>
+
+<div class="hero">
+  <div class="hero-bg"></div>
+  <div class="hero-grid"></div>
+  <div class="hero-scan"></div>
+  <div class="hero-content">
+    <div class="hero-badge"><span class="badge-dot"></span>Карьерная диагностика нового поколения</div>
+    <h1 class="hero-title">
+      <span class="t1">НАЙДИ СВОЙ</span>
+      <span class="t2" style="font-family:'Manrope',sans-serif;font-weight:800;font-size:clamp(54px,8vw,114px);letter-spacing:2px">КАРЬЕРНЫЙ</span>
+      <span class="t3">пульс · вектор · путь</span>
+    </h1>
+    <p class="hero-sub">
+      <strong>CareerPulse</strong> — платформа, которая соединяет глубокую диагностику личности, анализ рынка труда и живого карьерного наставника в один персональный маршрут.
+    </p>
+    <div class="hero-actions">
+      <a href="#register" class="btn-primary">Пройти диагностику →</a>
+      <a href="#product" class="btn-secondary">Как это работает</a>
+    </div>
+    <div class="hero-strip">
+      <div class="strip-item"><div class="strip-num">30<sub>мин</sub></div><div class="strip-label">Тест и результат</div></div>
+      <div class="strip-item"><div class="strip-num">105</div><div class="strip-label">Профессий в атласе</div></div>
+      <div class="strip-item"><div class="strip-num">2</div><div class="strip-label">Карьерных пути</div></div>
+      <div class="strip-item"><div class="strip-num">4.8<sub>★</sub></div><div class="strip-label">Средний рейтинг</div></div>
+    </div>
+  </div>
+</div>
+
+<div class="trust-strip reveal">
+  <div class="trust-item"><span>🔒</span> Персональные данные защищены</div>
+  <div class="trust-item"><span>🧠</span> Методология Кеттелла · MBTI · Векторная система</div>
+  <div class="trust-item"><span>📊</span> Данные рынка hh.ru в реальном времени</div>
+  <div class="trust-item"><span>👤</span> Живой наставник по вашему профилю</div>
+</div>
+
+<section class="sec" id="pain">
+  <div class="reveal">
+    <div class="eyebrow">Почему это важно</div>
+    <h2 class="sec-title">РЫНОК ТРУДА <span class="acc">СЛЕП.</span><br />ЛЮДИ — ПОТЕРЯНЫ.</h2>
+    <p class="sec-lead">Миллионы людей выбирают профессию вслепую, без анализа своих навыков и без понимания, что требуется на рынке сейчас и в ближайшей перспективе.</p>
+  </div>
+  <div class="pain-grid reveal">
+    <div class="pain-card p1"><span class="pain-emoji">😵</span><h3>Выпускники выбирают вслепую</h3><p>11-классники выбирают специальность без системной диагностики, опираясь только на советы родителей и случайные тесты. 60% жалеют о выборе уже на 2-м курсе.</p></div>
+    <div class="pain-card p2"><span class="pain-emoji">🔄</span><h3>Специалисты застревают</h3><p>Сотрудники не понимают, как расти. HR-инструменты компаний не умеют работать с личностным профилем. Выгорание и стагнация — следствие отсутствия вектора.</p></div>
+    <div class="pain-card p3"><span class="pain-emoji">📊</span><h3>Аналитика не связана с человеком</h3><p>Данные о вакансиях, трендах профессий и резюме существуют отдельно от диагностики личности. Никто не объединял их в один персональный отчёт.</p></div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<section class="sec" id="product">
+  <div class="reveal">
+    <div class="eyebrow">Как мы решаем это</div>
+    <h2 class="sec-title">ЧТО ТАКОЕ <span class="acc">CAREERPULSE</span></h2>
+    <p class="sec-lead">Платформа объединяет психодиагностику, анализ рынка труда и живого карьерного наставника в одном персональном маршруте.</p>
+  </div>
+  <div class="product-layout">
+    <div class="product-features">
+      <div class="feat reveal"><div class="feat-icon">🧠</div><div><h4>Глубокая диагностика личности</h4><p>Многоуровневое тестирование: тип личности (MBTI), ценностный профиль, когнитивные способности, мотивационные драйверы — по методологии Кеттелла, 16Personalities и авторской векторной системе профессиональных ориентаций.</p></div></div>
+      <div class="feat reveal"><div class="feat-icon">📡</div><div><h4>AI-аналитика рынка труда</h4><p>Парсинг вакансий и резюме в реальном времени. Система находит совпадения между вашим профилем и тем, что ищут работодатели — в вашем городе и удалённо.</p></div></div>
+      <div class="feat reveal"><div class="feat-icon">🗺️</div><div><h4>Два пути развития</h4><p><strong>Путь A:</strong> Как вырасти на текущем месте — конкретные шаги, навыки, сроки. <strong>Путь B:</strong> Переход в новую сферу — дорожная карта смены карьеры с анализом рисков.</p></div></div>
+      <div class="feat reveal"><div class="feat-icon">🎯</div><div><h4>Карьерный консультант и наставник</h4><p>После диагностики пользователь проходит сессии с живым экспертом, специализирующимся именно в той сфере, которая подошла по профилю.</p></div></div>
+      <div class="feat reveal"><div class="feat-icon">📈</div><div><h4>Персональный карьерный трекер</h4><p>Дашборд прогресса: выполненные шаги, навыки в развитии, изменения на рынке труда по вашей специализации, рекомендации в реальном времени.</p></div></div>
+    </div>
+    <div class="product-mock reveal">
+      <div class="mock-bar">
+        <div class="mock-dot" style="background:#ff5f57"></div>
+        <div class="mock-dot" style="background:#febc2e"></div>
+        <div class="mock-dot" style="background:#28c840"></div>
+        <div class="mock-url">careerpulse.ru · dashboard</div>
+      </div>
+      <div class="mock-body">
+        <div class="mock-profile-row">
+          <div class="mock-av">НС</div>
+          <div><div class="mock-name">Никита Соколов</div><div class="mock-type">ENTJ · Командир · Стратег</div></div>
+        </div>
+        <div class="mock-bars-block">
+          <div class="mock-bar-row"><div class="mock-bar-lbl">Лидерство</div><div class="mock-bar-track"><div class="mock-bar-fill" style="width:92%;background:linear-gradient(90deg,#7b5cf0,#00e5c8)"></div></div><div class="mock-bar-val">92</div></div>
+          <div class="mock-bar-row"><div class="mock-bar-lbl">Коммуникация</div><div class="mock-bar-track"><div class="mock-bar-fill" style="width:88%;background:linear-gradient(90deg,#00e5c8,#7b5cf0)"></div></div><div class="mock-bar-val">88</div></div>
+          <div class="mock-bar-row"><div class="mock-bar-lbl">Аналитика</div><div class="mock-bar-track"><div class="mock-bar-fill" style="width:85%;background:linear-gradient(90deg,#ff6b35,#7b5cf0)"></div></div><div class="mock-bar-val">85</div></div>
+          <div class="mock-bar-row"><div class="mock-bar-lbl">Стратегия</div><div class="mock-bar-track"><div class="mock-bar-fill" style="width:90%;background:linear-gradient(90deg,#7b5cf0,#ff6b35)"></div></div><div class="mock-bar-val">90</div></div>
+        </div>
+        <div class="mock-tags-row">
+          <span class="mock-tag">Предприниматель</span><span class="mock-tag t2">Стратег</span><span class="mock-tag t3">Продажи</span><span class="mock-tag">EdTech</span>
+        </div>
+        <div style="font-size:10px;color:var(--muted2);margin-bottom:10px;font-family:'JetBrains Mono',monospace;letter-spacing:1.5px;text-transform:uppercase">Карьерные пути</div>
+        <div class="mock-paths-row">
+          <div class="mock-path-card pa"><div class="mock-path-lbl">Путь A · Рост</div><div class="mock-path-title">Product Director</div><div class="mock-path-match" style="color:var(--accent)">● 94% совпадение</div></div>
+          <div class="mock-path-card pb"><div class="mock-path-lbl">Путь B · Переход</div><div class="mock-path-title">EdTech Founder</div><div class="mock-path-match" style="color:#a488f8">● 91% совпадение</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<div class="sec-full">
+  <div class="sec-inner" id="audience">
+    <div class="reveal">
+      <div class="eyebrow">Для кого</div>
+      <h2 class="sec-title">ЧЕТЫРЕ <span class="acc">АУДИТОРИИ</span></h2>
+      <p class="sec-lead">Четыре ключевых сегмента, боль которых мы закрываем.</p>
+    </div>
+    <div class="aud-grid reveal">
+      <div class="aud-card c1"><span class="aud-emoji">🎓</span><h3>Обучающиеся и родители</h3><div class="aud-sub">B2C · 16–18 лет</div><p>Стоят перед выбором профессии без инструментов и системы. Первый серьёзный выбор в жизни. Высокая тревога — родители готовы платить за определённость.</p><span class="aud-size">~700 000 выпускников в год</span></div>
+      <div class="aud-card c2"><span class="aud-emoji">💼</span><h3>Специалисты & Менеджеры</h3><div class="aud-sub">B2C · 25–45 лет</div><p>Ощущают стагнацию, думают о смене работы или сферы. Готовы инвестировать в карьеру. Ищут чёткий план, а не общие слова о «личностном росте».</p><span class="aud-size">~18 млн активных специалистов</span></div>
+      <div class="aud-card c3"><span class="aud-emoji">🚀</span><h3>Предприниматели</h3><div class="aud-sub">B2C Premium</div><p>Ищут подтверждение своих сильных сторон, хотят понять — куда развивать бизнес в связке с личным профилем. Готовы платить за Premium-сессии.</p><span class="aud-size">~6 млн предпринимателей</span></div>
+      <div class="aud-card c4"><span class="aud-emoji">🏢</span><h3>Компании & HR-отделы</h3><div class="aud-sub">B2B · корпоративный</div><p>Оценка персонала, построение карьерных треков, снижение текучести. Покупают пакеты на команду. Главный канал масштабирования выручки.</p><span class="aud-size">~2782 HR-компании в РФ</span></div>
+    </div>
+  </div>
+</div>
+
+<div class="reg-section" id="register">
+  <div class="reg-inner">
+    <div class="reg-left reveal">
+      <div class="eyebrow">Записаться</div>
+      <h2>НАЧНИ <span class="acc">ПРЯМО</span><br />СЕЙЧАС</h2>
+      <p>Пройди диагностику за 30 минут и получи персональный карьерный маршрут с двумя путями развития.</p>
+      <div class="reg-benefits">
+        <div class="reg-benefit">Полный отчёт по личности — 10+ методик</div>
+        <div class="reg-benefit">AI-анализ рынка труда по твоему профилю</div>
+        <div class="reg-benefit">Два карьерных пути: рост и переход</div>
+        <div class="reg-benefit">Первая сессия с наставником — бесплатно</div>
+        <div class="reg-benefit">Атлас из 105 профессий с совместимостью</div>
+        <div class="reg-benefit">Персональный трекер прогресса</div>
+      </div>
+    </div>
+    <div class="reg-form reveal" id="reg-form-wrap">
+      <div id="form-content">
+        <div class="reg-form-title">Создать аккаунт</div>
+        <div class="reg-form-sub">Уже есть аккаунт? <a href="#" style="color:var(--accent)">Войти</a></div>
+        <div style="margin-bottom:18px">
+          <div style="font-size:12px;font-weight:700;color:var(--muted2);margin-bottom:10px">Кто вы?</div>
+          <div class="roles-grid">
+            <label class="role-opt active"><input type="radio" name="role" checked /><span class="role-icon">🎓</span>Выпускник</label>
+            <label class="role-opt"><input type="radio" name="role" /><span class="role-icon">💼</span>Специалист</label>
+            <label class="role-opt"><input type="radio" name="role" /><span class="role-icon">🚀</span>Предприниматель</label>
+            <label class="role-opt"><input type="radio" name="role" /><span class="role-icon">🏢</span>HR / Компания</label>
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group"><label>Имя</label><input class="form-input" type="text" placeholder="Иван" /></div>
+          <div class="form-group"><label>Фамилия</label><input class="form-input" type="text" placeholder="Иванов" /></div>
+        </div>
+        <div class="form-group"><label>Email</label><input class="form-input" type="email" placeholder="ivan@email.com" /></div>
+        <div class="form-group"><label>Телефон</label><input class="form-input" type="tel" placeholder="+7 (___) ___-__-__" /></div>
+        <div class="form-group"><label>Пароль</label><input class="form-input" type="password" placeholder="Минимум 8 символов" /></div>
+        <div class="form-agree" style="margin-bottom:10px"><input type="checkbox" id="f-adult-p" /><label for="f-adult-p">Мне есть 18 лет</label></div>
+        <div class="form-agree"><input type="checkbox" id="f-agree-p" /><label for="f-agree-p">Я принимаю Условия использования и Политику конфиденциальности, а также даю согласие на обработку персональных данных</label></div>
+        <button class="btn-form" type="button">Начать диагностику →</button>
+        <div class="form-divider">или</div>
+        <button type="button" style="width:100%;padding:13px;font-size:14px;border-radius:8px;display:flex;align-items:center;justify-content:center;gap:10px;color:#fff;background:#0077FF;border:none">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="#fff"><path d="M15.07 2H8.93C3.33 2 2 3.33 2 8.93v6.14C2 20.67 3.33 22 8.93 22h6.14C20.67 22 22 20.67 22 15.07V8.93C22 3.33 20.67 2 15.07 2zm3.08 13.5h-1.64c-.62 0-.81-.49-1.92-1.61-1-.95-1.44-.95-1.68-.95-.34 0-.44.1-.44.59v1.47c0 .42-.13.67-1.24.67-1.82 0-3.84-1.1-5.26-3.16C4.8 9.88 4.25 8.24 4.25 7.84c0-.24.1-.46.59-.46h1.64c.44 0 .61.2.78.67.86 2.49 2.3 4.67 2.89 4.67.22 0 .32-.1.32-.66V9.84c-.07-1.18-.69-1.28-.69-1.7 0-.2.17-.4.44-.4h2.58c.37 0 .5.2.5.62v3.34c0 .37.17.5.27.5.22 0 .41-.13.82-.54 1.27-1.42 2.17-3.6 2.17-3.6.12-.24.32-.46.76-.46h1.64c.49 0 .6.25.49.59-.2 1-.2.95-1.87 3.17l-.73.98c-.12.17-.17.27 0 .47.12.17.54.53.81.85.75.83 1.32 1.52 1.47 2 .15.46-.07.7-.54.7z"/></svg>
+          Войти через ВКонтакте
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="trust-strip reveal">
+  <div class="trust-item"><span>🏆</span> 247+ пользователей в 2026</div>
+  <div class="trust-item"><span>⭐</span> Рейтинг 4.8 из 5</div>
+  <div class="trust-item"><span>🤝</span> Партнёр: Общество «Знание»</div>
+  <div class="trust-item"><span>📍</span> Санкт-Петербург · Работаем по всей России</div>
+</div>
+
+<footer>
+  <div class="foot-logo">CAREER<span>PULSE</span></div>
+  <div class="foot-links" style="flex-wrap:wrap;gap:16px">
+    <a href="#pain">Проблема</a><a href="#product">Продукт</a><a href="#audience">Для кого</a><a href="#register">Регистрация</a>
+  </div>
+  <div class="foot-copy">© 2026 CareerPulse · careerpulse.ru</div>
+</footer>
+</div>
+
+<script>
+  document.getElementById('theme-toggle-btn').addEventListener('click', function () {
+    var isDark = document.documentElement.dataset.theme === 'dark'
+    if (isDark) { delete document.documentElement.dataset.theme; this.textContent = '🌙' }
+    else { document.documentElement.dataset.theme = 'dark'; this.textContent = '☀️' }
+  })
+</script>
+</body>
+</html>

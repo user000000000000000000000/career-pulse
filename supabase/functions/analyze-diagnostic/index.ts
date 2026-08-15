@@ -13,8 +13,10 @@
 //    (для deepseek/openai — AI_API_KEY)
 // ════════════════════════════════════════════════════════════════
 
+// ALLOWED_ORIGIN — секрет (supabase secrets set ALLOWED_ORIGIN=https://ваш-домен).
+// Пока не задан — '*' (как раньше), чтобы не сломать текущий деплой.
 const cors = {
-  'Access-Control-Allow-Origin': '*',
+  'Access-Control-Allow-Origin': Deno.env.get('ALLOWED_ORIGIN') || '*',
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
   'Access-Control-Allow-Methods': 'POST, OPTIONS',
 }
@@ -28,32 +30,48 @@ const SYSTEM_PROMPT =
   'ЗАПРЕЩЕНО: «он», «она», «этот человек», «пользователь», «испытуемый». ' +
   'ЗАПРЕЩЁННЫЕ ФРАЗЫ: «можно сделать вывод», «следует отметить», «на основании анализа», «выявлен высокий уровень». ' +
   'ПИШИ ВСЁ СТРОГО НА РУССКОМ ЯЗЫКЕ. Названия профессий — только по-русски (не «Data Scientist», а «специалист по анализу данных»; не «Product Manager», а «менеджер продукта»). Без английских слов и латиницы в тексте. ' +
+  'ВАЖНО про данные профиля: ценностные шкалы (KR/AK/RZ/DU/PR/MB/DO/IN) получены попарным выбором и относительны ДРУГ К ДРУГУ внутри этого же профиля — не утверждай абсолютный уровень («у тебя очень высокая креативность»), а только сравнение важности для этого человека. Если у шкалы указан lowReliability/itemCount < 8 — формулируй помягче («есть признаки», а не категоричное утверждение). ' +
+  'Если в данных есть текст письма в будущее (letter_text) или другие открытые ответы (open_answers) — используй их как ГЛАВНЫЙ источник для тона и содержания разбора: то, что подросток написал своими словами, важнее сухих цифр. ' +
   'Поле full_report — это ГЛАВНОЕ: связный живой текст на 10–12 предложений (3–4 абзаца). ' +
-  'Первый абзац — кто ты по сути (характер, что движет). ' +
+  'Первый абзац — кто ты по сути (характер, что движет), опираясь в том числе на письмо, если оно есть. ' +
   'Второй — конкретные сильные стороны и как они связаны (Holland, способности, мышление). ' +
   'Третий — куда тебе расти профессионально и почему именно туда. ' +
   'Четвёртый — короткое поддерживающее завершение, дающее уверенность и первый шаг. ' +
   'Ответь СТРОГО валидным JSON без markdown, по схеме: ' +
   '{"full_report":"10-12 предложений","strengths":["...","...","..."],"weaknesses":["...","..."],' +
-  '"recommended_professions":[{"name":"...","match":94}, ...]}. ' +
+  '"recommended_professions":[{"name":"...","match":94}, ...],' +
+  '"agency_assessment":{"level":"высокая|средняя|низкая","reason":"1 предложение, на основе тона письма — активный голос и конкретные шаги vs общие/пассивные формулировки"}}. ' +
+  'Поле agency_assessment заполняй, только если есть letter_text — иначе оставь level:"unknown", reason:"". ' +
   'В recommended_professions — 5–7 профессий по убыванию match (0–100), реалистичных для школьника/абитуриента.'
 
 function buildUserPrompt(profile: Record<string, any> = {}) {
   const TYPE = { R: 'Реалистичный', I: 'Исследовательский', A: 'Артистичный', S: 'Социальный', E: 'Предпринимательский', C: 'Конвенциональный' } as Record<string, string>
   const lines: string[] = ['ПРОФИЛЬ ДИАГНОСТИКИ (CareerPulse, 10 блоков):', '']
 
-  if (profile.career_archetype) lines.push(`Карьерный архетип (Holland): ${profile.career_archetype} (код ${profile.holland_code || '—'})`)
+  if (profile.career_archetype) lines.push(`Карьерный архетип (Holland): ${profile.career_archetype} (код ${profile.holland_code || '—'}, ясность профиля ${profile.profile_clarity ?? '—'}/100)`)
   if (Array.isArray(profile.holland_top2)) lines.push(`Ведущие типы: ${profile.holland_top2.map((t: string) => TYPE[t] || t).join(' + ')}`)
   if (profile.holland_scores) lines.push('Holland по шкалам: ' + Object.entries(profile.holland_scores).map(([k, v]) => `${TYPE[k] || k} ${v}%`).join(', '))
-  if (profile.values_archetype) lines.push(`Ценностный архетип: ${profile.values_archetype} (мотивация: ${profile.motivation_type || '—'}, топ: ${(profile.values_top3 || []).join(', ')})`)
+  if (profile.values_archetype) lines.push(`Ценностный архетип: ${profile.values_archetype} (мотивация: ${profile.motivation_type || '—'}, топ: ${(profile.values_top3 || []).join(', ')}, шкала ипсативная — см. инструкцию)`)
   if (profile.personality_archetype) lines.push(`Личностный архетип: ${profile.personality_archetype}`)
   if (profile.personality_scores) lines.push('Личность (Big Five+): ' + Object.entries(profile.personality_scores).map(([k, v]) => `${k} ${v}%`).join(', '))
-  if (profile.cognitive_archetype) lines.push(`Когнитивный архетип: ${profile.cognitive_archetype} (стиль обучения: ${profile.vark_style || '—'}, топ: ${(profile.cognitive_top3 || []).join(', ')})`)
+  if (profile.emotional_profile) lines.push(`Эмоциональный профиль: тревожность ${profile.emotional_profile.anxiety_pct ?? '—'}%, устойчивость ${profile.emotional_profile.resilience_pct ?? '—'}%`)
+  if (profile.cognitive_archetype) lines.push(`Когнитивный архетип: ${profile.cognitive_archetype} (стиль обучения: ${profile.vark_style || '—'}, топ по самооценке: ${(profile.cognitive_top3 || []).join(', ')})`)
   if (Array.isArray(profile.readiness_top2)) lines.push(`Профессиональная готовность (топ-2 типа): ${profile.readiness_top2.join(', ')}; зрелость ${profile.career_maturity ?? '—'}/100`)
   if (profile.se_general != null) lines.push(`Самоэффективность: ${profile.se_general}/100, решительность ${profile.decisiveness ?? '—'}/100, стиль решений ${profile.decision_style || '—'}, индекс реализации ${profile.career_execution ?? '—'}/100`)
   if (profile.context) {
     const c = profile.context
     lines.push(`Контекст: возраст ${c.age || '—'}, класс ${c.grade || '—'}, город ${c.city || '—'}, планы ${c.plans_after_school || '—'}`)
+  }
+
+  if (Array.isArray(profile.open_answers) && profile.open_answers.length) {
+    lines.push('', 'ОТКРЫТЫЕ ОТВЕТЫ (своими словами, из разных блоков):')
+    profile.open_answers.forEach((a: { questionId: string; text: string }) => {
+      if (a.text && a.text.trim()) lines.push(`— [${a.questionId}] ${a.text.trim()}`)
+    })
+  }
+
+  if (profile.letter_text) {
+    lines.push('', 'ПИСЬМО В БУДУЩЕЕ (полный текст, самое важное для тона разбора):', profile.letter_text)
   }
 
   lines.push('', 'Сформируй тёплый профориентационный разбор (full_report на 10–12 предложений) и список подходящих профессий на основе профиля выше.')
@@ -133,6 +151,7 @@ Deno.serve(async (req) => {
       strengths: r.strengths ?? [],
       weaknesses: r.weaknesses ?? [],
       recommended_professions: r.recommended_professions ?? [],
+      agency_assessment: r.agency_assessment ?? { level: 'unknown', reason: '' },
     })
   } catch (err) {
     return json({ error: String(err) }, 500)

@@ -16,8 +16,10 @@
 
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
 
+// ALLOWED_ORIGIN — секрет (supabase secrets set ALLOWED_ORIGIN=https://ваш-домен).
+// Пока не задан — '*' (как раньше), чтобы не сломать текущий деплой.
 const cors = {
-  'Access-Control-Allow-Origin': '*',
+  'Access-Control-Allow-Origin': Deno.env.get('ALLOWED_ORIGIN') || '*',
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
   'Access-Control-Allow-Methods': 'POST, OPTIONS',
 }
@@ -98,8 +100,16 @@ Deno.serve(async (req) => {
         email, email_confirm: true,
         user_metadata: { full_name: name, avatar_url: avatar, provider: 'vk', vk_id: u.user_id || u.id },
       }).catch(() => {})
-      const { data: list } = await admin.auth.admin.listUsers()
-      const found = list?.users?.find((x: any) => x.email === email)
+      // Ищем созданного/существующего пользователя постранично — listUsers() без пагинации
+      // возвращает только первую страницу (по умолчанию 50), и по мере роста базы вход
+      // через VK для более старых аккаунтов перестал бы находить их и плодил бы дубли.
+      let found: any = null
+      for (let page = 1; page <= 50 && !found; page++) {
+        const { data: list } = await admin.auth.admin.listUsers({ page, perPage: 200 })
+        if (!list?.users?.length) break
+        found = list.users.find((x: any) => x.email === email)
+        if (list.users.length < 200) break
+      }
       if (found) { try { await admin.from('profiles').upsert({ id: found.id, email, full_name: name, avatar_url: avatar, role: 'student' }) } catch (_) { /* профиль не критичен */ } }
       const { data: linkData, error: linkErr } = await admin.auth.admin.generateLink({ type: 'magiclink', email })
       if (linkErr) return json({ error: 'generateLink: ' + linkErr.message }, 500)

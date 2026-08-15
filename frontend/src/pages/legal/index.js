@@ -1,0 +1,6 @@
+export { default as LegalHub } from './ui/LegalHub.jsx'
+export { default as Privacy } from './ui/Privacy.jsx'
+export { default as Terms } from './ui/Terms.jsx'
+export { default as Consent } from './ui/Consent.jsx'
+export { default as AdConsent } from './ui/AdConsent.jsx'
+export { default as Recomm } from './ui/Recomm.jsx'

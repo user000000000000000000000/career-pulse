@@ -3,8 +3,10 @@
 // Функция определяет пользователя по токену и удаляет его профиль + учётную запись.
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
 
+// ALLOWED_ORIGIN — секрет (supabase secrets set ALLOWED_ORIGIN=https://ваш-домен).
+// Пока не задан — '*' (как раньше), чтобы не сломать текущий деплой.
 const cors = {
-  'Access-Control-Allow-Origin': '*',
+  'Access-Control-Allow-Origin': Deno.env.get('ALLOWED_ORIGIN') || '*',
   'Access-Control-Allow-Headers': 'authorization, apikey, content-type',
   'Access-Control-Allow-Methods': 'POST, OPTIONS',
 }

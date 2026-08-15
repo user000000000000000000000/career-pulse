@@ -1,0 +1,54 @@
+/* ─── UI-кит CareerPulse ─── */
+/* Кнопки — всегда stadium (style-guide.md §4): полностью скруглённые края,
+   заливка — синий диагональный градиент, мягкое свечение снизу. */
+.cp-btn{
+  font-family:'Manrope',sans-serif;font-weight:800;font-size:14px;letter-spacing:.4px;
+  border:none;cursor:pointer;border-radius:var(--radius-full);padding:14px 28px;transition:all .2s;
+  display:inline-flex;align-items:center;justify-content:center;gap:8px;text-decoration:none;
+}
+.cp-btn--primary{background:var(--gradient-accent);color:var(--on-accent);box-shadow:0 8px 24px rgba(95,150,233,.35)}
+.cp-btn--primary:hover{transform:translateY(-1px);box-shadow:0 10px 32px rgba(95,150,233,.45)}
+.cp-btn--ghost{background:transparent;color:var(--text);border:1px solid var(--line2)}
+.cp-btn--ghost:hover{border-color:var(--accent);color:var(--accent)}
+.cp-btn--violet{background:linear-gradient(135deg,var(--violet),var(--accent));color:#fff}
+.cp-btn:disabled{opacity:.5;cursor:not-allowed;transform:none}
+.cp-btn--block{width:100%}
+
+.cp-field{display:flex;flex-direction:column;gap:7px;margin-bottom:16px}
+.cp-field label{font-size:12px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--ghost)}
+.cp-input{
+  background:var(--card2);border:1px solid var(--line);border-radius:var(--radius-sm);
+  padding:13px 15px;color:var(--text);font-family:'Manrope',sans-serif;font-size:15px;
+  transition:border-color .2s,box-shadow .2s;width:100%;
+}
+.cp-input::placeholder{color:var(--ghost)}
+.cp-input:focus{outline:none;border-color:var(--accent);box-shadow:var(--shadow-focus)}
+.cp-input--error{border-color:var(--danger);box-shadow:0 0 0 3px rgba(255,77,109,.15)}
+.cp-field__error{font-size:12px;color:var(--danger);font-weight:600}
+
+/* Карточки — скругление ~20-24px, мягкая тень, белый фон (style-guide.md §4). */
+.cp-card{
+  background:var(--card);border:1px solid var(--line);border-radius:var(--radius-lg);padding:28px;
+  box-shadow:var(--shadow-sm);position:relative;overflow:hidden;
+}
+.cp-card--accent::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;
+  background:var(--gradient-accent)}
+
+.cp-progress{height:8px;background:var(--track-color);border-radius:var(--radius-full);overflow:hidden;width:100%}
+.cp-progress__fill{height:100%;border-radius:var(--radius-full);
+  background:var(--gradient-accent);transition:width .4s ease}
+
+.cp-radio-group{display:flex;flex-direction:column;gap:10px}
+.cp-radio{
+  display:flex;align-items:flex-start;gap:12px;padding:14px 16px;cursor:pointer;
+  background:var(--card2);border:1px solid var(--line);border-radius:var(--radius-md);transition:all .18s;
+}
+.cp-radio:hover{border-color:var(--line2)}
+.cp-radio--active{border-color:var(--accent);background:rgba(95,150,233,.08)}
+.cp-radio__dot{
+  width:18px;height:18px;border-radius:50%;border:2px solid var(--ghost);flex-shrink:0;margin-top:2px;
+  display:flex;align-items:center;justify-content:center;transition:all .18s;
+}
+.cp-radio--active .cp-radio__dot{border-color:var(--accent)}
+.cp-radio--active .cp-radio__dot::after{content:'';width:8px;height:8px;border-radius:50%;background:var(--accent)}
+.cp-radio__text{font-size:15px;color:var(--text);line-height:1.5}
