@@ -1,0 +1,50 @@
+.cp-mascot{
+  display: flex;
+  align-items: flex-end;
+  gap: 12px;
+}
+.cp-mascot--sm{ position: fixed; right: 20px; bottom: 20px; z-index: 60; }
+.cp-mascot--lg{ position: relative; }
+
+@media (max-width: 640px){
+  .cp-mascot--sm{ right: 12px; bottom: 12px; }
+  .cp-mascot--sm .cp-mascot-bubble{ display: none; } /* на телефоне облачко мешает — реплика есть в блоке текстом */
+}
+
+.cp-mascot-figure{
+  filter: drop-shadow(0 8px 20px rgba(0,0,0,.35));
+  animation: cp-mascot-breathe 3.2s ease-in-out infinite;
+}
+.cp-mascot-figure--thinking{ animation-duration: 2.4s; }
+.cp-mascot-figure--celebrating{ animation: cp-mascot-bounce 0.6s ease-in-out infinite; }
+
+.cp-mascot-bubble{
+  background: var(--card, #111120);
+  border: 1px solid var(--line, rgba(var(--overlay-rgb),.07));
+  color: var(--text, #ecedf8);
+  font-size: 12.5px;
+  line-height: 1.5;
+  padding: 10px 14px;
+  border-radius: 14px;
+  max-width: 220px;
+  margin-bottom: 14px;
+  box-shadow: 0 8px 24px rgba(0,0,0,.3);
+  animation: cp-mascot-fade-in .25s ease;
+}
+
+@keyframes cp-mascot-breathe{
+  0%, 100% { transform: translateY(0) scaleY(1); }
+  50% { transform: translateY(-2px) scaleY(1.015); }
+}
+@keyframes cp-mascot-bounce{
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-8px); }
+}
+@keyframes cp-mascot-fade-in{
+  from { opacity: 0; transform: translateY(6px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@media (prefers-reduced-motion: reduce){
+  .cp-mascot-figure, .cp-mascot-figure--celebrating{ animation: none; }
+}
