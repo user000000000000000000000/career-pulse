@@ -219,12 +219,15 @@ export default function DiagResults() {
                             </div>
                             {sp.programs.length > 0 ? (
                               <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
-                                {sp.programs.map((prog, i) => (
+                                {sp.programs.slice(0, 6).map((prog, i) => (
                                   <div key={i} style={{ fontSize: 12, color: 'var(--text)', display: 'flex', gap: 8 }}>
                                     <span style={{ flex: 1 }}>{prog.institution_name}{prog.city ? ` · ${prog.city}` : ''}</span>
                                     {prog.min_score_last_year && <span style={{ color: 'var(--ghost)' }}>от {prog.min_score_last_year} баллов ({prog.admission_year})</span>}
                                   </div>
                                 ))}
+                                {sp.programs.length > 6 && (
+                                  <div style={{ fontSize: 11.5, color: 'var(--ghost)', marginTop: 2 }}>+{sp.programs.length - 6} вузов ещё</div>
+                                )}
                               </div>
                             ) : (
                               <div style={{ fontSize: 12, color: 'var(--ghost)' }}>Список вузов для этого направления пока не заполнен.</div>

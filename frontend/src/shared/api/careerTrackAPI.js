@@ -56,11 +56,15 @@ export async function getCareerTrack(professionId, userCity = '') {
         admission_year: p.admission_year,
         link: p.link || p.institutions?.website,
       }))
-      // сначала вузы в городе пользователя, потом остальные
+      // приоритет: город пользователя → есть бюджетные места → по алфавиту
       .sort((a, b) => {
-        const aMatch = userCity && a.city === userCity ? 0 : 1
-        const bMatch = userCity && b.city === userCity ? 0 : 1
-        return aMatch - bMatch
+        const cityA = userCity && a.city === userCity ? 0 : 1
+        const cityB = userCity && b.city === userCity ? 0 : 1
+        if (cityA !== cityB) return cityA - cityB
+        const budA = a.has_budget_places ? 0 : 1
+        const budB = b.has_budget_places ? 0 : 1
+        if (budA !== budB) return budA - budB
+        return (a.institution_name || '').localeCompare(b.institution_name || '', 'ru')
       })
 
     return {
