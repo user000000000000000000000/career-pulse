@@ -16,30 +16,15 @@
  */
 
 import { supabase, isSupabaseConfigured } from './supabase'
+import { BLOCKS_META, BLOCK_ORDER, TOTAL_BLOCKS, CONSULTATION_REQUIRED } from '../config/blocks'
 
 const STORAGE_PREFIX = 'cp_'
 const DATA_VERSION = '1.0'
 
-// Мета-данные блоков (из diagnostics_architecture.md)
-export const BLOCKS_META = {
-  1:  { name: 'Анкета-контекст',           questions: 20, time: 7,  method: 'Synergystart + собств.',       hasAI: false, axis: 'НАДО' },
-  2:  { name: 'Склонности в деятельности',  questions: 30, time: 10, method: 'Holland RIASEC + Голомшток',   hasAI: false, axis: 'ХОЧУ' },
-  3:  { name: 'Жизненные ценности',         questions: 28, time: 10, method: 'Мотив. карта (адапт.)',        hasAI: false, axis: 'ХОЧУ' },
-  4:  { name: 'Личностные качества',        questions: 44, time: 12, method: 'Big Five + EPI + Кеттелл',     hasAI: false, axis: 'КТО Я' },
-  5:  { name: 'Когнитивный профиль',        questions: 40, time: 12, method: 'Гарднер + VARK + задачи',      hasAI: false, axis: 'МОГУ' },
-  6:  { name: 'Проф. готовность',           questions: 32, time: 10, method: 'Вектор + JamSkills',           hasAI: true,  axis: 'МОГУ' },
-  7:  { name: 'Самоэффективность',          questions: 39, time: 10, method: 'Бандура + JamSkills',          hasAI: false, axis: 'КТО Я' },
-  8:  { name: 'Образ будущего',             questions: 16, time: 8,  method: 'Собственная',                  hasAI: true,  axis: 'ХОЧУ' },
-  9:  { name: 'Социальный контекст',        questions: 25, time: 8,  method: 'Собственная',                  hasAI: true,  axis: 'КОНТЕКСТ' },
-  10: { name: 'Письмо в будущее',           questions: 19, time: 25, method: 'Нарративная психология',       hasAI: true,  axis: 'КОНТЕКСТ' },
-}
-
-// Минимум для консультации: блоки 1, 2, 3, 4, 10
-export const CONSULTATION_REQUIRED = [1, 2, 3, 4, 10]
-export const TOTAL_BLOCKS = 10
-
-// Порядок прохождения — строго по номерам: 1 → 2 → … → 10
-const BLOCK_ORDER = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+// Реестр блоков вынесен в единый источник правды — shared/config/blocks.js
+// (там же исправлены оси 4/6/7/9/10 и время блока 6). Ре-экспортируем имена,
+// которые исторически импортировали из cpStorage.
+export { BLOCKS_META, TOTAL_BLOCKS, CONSULTATION_REQUIRED }
 
 // ── низкоуровневые хелперы localStorage ──
 function key(name) { return STORAGE_PREFIX + name }

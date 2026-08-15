@@ -15,17 +15,17 @@
   --surface: #ffffff;
   --card:    #ffffff;
   --card2:   #eef0fb;
-  --accent:  #5f96e9;
+  --accent:  #4079d3;
   --accent2: #8b6fe8;
   --violet:  #8b6fe8;
   --accent3: #e8a0c4;
   --ember:   #e8a0c4;
-  --gold:    #72a2eb;
+  --gold:    #4a82db;
   --text:    #25205c;
   --sub:     #626185;
-  --muted:   #8583a3;
+  --muted:   #77758f;
   --muted2:  #626185;
-  --ghost:   #a6a4c0;
+  --ghost:   #82819b;
   --line:    rgba(37,32,92,0.10);
   --line2:   rgba(37,32,92,0.16);
   --border:  rgba(37,32,92,0.10);
@@ -59,14 +59,14 @@
   --hero-glow-1: rgba(223,207,248,0.65);
   --hero-glow-2: rgba(199,214,248,0.55);
   --hero-glow-3: rgba(185,170,245,0.45);
-  --accent-italic: #5f96e9;
+  --accent-italic: #4079d3;
   /* Текст поверх заливки var(--accent) — не путать с --black. */
   --on-accent: #ffffff;
 
   /* Градиенты style-guide.md §3 — многоточечные, отдельные токены, т.к.
      var(--accent)→var(--violet) двухцветного linear-gradient недостаточно
      для трёхстопового hero/CTA градиента. */
-  --gradient-accent:      linear-gradient(135deg, #5f96e9 0%, #87aff3 100%);
+  --gradient-accent:      linear-gradient(135deg, #4079d3 0%, #6f9def 100%);
   --gradient-accent-soft: linear-gradient(135deg, #7b9fee 0%, #a8c6f7 100%);
   --gradient-badge:       linear-gradient(135deg, #ebe4f9 0%, #d9caf2 100%);
   --gradient-hero:        linear-gradient(135deg, #dfcff8 0%, #c7d6f8 55%, #edeffb 100%);

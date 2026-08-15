@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react'
 import { useNavigate, Link } from 'react-router-dom'
 import { getCurrentUser, logout as doLogout } from '../../../shared/auth'
 import { CP } from '../../../shared/api'
+import { BLOCKS } from '../../../shared/config'
 import { STORAGE_KEYS } from '../../../shared/lib/storageKeys'
 import { DEV_PROFILES, applyDevProfile } from '../devProfiles'
 import { submitConsultRequest } from '../../../shared/api'
@@ -10,38 +11,7 @@ import SocialIcon from '../../../shared/ui/SocialIcon.jsx'
 import { confirmDialog, alertDialog } from '../../../shared/ui/Dialog.jsx'
 import '../dashboard.css'
 
-const BLOCKS = [
-  { num: '01', n: 1, axis: 'НАДО', axisColor: 'var(--sub)', title: 'Анкета-контекст',
-    desc: 'Класс, ЕГЭ, планы, тревоги. Настраивает все остальные блоки под тебя. Проходится первой.',
-    questions: 20, time: 7, required: true, weight: 8 },
-  { num: '02', n: 2, axis: 'ХОЧУ', axisColor: 'var(--accent)', title: 'Склонности в деятельности',
-    desc: 'Holland RIASEC: попарный выбор занятий с силой предпочтения. Даёт карьерный архетип.',
-    questions: 30, time: 10, weight: 15 },
-  { num: '03', n: 3, axis: 'ХОЧУ', axisColor: 'var(--accent)', title: 'Жизненные ценности',
-    desc: 'Ситуационные дилеммы. Топ-3 ценности, мотивационный профиль и согласованность.',
-    questions: 28, time: 10, weight: 10 },
-  { num: '04', n: 4, axis: 'ВОЗМОЖНОСТИ', axisColor: 'var(--violet)', title: 'Личностные качества',
-    desc: 'Big Five + стрессоустойчивость и толерантность к неопределённости. С контролем искренности.',
-    questions: 44, time: 12, weight: 12 },
-  { num: '05', n: 5, axis: 'МОГУ', axisColor: 'var(--ember)', title: 'Когнитивный профиль',
-    desc: 'Самооценка мышления + практические задачи + стиль обучения VARK.',
-    questions: 40, time: 12, weight: 10 },
-  { num: '06', n: 6, axis: 'МОГУ', axisColor: 'var(--ember)', title: 'Профессиональная готовность',
-    desc: 'Что реально получается: самооценка + реальный опыт по 5 типам деятельности.',
-    questions: 32, time: 12, weight: 13 },
-  { num: '07', n: 7, axis: 'ВОЗМОЖНОСТИ', axisColor: 'var(--violet)', title: 'Самоэффективность',
-    desc: 'Уверенность в силах + стиль принятия решений (Бандура). Матрица Хочу–Могу–Верю.',
-    questions: 39, time: 10, weight: 10 },
-  { num: '08', n: 8, axis: 'ХОЧУ', axisColor: 'var(--accent)', title: 'Образ будущего',
-    desc: 'Какой ты видишь работу и жизнь. Параметры-фильтры + смысловой вектор.',
-    questions: 16, time: 8, weight: 7 },
-  { num: '09', n: 9, axis: 'КТО Я', axisColor: 'var(--sub)', title: 'Социальный контекст',
-    desc: 'Семья, окружение, опыт и поддержка. Полная картина для наставника.',
-    questions: 25, time: 8, weight: 8 },
-  { num: '10', n: 10, axis: 'КТО Я', axisColor: 'var(--gold)', title: 'Письмо в будущее',
-    desc: '19 открытых вопросов. Рефлексивная практика — самый ценный источник данных для эксперта.',
-    questions: 19, time: 25, weight: 7, special: true },
-]
+// BLOCKS — единый реестр блоков из shared/config/blocks.js (импортируется выше).
 
 const AXIS_INFO = [
   { key: 'ХОЧУ',     color: 'var(--accent)', icon: '💡', desc: 'Склонности, ценности, образ будущего',          blocks: [2, 3, 8] },

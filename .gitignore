@@ -1,0 +1,16 @@
+# ── graphify (граф знаний — рабочий инструмент, не для репо) ──
+graphify-out/
+**/graphify-out/
+
+# ── одноразовые seed-скрипты БД (данные уже залиты в Supabase; исходники в supabase/parsers/output) ──
+/supabase/seed_parts/
+/supabase/seed_career_track.sql
+
+# ── прочий мусор ──
+node_modules/
+.env
+.env.local
+.env.*.local
+*.log
+.DS_Store
+Thumbs.db
