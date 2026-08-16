@@ -3,7 +3,7 @@
    он мог перебить глобальную светлую палитру порядком объявления в итоговом CSS. */
 .cp-legal *{margin:0;padding:0;box-sizing:border-box}
 .cp-legal{scroll-behavior:smooth}
-.cp-legal{background:var(--ink);color:var(--text);font-family:'Manrope',sans-serif;font-size:16px;line-height:1.7;-webkit-font-smoothing:antialiased}
+.cp-legal{background:var(--ink);color:var(--text);font-family:'Golos Text',sans-serif;font-size:16px;line-height:1.7;-webkit-font-smoothing:antialiased}
 .cp-legal ::-webkit-scrollbar{width:3px}
 .cp-legal ::-webkit-scrollbar-thumb{background:var(--violet);border-radius:2px}
 
@@ -17,10 +17,10 @@ nav.legal-nav{
 }
 .cp-legal .nav-logo-link{display:flex;align-items:center;gap:9px;text-decoration:none}
 .cp-legal .nav-logo-mark{width:28px;height:28px;border-radius:7px;background:linear-gradient(135deg,var(--violet),var(--accent));display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0}
-.cp-legal .nav-logo-txt{font-family:'Bebas Neue',sans-serif;font-size:20px;letter-spacing:3px;color:var(--text)}
+.cp-legal .nav-logo-txt{font-family:'Bebas Neue',sans-serif;font-size:20px;letter-spacing:3px;color:var(--nav-text)}
 .cp-legal .nav-logo-txt span{color:var(--accent)}
-.cp-legal .nav-back-link{color:var(--sub);text-decoration:none;font-size:13px;font-weight:600;display:flex;align-items:center;gap:6px;padding:8px 16px;border-radius:6px;border:1px solid var(--line);transition:all .2s}
-.cp-legal .nav-back-link:hover{border-color:var(--accent);color:var(--accent)}
+.cp-legal .nav-back-link{color:var(--sea-text);background:var(--sea-bg);text-decoration:none;font-size:13px;font-weight:600;display:flex;align-items:center;gap:6px;padding:8px 15px;border-radius:10px;border:1px solid var(--sea-border);transition:all .18s}
+.cp-legal .nav-back-link:hover{background:var(--sea-bg-hover);border-color:var(--sea-border-hover)}
 
 .cp-legal /* PAGE */
 .legal-page{padding:108px 0 80px;min-height:100vh}

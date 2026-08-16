@@ -20,13 +20,13 @@ export default class ErrorBoundary extends React.Component {
 
     const btn = {
       padding: '12px 24px', borderRadius: 8, fontWeight: 700, fontSize: 14,
-      fontFamily: "'Manrope', sans-serif", cursor: 'pointer', border: 'none',
+      fontFamily: "'Golos Text', sans-serif", cursor: 'pointer', border: 'none',
     }
     return (
       <div style={{
         minHeight: '100vh', display: 'flex', flexDirection: 'column',
         alignItems: 'center', justifyContent: 'center', gap: 16,
-        background: '#25205c', color: '#25205c', fontFamily: "'Manrope', sans-serif",
+        background: '#25205c', color: '#25205c', fontFamily: "'Golos Text', sans-serif",
         padding: 24, textAlign: 'center',
       }}>
         <div style={{ fontSize: 52 }}>😵</div>

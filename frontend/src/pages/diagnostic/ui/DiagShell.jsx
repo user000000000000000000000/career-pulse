@@ -26,7 +26,9 @@ export default function DiagShell({ num, title, desc, meta = [], pct = 0, wide =
       <div className="topbar">
         <div className="tb-left">
           <div className="tb-logo" onClick={() => navigate('/dashboard')}>
-            <div className="tb-logo-mark">⚡</div>CAREER<span>PULSE</span>
+            <div className="tb-logo-mark">
+              <svg viewBox="0 0 32 32" width="13" height="13" aria-hidden="true"><path d="M17.8 4.5 8.5 18.2h6.1L13 27.5 23.5 13.4h-6.1z" fill="#fff"/></svg>
+            </div>CAREER<span>PULSE</span>
           </div>
           <div className="tb-divider"></div>
           <div className="tb-block">Блок <b>{pad}</b> из {CP.TOTAL_BLOCKS}</div>

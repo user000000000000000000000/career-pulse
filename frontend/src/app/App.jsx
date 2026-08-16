@@ -1,23 +1,40 @@
+import { lazy, Suspense } from 'react'
 import { Routes, Route, Navigate } from 'react-router-dom'
 
+// Eager — точки входа (первый экран), грузятся сразу.
 import { Landing } from '../pages/landing'
-import { Register } from '../pages/register'
-import { VkConsent } from '../pages/vk-consent'
 import { Login } from '../pages/login'
-import { ResetPassword } from '../pages/reset-password'
-import { Dashboard } from '../pages/dashboard'
-import { DiagnosticBlock, DiagResults, Roadmap } from '../pages/diagnostic'
-import { Result } from '../pages/result'
-import { Profile } from '../pages/profile'
-import { Atlas } from '../pages/atlas'
 
-import { LegalHub, Privacy, Terms, Consent, AdConsent, Recomm } from '../pages/legal'
+// Lazy — остальные страницы грузятся отдельными чанками только при заходе.
+const Register      = lazy(() => import('../pages/register').then(m => ({ default: m.Register })))
+const VkConsent     = lazy(() => import('../pages/vk-consent').then(m => ({ default: m.VkConsent })))
+const ResetPassword = lazy(() => import('../pages/reset-password').then(m => ({ default: m.ResetPassword })))
+const Dashboard     = lazy(() => import('../pages/dashboard').then(m => ({ default: m.Dashboard })))
+const DiagnosticBlock = lazy(() => import('../pages/diagnostic').then(m => ({ default: m.DiagnosticBlock })))
+const DiagResults   = lazy(() => import('../pages/diagnostic').then(m => ({ default: m.DiagResults })))
+const Roadmap       = lazy(() => import('../pages/diagnostic').then(m => ({ default: m.Roadmap })))
+const Result        = lazy(() => import('../pages/result').then(m => ({ default: m.Result })))
+const Profile       = lazy(() => import('../pages/profile').then(m => ({ default: m.Profile })))
+const Atlas         = lazy(() => import('../pages/atlas').then(m => ({ default: m.Atlas })))
+const LegalHub  = lazy(() => import('../pages/legal').then(m => ({ default: m.LegalHub })))
+const Privacy   = lazy(() => import('../pages/legal').then(m => ({ default: m.Privacy })))
+const Terms     = lazy(() => import('../pages/legal').then(m => ({ default: m.Terms })))
+const Consent   = lazy(() => import('../pages/legal').then(m => ({ default: m.Consent })))
+const AdConsent = lazy(() => import('../pages/legal').then(m => ({ default: m.AdConsent })))
+const Recomm    = lazy(() => import('../pages/legal').then(m => ({ default: m.Recomm })))
 
 import RequireAuth from './layout/RequireAuth.jsx'
 import VkAuthHandler from './VkAuthHandler.jsx'
 import AuthRecoveryHandler from './AuthRecoveryHandler.jsx'
 import AppNav from './AppNav.jsx'
 import { DialogHost } from '../shared/ui/Dialog.jsx'
+
+const PageLoader = () => (
+  <div style={{
+    minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center',
+    color: 'var(--ghost)', fontFamily: "'JetBrains Mono', monospace", fontSize: 13, letterSpacing: 2,
+  }}>ЗАГРУЗКА…</div>
+)
 
 export default function App() {
   return (
@@ -26,6 +43,7 @@ export default function App() {
     <AuthRecoveryHandler />
     <AppNav />
     <DialogHost />
+    <Suspense fallback={<PageLoader />}>
     <Routes>
       <Route path="/" element={<Landing />} />
       <Route path="/register" element={<Register />} />
@@ -51,6 +69,7 @@ export default function App() {
 
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
+    </Suspense>
     </>
   )
 }

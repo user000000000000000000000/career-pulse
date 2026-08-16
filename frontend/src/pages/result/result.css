@@ -21,15 +21,15 @@
 .res-prof__tags{display:flex;gap:5px;flex-wrap:wrap;flex:1;margin:0 12px}
 .res-prof__htag{font-size:10px;font-weight:800;letter-spacing:.5px;border-radius:5px;
   padding:2px 7px;border:1px solid}
-.res-prof__htag[data-h="R"]{background:#e8a0c422;color:#e8a0c4;border-color:#e8a0c444}
-.res-prof__htag[data-h="I"]{background:#5f96e922;color:#5f96e9;border-color:#5f96e944}
-.res-prof__htag[data-h="A"]{background:#8b6fe822;color:#8b6fe8;border-color:#8b6fe844}
-.res-prof__htag[data-h="S"]{background:#3b82f622;color:#3b82f6;border-color:#3b82f644}
-.res-prof__htag[data-h="E"]{background:#72a2eb22;color:#72a2eb;border-color:#72a2eb44}
-.res-prof__htag[data-h="C"]{background:#ff4d6d22;color:#ff4d6d;border-color:#ff4d6d44}
+.res-prof__htag[data-h="R"]{background:#c2568622;color:#c25686;border-color:#c2568644}
+.res-prof__htag[data-h="I"]{background:#3f77cf22;color:#3f77cf;border-color:#3f77cf44}
+.res-prof__htag[data-h="A"]{background:#7a5bd622;color:#7a5bd6;border-color:#7a5bd644}
+.res-prof__htag[data-h="S"]{background:#2b8f6b22;color:#2b8f6b;border-color:#2b8f6b44}
+.res-prof__htag[data-h="E"]{background:#b57e1f22;color:#b57e1f;border-color:#b57e1f44}
+.res-prof__htag[data-h="C"]{background:#d6345622;color:#d63456;border-color:#d6345644}
 .res-prof__cat{font-size:11px;color:var(--ghost)}
 .res-prof__pct{font-family:'JetBrains Mono',monospace;font-size:13px;color:var(--accent);min-width:42px;text-align:right}
-.res-report{font-size:15px;line-height:1.8;color:var(--sub);white-space:pre-wrap}
+.res-report{font-size:16px;line-height:1.75;color:var(--text);white-space:pre-wrap;max-width:65ch}
 .res-actions{display:flex;gap:12px;flex-wrap:wrap;margin-top:26px}
 .res-empty{text-align:center;padding:80px 20px;color:var(--sub)}
 
@@ -44,11 +44,26 @@
   .res-prof__tags{margin:6px 0;order:3;flex-basis:100%}
 }
 .chart-block{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:20px 16px}
-.chart-title{font-size:12px;font-weight:800;letter-spacing:1.5px;text-transform:uppercase;
-  color:var(--ghost);margin-bottom:16px}
+.chart-title{font-size:13px;font-weight:800;letter-spacing:1px;text-transform:uppercase;
+  color:var(--sub);margin-bottom:16px}
 .chart-legend{display:flex;flex-direction:column;gap:6px;margin-top:12px}
 .legend-item{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--sub)}
 .legend-item .legend-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
 .legend-item .legend-val{margin-left:auto;font-family:'JetBrains Mono',monospace;
   font-size:11px;color:var(--accent)}
 .chart-empty{font-size:13px;color:var(--ghost);text-align:center;padding:8px 0 4px;font-style:italic}
+
+/* Ранжированные бары — единый язык вместо радара/пирога */
+.rc-bars{display:flex;flex-direction:column;gap:10px;margin-top:4px}
+.rc-bar{display:grid;grid-template-columns:118px 1fr 42px;align-items:center;gap:10px}
+.rc-bar__name{font-size:12.5px;font-weight:600;color:var(--text)}
+.rc-bar__track{height:11px;border-radius:7px;background:var(--card2);overflow:hidden}
+.rc-bar__fill{height:100%;border-radius:7px;transition:width .8s ease}
+.rc-bar__val{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--sub);text-align:right}
+.rc-bars--prof .rc-bar{grid-template-columns:158px 1fr 42px}
+.rc-bars--prof .rc-bar__name{font-weight:700}
+@media (max-width:640px){
+  .rc-bar{grid-template-columns:96px 1fr 38px;gap:8px}
+  .rc-bar__name{font-size:12px}
+  .rc-bars--prof .rc-bar{grid-template-columns:120px 1fr 38px}
+}

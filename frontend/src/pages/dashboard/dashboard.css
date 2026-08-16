@@ -1,7 +1,7 @@
 /* Токены — только из app/index.css. См. пояснение в shared/ui/legal.css. */
 .cp-dashboard *{margin:0;padding:0;box-sizing:border-box}
 .cp-dashboard{scroll-behavior:smooth}
-.cp-dashboard{background:var(--ink);color:var(--text);font-family:'Manrope',sans-serif;font-size:15px;line-height:1.6;display:flex;min-height:100vh}
+.cp-dashboard{background:var(--ink);color:var(--text);font-family:'Golos Text',sans-serif;font-size:15px;line-height:1.6;display:flex;min-height:100vh}
 .cp-dashboard ::-webkit-scrollbar{width:3px}
 .cp-dashboard ::-webkit-scrollbar-thumb{background:var(--violet);border-radius:2px}
 
@@ -45,16 +45,16 @@
   position:sticky;top:0;z-index:50;
 }
 .cp-dashboard .topbar-left{display:flex;align-items:center;gap:12px}
-.cp-dashboard .page-crumb{font-size:13px;color:var(--ghost)}
-.cp-dashboard .page-crumb span{color:var(--text);font-weight:700}
+.cp-dashboard .page-crumb{font-size:13px;color:var(--nav-text-sub)}
+.cp-dashboard .page-crumb span{color:var(--nav-text);font-weight:700}
 .cp-dashboard .topbar-right{display:flex;align-items:center;gap:12px}
 .cp-dashboard .topbar-btn{
-  padding:8px 16px;border-radius:6px;border:1px solid var(--line2);
-  font-size:12px;font-weight:700;color:var(--sub);background:transparent;
-  cursor:pointer;font-family:'Manrope',sans-serif;transition:all .2s;text-decoration:none;
+  padding:8px 15px;border-radius:10px;border:1px solid var(--sea-border);
+  font-size:12px;font-weight:700;color:var(--sea-text);background:var(--sea-bg);
+  cursor:pointer;font-family:'Golos Text',sans-serif;transition:all .18s;text-decoration:none;
   display:flex;align-items:center;gap:6px;
 }
-.cp-dashboard .topbar-btn:hover{border-color:var(--accent);color:var(--accent)}
+.cp-dashboard .topbar-btn:hover{background:var(--sea-bg-hover);border-color:var(--sea-border-hover)}
 .cp-dashboard .topbar-btn.primary{background:var(--accent);color:var(--ink);border-color:var(--accent)}
 .cp-dashboard .topbar-btn.primary:hover{opacity:.88;transform:translateY(-1px)}
 
@@ -72,7 +72,7 @@
 .cp-dashboard .wb-text h2{font-family:'Bebas Neue',sans-serif;font-size:32px;letter-spacing:2px;margin-bottom:4px}
 .cp-dashboard .wb-text p{font-size:14px;color:var(--sub);max-width:480px;line-height:1.6}
 .cp-dashboard .wb-actions{display:flex;gap:10px;flex-wrap:wrap}
-.cp-dashboard .btn{padding:11px 24px;border-radius:6px;font-weight:700;font-size:13px;font-family:'Manrope',sans-serif;cursor:pointer;border:none;transition:all .2s;text-decoration:none;display:inline-flex;align-items:center;gap:7px}
+.cp-dashboard .btn{padding:11px 24px;border-radius:6px;font-weight:700;font-size:13px;font-family:'Golos Text',sans-serif;cursor:pointer;border:none;transition:all .2s;text-decoration:none;display:inline-flex;align-items:center;gap:7px}
 .cp-dashboard .btn-accent{background:var(--accent);color:var(--ink);box-shadow:0 0 20px rgba(95,150,233,.2)}
 .cp-dashboard .btn-accent:hover{transform:translateY(-1px);box-shadow:0 4px 28px rgba(95,150,233,.35)}
 .cp-dashboard .btn-outline{background:transparent;color:var(--text);border:1px solid var(--line2)}
@@ -81,34 +81,26 @@
 .cp-dashboard .btn-violet:hover{opacity:.88;transform:translateY(-1px)}
 
 .cp-dashboard /* ── PROGRESS ── */
-.progress-block{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:20px 24px;margin-bottom:24px}
-.cp-dashboard .pb-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}
-.cp-dashboard .pb-title{font-size:14px;font-weight:700}
-.cp-dashboard .pb-pct-wrap{display:flex;flex-direction:column;align-items:flex-end;line-height:1;gap:3px}
-.cp-dashboard .pb-pct{font-family:'Bebas Neue',sans-serif;font-size:36px;letter-spacing:2px;color:var(--accent)}
-.cp-dashboard .pb-pct-sub{font-size:10px;letter-spacing:1.5px;text-transform:uppercase;color:var(--ghost);font-family:'JetBrains Mono',monospace}
-.cp-dashboard .pb-hint{font-size:12px;color:var(--ghost)}
+.progress-block{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:24px;margin-bottom:24px}
+.cp-dashboard .pb-title{font-size:15px;font-weight:700;margin-bottom:14px}
+.cp-dashboard .pb-hint{font-size:12px;color:var(--sub);margin-top:14px;line-height:1.5}
 
-/* ── полоса прогресса с чекпоинтами ── */
-.cp-dashboard .pb-bar{position:relative;padding-bottom:46px;margin-bottom:6px}
-.cp-dashboard .pb-track{height:10px;background:rgba(var(--overlay-rgb),.06);border-radius:6px;overflow:hidden}
-.cp-dashboard .pb-fill{height:100%;width:0%;background:linear-gradient(90deg,var(--violet),var(--accent));border-radius:6px;transition:width 1.2s ease;box-shadow:0 0 12px rgba(95,150,233,.35)}
-/* top: -4px центрирует кружок (18px) по линии полоски (10px) */
-.cp-dashboard .pb-mark{position:absolute;top:-4px;display:flex;flex-direction:column;align-items:center;gap:8px;transform:translateX(-50%);text-align:center}
-.cp-dashboard .pb-mark-dot{
-  width:18px;height:18px;border-radius:50%;
-  background:var(--surface);border:2px solid var(--ghost);
-  display:flex;align-items:center;justify-content:center;
-  font-size:10px;font-weight:800;color:var(--ink);
-  box-shadow:0 0 0 3px var(--card);transition:all .3s;flex-shrink:0;
-}
-.cp-dashboard .pb-mark.reached .pb-mark-dot{background:var(--accent);border-color:var(--accent);box-shadow:0 0 0 3px var(--card),0 0 10px rgba(95,150,233,.5)}
-.cp-dashboard .pb-mark.key:not(.reached) .pb-mark-dot{border-color:var(--accent)}
-.cp-dashboard .pb-mark-label{display:flex;flex-direction:column;gap:1px;white-space:nowrap}
-.cp-dashboard .pb-mark-label b{font-size:13px;font-weight:800;color:var(--sub);font-family:'JetBrains Mono',monospace}
-.cp-dashboard .pb-mark-label span{font-size:11px;color:var(--ghost)}
-.cp-dashboard .pb-mark.reached .pb-mark-label b{color:var(--accent)}
-.cp-dashboard .pb-mark.reached .pb-mark-label span{color:var(--sub)}
+/* ── кольцо прогресса + список шагов ── */
+.cp-dashboard .pb-ring-wrap{display:flex;align-items:center;gap:26px;flex-wrap:wrap}
+.cp-dashboard .pb-ring{position:relative;width:116px;height:116px;flex-shrink:0}
+.cp-dashboard .pb-ring-svg{width:100%;height:100%;display:block}
+.cp-dashboard .pb-ring-bg{fill:none;stroke:rgba(var(--overlay-rgb),.08);stroke-width:9}
+.cp-dashboard .pb-ring-fg{fill:none;stroke:url(#pb-grad);stroke-width:9;stroke-linecap:round;transition:stroke-dashoffset 1.2s cubic-bezier(.4,0,.2,1)}
+.cp-dashboard .pb-ring-num{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px}
+.cp-dashboard .pb-ring-pct{font-family:var(--font-display);font-size:23px;font-weight:700;color:var(--text);line-height:1;letter-spacing:-.5px}
+.cp-dashboard .pb-ring-sub{font-size:9px;letter-spacing:1.5px;text-transform:uppercase;color:var(--ghost);font-family:'JetBrains Mono',monospace}
+.cp-dashboard .pb-steps{flex:1;min-width:230px}
+.cp-dashboard .pb-steplist{list-style:none;display:flex;flex-direction:column;gap:9px;margin:0;padding:0}
+.cp-dashboard .pb-step{display:flex;align-items:center;gap:11px;font-size:13.5px;color:var(--sub)}
+.cp-dashboard .pb-step-tick{flex-shrink:0;min-width:34px;height:22px;padding:0 6px;border-radius:11px;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;font-family:'JetBrains Mono',monospace;background:rgba(var(--overlay-rgb),.06);color:var(--ghost);transition:all .3s}
+.cp-dashboard .pb-step.reached{color:var(--text);font-weight:600}
+.cp-dashboard .pb-step.reached .pb-step-tick{background:var(--accent);color:var(--on-accent);min-width:22px}
+/* Ключевой шаг НЕ подсвечиваем, пока он не пройден (иначе «горит» при 0%). */
 
 .cp-dashboard /* ── AXES GRID ── */
 .axes-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:24px}
@@ -121,7 +113,7 @@
 .cp-dashboard /* ── BLOCKS SECTION ── */
 .blocks-section{margin-bottom:24px}
 .cp-dashboard .section-header{display:flex;align-items:baseline;gap:16px;margin-bottom:16px}
-.cp-dashboard .section-title{font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--ghost);font-family:'JetBrains Mono',monospace}
+.cp-dashboard .section-title{font-size:13px;font-weight:800;letter-spacing:1px;text-transform:uppercase;color:var(--sub);font-family:'JetBrains Mono',monospace}
 .cp-dashboard .section-sub{font-size:11px;color:var(--ghost)}
 .cp-dashboard .blocks-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}
 .cp-dashboard .block-card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:18px 20px;display:flex;flex-direction:column;gap:10px;transition:border-color .2s}
@@ -164,7 +156,7 @@
 .cp-dashboard /* ── 2-COL GRID ── */
 .two-col{display:grid;grid-template-columns:1.3fr 1fr;gap:18px;margin-bottom:24px}
 .cp-dashboard .panel{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:22px}
-.cp-dashboard .panel-title{font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--ghost);margin-bottom:16px;font-family:'JetBrains Mono',monospace}
+.cp-dashboard .panel-title{font-size:13px;font-weight:800;letter-spacing:1px;text-transform:uppercase;color:var(--sub);margin-bottom:16px;font-family:'JetBrains Mono',monospace}
 
 .cp-dashboard /* trait bars */
 .t-row{display:flex;flex-direction:column;gap:5px;margin-bottom:12px}
@@ -185,7 +177,7 @@
 .cp-dashboard .m-name{font-size:14px;font-weight:800}
 .cp-dashboard .m-spec{font-size:11px;color:var(--accent);font-family:'JetBrains Mono',monospace}
 .cp-dashboard .m-stars{font-size:11px;color:var(--gold);margin-top:2px}
-.cp-dashboard .m-btn{margin-left:auto;background:var(--violet);color:white;border:none;border-radius:6px;padding:8px 14px;font-size:11px;font-weight:700;cursor:pointer;font-family:'Manrope',sans-serif;white-space:nowrap}
+.cp-dashboard .m-btn{margin-left:auto;background:var(--violet);color:white;border:none;border-radius:6px;padding:8px 14px;font-size:11px;font-weight:700;cursor:pointer;font-family:'Golos Text',sans-serif;white-space:nowrap}
 
 .cp-dashboard /* activity */
 .activity-list{display:flex;flex-direction:column;gap:0}
@@ -211,7 +203,7 @@
 .cp-dashboard .ts-icon{font-size:28px;width:44px;height:44px;background:rgba(95,150,233,.07);border-radius:10px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
 .cp-dashboard .ts-title{font-size:15px;font-weight:800;margin-bottom:4px}
 .cp-dashboard .ts-desc{font-size:13px;color:var(--sub);line-height:1.6}
-.cp-dashboard .ts-link{display:inline-flex;align-items:center;gap:5px;margin-top:8px;font-size:12px;font-weight:700;color:var(--accent);cursor:pointer;background:none;border:none;font-family:'Manrope',sans-serif;padding:0}
+.cp-dashboard .ts-link{display:inline-flex;align-items:center;gap:5px;margin-top:8px;font-size:12px;font-weight:700;color:var(--accent);cursor:pointer;background:none;border:none;font-family:'Golos Text',sans-serif;padding:0}
 .cp-dashboard .ts-link:hover{text-decoration:underline}
 
 /* Футер — сплошная navy-плашка (style-guide.md §4), как в Landing/Legal, а не
@@ -295,10 +287,10 @@
   .cp-dashboard .blocks-grid{grid-template-columns:1fr}
   .cp-dashboard .footer-grid{grid-template-columns:1fr;gap:24px}
   .cp-dashboard .footer-bottom{flex-direction:column;align-items:flex-start;gap:10px}
-  .cp-dashboard .pb-pct{font-size:28px}
-  .cp-dashboard .pb-mark-label b{font-size:11px}
-  .cp-dashboard .pb-mark-label span{font-size:9px}
-  .cp-dashboard .pb-mark{gap:6px}
+  .cp-dashboard .pb-ring-wrap{gap:18px}
+  .cp-dashboard .pb-ring{width:96px;height:96px}
+  .cp-dashboard .pb-ring-pct{font-size:22px}
+  .cp-dashboard .pb-step{font-size:12.5px}
 }
 .cp-dashboard .mobile-menu-btn{display:none;background:none;border:1px solid var(--line);color:var(--sub);padding:8px 12px;border-radius:6px;cursor:pointer;font-size:18px}
 
@@ -320,7 +312,7 @@
 .cp-dashboard .consult-input,
 .cp-dashboard .consult-textarea{
   width:100%;background:var(--card2);border:1px solid var(--line2);border-radius:8px;
-  color:var(--text);padding:11px 13px;font-size:14px;font-family:'Manrope',sans-serif;
+  color:var(--text);padding:11px 13px;font-size:14px;font-family:'Golos Text',sans-serif;
   outline:none;transition:border-color .2s;resize:vertical;
 }
 .cp-dashboard .consult-input:focus,

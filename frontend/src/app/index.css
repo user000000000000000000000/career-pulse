@@ -44,7 +44,7 @@
 
   --font-display:       'Unbounded', sans-serif;
   --font-accent-italic: 'Fraunces', serif;
-  --font-body:          'Manrope', sans-serif;
+  --font-body:          'Golos Text', sans-serif;
   --font-mono:          'JetBrains Mono', monospace;
 
   /* RGB-компоненты (без rgba()) для тонких заливок/бордеров */
@@ -62,6 +62,14 @@
   --accent-italic: #4079d3;
   /* Текст поверх заливки var(--accent) — не путать с --black. */
   --on-accent: #ffffff;
+
+  /* «Морской белый» (seafoam) — единый стиль второстепенных кнопок и бургера
+     в шапках приложения (дашборд, диагностика, профиль). */
+  --sea-bg:           #eef4f3;
+  --sea-border:       #cfe0dc;
+  --sea-text:         #2f6b60;
+  --sea-bg-hover:     #e2efec;
+  --sea-border-hover: #a9cec7;
 
   /* Градиенты style-guide.md §3 — многоточечные, отдельные токены, т.к.
      var(--accent)→var(--violet) двухцветного linear-gradient недостаточно
@@ -115,6 +123,12 @@
   --hero-glow-3: rgba(255,107,53,0.07);
   --accent-italic: var(--accent2);
   --on-accent: #08080f;
+
+  --sea-bg:           rgba(255,255,255,0.06);
+  --sea-border:       rgba(255,255,255,0.14);
+  --sea-text:         var(--text);
+  --sea-bg-hover:     rgba(255,255,255,0.12);
+  --sea-border-hover: rgba(255,255,255,0.24);
 }
 
 * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -122,7 +136,7 @@ html { scroll-behavior: smooth; }
 body {
   background: var(--ink);
   color: var(--text);
-  font-family: 'Manrope', sans-serif;
+  font-family: 'Golos Text', sans-serif;
   font-size: 16px;
   line-height: 1.65;
   -webkit-font-smoothing: antialiased;

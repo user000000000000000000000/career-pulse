@@ -2,7 +2,7 @@
 /* Кнопки — всегда stadium (style-guide.md §4): полностью скруглённые края,
    заливка — синий диагональный градиент, мягкое свечение снизу. */
 .cp-btn{
-  font-family:'Manrope',sans-serif;font-weight:800;font-size:14px;letter-spacing:.4px;
+  font-family:'Golos Text',sans-serif;font-weight:800;font-size:14px;letter-spacing:.4px;
   border:none;cursor:pointer;border-radius:var(--radius-full);padding:14px 28px;transition:all .2s;
   display:inline-flex;align-items:center;justify-content:center;gap:8px;text-decoration:none;
 }
@@ -18,7 +18,7 @@
 .cp-field label{font-size:12px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--ghost)}
 .cp-input{
   background:var(--card2);border:1px solid var(--line);border-radius:var(--radius-sm);
-  padding:13px 15px;color:var(--text);font-family:'Manrope',sans-serif;font-size:15px;
+  padding:13px 15px;color:var(--text);font-family:'Golos Text',sans-serif;font-size:15px;
   transition:border-color .2s,box-shadow .2s;width:100%;
 }
 .cp-input::placeholder{color:var(--ghost)}
