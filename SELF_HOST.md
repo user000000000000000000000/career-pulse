@@ -7,7 +7,7 @@
 ## ✅ Чеклист ПЕРЕД переносом
 1. Создать VM в Yandex Cloud (см. Фаза 0), зайти по SSH, скопировать туда `supabase/selfhost/setup.sh` и запустить — он ставит Docker/Caddy и клонирует репозиторий Supabase.
 2. Заполнить `supabase/docker/.env` на VM (пароли, JWT_SECRET, SMTP) — см. Фаза 1.
-3. Накатить `supabase/schema.sql` в поднятый Postgres (пустая БД, `auth`-схему разворачивает сам GoTrue-контейнер).
+3. Накатить `supabase/schema.sql` в поднятый Postgres (пустая БД, `auth`-схему разворачивает сам GoTrue-контейнер), затем справочные данные careerTrack из `supabase/to_upload/02..09` по порядку (см. Фаза 3b — без них блок «Вузы/ЕГЭ» пустой).
 4. Скопировать `supabase/functions/*` в `volumes/functions/<имя>/index.ts` self-host стека и задать секреты функций.
 5. Поднять `api.careerpulse.ru` через Caddy (Фаза 2), обновить DNS A-запись на IP VM.
 6. Обновить GitHub Secrets репозитория новыми `VITE_SUPABASE_URL=https://api.careerpulse.ru` и `VITE_SUPABASE_ANON_KEY`, задеплоить фронт (workflow сам соберёт и выложит на Pages).
@@ -106,12 +106,37 @@ api.careerpulse.ru {
    `sudo apt install caddy` → `sudo systemctl restart caddy`. Сертификат Let's Encrypt поднимется сам.
 3. Итог: API доступно по `https://api.careerpulse.ru`.
 
-## Фаза 3. Схема БД (чистый старт — данных для переноса нет)
+## Фаза 3. Схема БД (чистый старт — пользовательских данных для переноса нет)
 ```bash
 psql "postgresql://postgres:НОВЫЙ_PWD@localhost:5432/postgres" -f schema.sql
 ```
 `auth`-схему создаёт сам GoTrue-контейнер при первом старте — руками её накатывать не нужно.
 `public` получит наши таблицы + RLS-политики (profiles, consultation_requests, diagnostic_data) с нуля.
+
+### Фаза 3b. Справочные данные careerTrack (ОБЯЗАТЕЛЬНО)
+Пользовательских данных для переноса нет, но справочник специальностей/вузов/программ
+(им живёт блок «Вузы и ЕГЭ» на странице результатов) — есть, и его надо накатить,
+иначе careerTrack будет пустым и вернёт `status: 'unavailable'`. Файлы в
+`supabase/to_upload/`, грузить **строго по порядку** (FK: специальности → карта
+профессий → вузы/программы → обновление отзывов). Все инсёрты идемпотентны
+(`on conflict … do update`), повторный прогон безопасен.
+```bash
+cd supabase/to_upload
+PG="postgresql://postgres:НОВЫЙ_PWD@localhost:5432/postgres"
+for f in 02_specialties_bachelor 03_specialties_master 04_specialties_specialist \
+         05_specialties_college 06_missing_specialties 07_profession_specialty_map \
+         08_institutions_and_programs 09_feedback; do
+  echo ">>> $f"; psql "$PG" -v ON_ERROR_STOP=1 -f "$f.sql"
+done
+```
+`01_schema.sql` = тот же `schema.sql` (повторно не нужен). `08_*` — самый большой (~5.5 МБ,
+~5788 программ); через `psql -f` грузится целиком (лимита «Query too large» из Studio тут нет).
+Проверка:
+```sql
+select count(*) from public.specialties;    -- ~646
+select count(*) from public.institutions;   -- ~653
+select count(*) from public.programs;        -- ~5788
+```
 
 ## Фаза 4. Edge Functions
 Наши функции (`vk-auth`, `analyze-diagnostic`, `analyze-test`, `career-roadmap`) кладём в

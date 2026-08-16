@@ -8,7 +8,22 @@ function getInitialTheme() {
   return saved === 'dark' ? 'dark' : 'light' // светлая — дефолт, независимо от ОС (решение с Grill Me)
 }
 
-/** Переключатель светлой/тёмной темы. Персистит выбор, ничего не делает при первом заходе кроме чтения localStorage. */
+const MoonIcon = (
+  <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor"
+       strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+    <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" />
+  </svg>
+)
+const SunIcon = (
+  <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor"
+       strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+    <circle cx="12" cy="12" r="4.2" />
+    <path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4" />
+  </svg>
+)
+
+/** Переключатель светлой/тёмной темы. Иконка-морф (луна/солнце), поворот на hover.
+ *  Цвета через currentColor + color-mix — работает и на navy-шапке, и на светлом фоне. */
 export default function ThemeToggle() {
   const [theme, setTheme] = useState(getInitialTheme)
 
@@ -25,16 +40,26 @@ export default function ThemeToggle() {
       aria-label={theme === 'dark' ? 'Включить светлую тему' : 'Включить тёмную тему'}
       title={theme === 'dark' ? 'Светлая тема' : 'Тёмная тема'}
       style={{
-        width: 36, height: 36, borderRadius: '50%',
-        border: '1px solid var(--line)', background: 'var(--card2)',
+        width: 38, height: 38, borderRadius: 12,
+        border: '1px solid color-mix(in srgb, currentColor 18%, transparent)',
+        background: 'color-mix(in srgb, currentColor 7%, transparent)',
+        color: 'inherit',
         display: 'flex', alignItems: 'center', justifyContent: 'center',
-        cursor: 'pointer', fontSize: 16, flexShrink: 0,
-        transition: 'border-color .2s ease, background .2s ease',
+        cursor: 'pointer', flexShrink: 0,
+        transition: 'background .18s ease, border-color .18s ease, transform .18s ease',
       }}
-      onMouseEnter={e => { e.currentTarget.style.borderColor = 'var(--accent)' }}
-      onMouseLeave={e => { e.currentTarget.style.borderColor = 'var(--line)' }}
+      onMouseEnter={e => {
+        e.currentTarget.style.background = 'color-mix(in srgb, currentColor 14%, transparent)'
+        e.currentTarget.style.borderColor = 'color-mix(in srgb, currentColor 30%, transparent)'
+        e.currentTarget.style.transform = 'rotate(-12deg)'
+      }}
+      onMouseLeave={e => {
+        e.currentTarget.style.background = 'color-mix(in srgb, currentColor 7%, transparent)'
+        e.currentTarget.style.borderColor = 'color-mix(in srgb, currentColor 18%, transparent)'
+        e.currentTarget.style.transform = 'none'
+      }}
     >
-      {theme === 'dark' ? '☀️' : '🌙'}
+      {theme === 'dark' ? SunIcon : MoonIcon}
     </button>
   )
 }

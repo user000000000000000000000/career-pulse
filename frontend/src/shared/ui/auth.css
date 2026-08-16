@@ -29,7 +29,7 @@
 .cp-legal .auth-divider::before,.cp-legal .auth-divider::after{content:'';flex:1;height:1px;background:var(--line)}
 .cp-legal .auth-link-btn{
   background:none;border:none;color:var(--accent);font-weight:700;font-size:13px;
-  cursor:pointer;font-family:'Manrope',sans-serif;padding:4px;text-decoration:none;
+  cursor:pointer;font-family:'Golos Text',sans-serif;padding:4px;text-decoration:none;
 }
 .cp-legal .auth-link-btn:hover{text-decoration:underline}
 .cp-legal .auth-link-btn:disabled{opacity:.5;cursor:default}

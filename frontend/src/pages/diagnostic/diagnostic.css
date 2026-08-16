@@ -9,31 +9,48 @@
   flex-direction: column;
   background: var(--ink);
   color: var(--text);
-  font-family: 'Manrope', sans-serif;
+  font-family: 'Golos Text', sans-serif;
   font-size: 15px;
   line-height: 1.6;
 }
 
 /* topbar */
 .cp-diag .topbar {
-  background: rgba(var(--ink-rgb),.92); backdrop-filter: blur(16px);
+  background: rgba(37,32,92,.9); backdrop-filter: blur(16px);
   border-bottom: 1px solid var(--line); padding: 14px 28px;
   display: flex; align-items: center; justify-content: space-between;
   position: sticky; top: 0; z-index: 50;
 }
 .cp-diag .tb-left { display: flex; align-items: center; gap: 12px; }
-.cp-diag .tb-logo { font-family: var(--font-display); font-size: 16px; letter-spacing: 2.5px; color: var(--text); text-decoration: none; display: flex; align-items: center; gap: 8px; cursor: pointer; }
-.cp-diag .tb-logo-mark { width: 24px; height: 24px; border-radius: 6px; background: linear-gradient(135deg, var(--violet), var(--accent)); display: flex; align-items: center; justify-content: center; font-size: 12px; }
+.cp-diag .tb-logo { font-family: var(--font-display); font-size: 16px; letter-spacing: 2.5px; color: var(--nav-text); text-decoration: none; display: flex; align-items: center; gap: 8px; cursor: pointer; }
+.cp-diag .tb-logo-mark { width: 24px; height: 24px; border-radius: 6px; background: linear-gradient(135deg, var(--violet), var(--accent)); display: flex; align-items: center; justify-content: center; font-size: 12px; flex-shrink: 0; }
 .cp-diag .tb-logo span { color: var(--accent); }
-.cp-diag .tb-divider { width: 1px; height: 20px; background: var(--line2); }
-.cp-diag .tb-block { font-size: 13px; color: var(--sub); }
-.cp-diag .tb-block b { color: var(--text); }
-.cp-diag .tb-btn { padding: 8px 16px; border-radius: 6px; border: 1px solid var(--line2); font-size: 12px; font-weight: 700; color: var(--sub); background: transparent; cursor: pointer; font-family: 'Manrope', sans-serif; transition: all .2s; text-decoration: none; display: flex; align-items: center; gap: 6px; }
-.cp-diag .tb-btn:hover { border-color: var(--accent); color: var(--accent); }
+.cp-diag .tb-divider { width: 1px; height: 20px; background: rgba(255,255,255,.16); }
+.cp-diag .tb-block { font-size: 13px; color: var(--nav-text-sub); }
+.cp-diag .tb-block b { color: var(--nav-text); }
+.cp-diag .tb-btn { padding: 8px 15px; border-radius: 10px; border: 1px solid var(--sea-border); font-size: 12px; font-weight: 700; color: var(--sea-text); background: var(--sea-bg); cursor: pointer; font-family: 'Golos Text', sans-serif; transition: all .18s; text-decoration: none; display: flex; align-items: center; gap: 6px; }
+.cp-diag .tb-btn:hover { background: var(--sea-bg-hover); border-color: var(--sea-border-hover); }
 
 /* progress */
 .cp-diag .progress-bar { height: 3px; background: rgba(var(--overlay-rgb),.04); }
 .cp-diag .progress-fill { height: 100%; background: linear-gradient(90deg, var(--violet), var(--accent)); transition: width .4s ease; border-radius: 0 2px 2px 0; }
+
+/* ── Holland «соты» (тип личности) — читаемое представление вместо радара ── */
+.cp-diag .holland-soty { margin-top: 8px; }
+.cp-diag .hs-lead { background: var(--card); border: 1px solid var(--line); border-left: 4px solid var(--accent); border-radius: 14px; padding: 16px 18px; margin-bottom: 12px; }
+.cp-diag .hs-lead-badge { display: inline-block; font-size: 10px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; padding: 3px 9px; border-radius: 6px; margin-bottom: 8px; }
+.cp-diag .hs-lead-name { font-family: var(--font-display); font-size: 19px; font-weight: 700; }
+.cp-diag .hs-lead-mean { color: var(--sub); font-size: 13.5px; margin-top: 6px; line-height: 1.5; }
+.cp-diag .hs-metric { display: flex; align-items: center; gap: 10px; margin-top: 12px; flex-wrap: wrap; }
+.cp-diag .hs-metric-cap { font-size: 12px; color: var(--ghost); }
+.cp-diag .hs-track { flex: 1; min-width: 120px; height: 8px; border-radius: 6px; background: var(--card2); overflow: hidden; }
+.cp-diag .hs-fill { height: 100%; border-radius: 6px; transition: width .8s ease; }
+.cp-diag .hs-val { font-family: 'JetBrains Mono', monospace; font-size: 12px; color: var(--sub); white-space: nowrap; }
+.cp-diag .hs-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 10px; }
+.cp-diag .hs-card { background: var(--card); border: 1px solid var(--line); border-radius: 12px; padding: 12px 14px; }
+.cp-diag .hs-card-top { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; }
+.cp-diag .hs-card-name { font-weight: 700; font-size: 13.5px; }
+.cp-diag .hs-card-mean { font-size: 12px; color: var(--ghost); margin: 5px 0 9px; line-height: 1.45; }
 
 /* container + headings */
 .cp-diag .container { max-width: 640px; margin: 0 auto; padding: 32px 20px 80px; flex: 1; width: 100%; }
@@ -51,13 +68,13 @@
 
 /* section badges */
 .cp-diag .section-badge { font-size: 10px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; text-align: center; margin-bottom: 8px; padding: 4px 12px; display: inline-block; border-radius: 4px; }
-.cp-diag .badge-self, .cp-diag .badge-prof { background: rgba(139,111,232,.15); color: #8b6fe8; }
+.cp-diag .badge-self, .cp-diag .badge-prof { background: rgba(139,111,232,.15); color: #7a5bd6; }
 .cp-diag .badge-task, .cp-diag .badge-case { background: rgba(232,160,196,.15); color: var(--ember); }
 .cp-diag .badge-vark, .cp-diag .badge-gen { background: rgba(95,150,233,.12); color: var(--accent); }
 .cp-diag .badge-dec { background: rgba(245,200,66,.12); color: var(--gold); }
 .cp-diag .type-badge { font-size: 10px; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; text-align: center; display: block; margin-bottom: 6px; color: var(--ghost); }
 .cp-diag .q-tag { display: inline-block; padding: 2px 8px; border-radius: 3px; font-size: 9px; font-weight: 700; letter-spacing: 1px; margin-bottom: 8px; }
-.cp-diag .tag-self { background: rgba(139,111,232,.15); color: #8b6fe8; }
+.cp-diag .tag-self { background: rgba(139,111,232,.15); color: #7a5bd6; }
 .cp-diag .tag-behav { background: rgba(95,150,233,.12); color: var(--accent); }
 
 /* pair cards */
@@ -73,7 +90,7 @@
 .cp-diag .intensity { text-align: center; animation: cpFade .3s ease; }
 .cp-diag .int-label { font-size: 13px; color: var(--sub); margin-bottom: 10px; }
 .cp-diag .int-row { display: flex; gap: 10px; justify-content: center; }
-.cp-diag .int-btn { padding: 10px 20px; border-radius: 8px; border: 1px solid var(--line2); background: var(--card); color: var(--sub); font-size: 13px; font-weight: 700; cursor: pointer; transition: all .2s; font-family: 'Manrope', sans-serif; }
+.cp-diag .int-btn { padding: 10px 20px; border-radius: 8px; border: 1px solid var(--line2); background: var(--card); color: var(--sub); font-size: 13px; font-weight: 700; cursor: pointer; transition: all .2s; font-family: 'Golos Text', sans-serif; }
 .cp-diag .int-btn:hover { border-color: rgba(var(--overlay-rgb),.2); color: var(--text); }
 .cp-diag .int-btn.sel { border-color: var(--accent); background: rgba(95,150,233,.1); color: var(--accent); }
 
@@ -87,7 +104,7 @@
   flex: 1; padding: 10px 4px; border-radius: 8px;
   border: 1px solid transparent; font-size: 11px; font-weight: 700;
   cursor: pointer; transition: transform .12s, filter .12s;
-  font-family: 'Manrope', sans-serif; color: var(--text);
+  font-family: 'Golos Text', sans-serif; color: var(--text);
 }
 .cp-diag .ii-btn:hover { transform: translateY(-2px); filter: brightness(1.12); }
 /* сила = насыщенность цвета: бледный → насыщенный */
@@ -126,14 +143,14 @@
 .cp-diag .case-block { background: var(--card2); border: 1px solid var(--line); border-radius: 12px; padding: 18px; margin-bottom: 14px; font-size: 14px; line-height: 1.7; color: var(--sub); text-align: center; }
 
 /* textarea */
-.cp-diag .q-textarea { width: 100%; min-height: 120px; padding: 14px; background: var(--card); border: 1px solid var(--line2); border-radius: 10px; color: var(--text); font-family: 'Manrope', sans-serif; font-size: 14px; resize: vertical; outline: none; transition: border-color .2s; }
+.cp-diag .q-textarea { width: 100%; min-height: 120px; padding: 14px; background: var(--card); border: 1px solid var(--line2); border-radius: 10px; color: var(--text); font-family: 'Golos Text', sans-serif; font-size: 14px; resize: vertical; outline: none; transition: border-color .2s; }
 .cp-diag .q-textarea:focus { border-color: var(--accent); }
 .cp-diag .q-textarea::placeholder { color: var(--ghost); }
 .cp-diag .char-count { font-size: 11px; color: var(--ghost); text-align: right; margin-top: 4px; }
 
 /* nav + buttons */
 .cp-diag .nav-row { display: flex; justify-content: center; gap: 12px; margin-top: 24px; }
-.cp-diag .btn { padding: 12px 28px; border-radius: 8px; font-weight: 700; font-size: 14px; font-family: 'Manrope', sans-serif; cursor: pointer; border: none; transition: all .2s; display: inline-flex; align-items: center; gap: 8px; text-decoration: none; }
+.cp-diag .btn { padding: 12px 28px; border-radius: 8px; font-weight: 700; font-size: 14px; font-family: 'Golos Text', sans-serif; cursor: pointer; border: none; transition: all .2s; display: inline-flex; align-items: center; gap: 8px; text-decoration: none; }
 .cp-diag .btn-accent { background: var(--accent); color: var(--ink); }
 .cp-diag .btn-accent:hover { transform: translateY(-1px); box-shadow: 0 4px 20px rgba(95,150,233,.3); }
 .cp-diag .btn-accent:disabled { opacity: .35; cursor: default; transform: none; box-shadow: none; }
@@ -149,7 +166,24 @@
 .cp-diag .result-desc { font-size: 14px; color: var(--sub); max-width: 460px; margin: 0 auto 20px; line-height: 1.7; }
 .cp-diag .r-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 24px; text-align: left; }
 .cp-diag .r-card { background: var(--card); border: 1px solid var(--line); border-radius: 10px; padding: 14px; }
-.cp-diag .r-label { font-size: 10px; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; color: var(--ghost); margin-bottom: 3px; font-family: 'JetBrains Mono', monospace; }
+.cp-diag .r-label { font-size: 12px; font-weight: 800; letter-spacing: 1px; text-transform: uppercase; color: var(--sub); margin-bottom: 3px; font-family: 'JetBrains Mono', monospace; }
+
+/* ── Крупный заголовок блока результата (было: мелкий бледный r-label) ── */
+.cp-diag .block-head { display: flex; align-items: center; gap: 11px; margin-bottom: 6px; }
+.cp-diag .block-head .bh-ic { width: 34px; height: 34px; border-radius: 10px; flex-shrink: 0; display: grid; place-items: center; font-size: 18px; }
+.cp-diag .block-head h3 { font-family: var(--font-display); font-size: 20px; font-weight: 700; color: var(--text); line-height: 1.15; }
+.cp-diag .block-head-sub { color: var(--sub); font-size: 13px; margin-bottom: 16px; line-height: 1.5; }
+.cp-diag .block-intro { font-size: 14px; color: var(--text); line-height: 1.6; margin-bottom: 14px; max-width: 65ch; }
+
+/* ── Метрики-карточки (число + уровень словами + смысл) ── */
+.cp-diag .metrics { display: grid; grid-template-columns: repeat(auto-fill, minmax(215px, 1fr)); gap: 12px; }
+.cp-diag .metric { background: var(--card); border: 1px solid var(--line); border-radius: 14px; padding: 15px 17px; }
+.cp-diag .metric__top { display: flex; align-items: baseline; justify-content: space-between; gap: 8px; }
+.cp-diag .metric__name { font-size: 13.5px; font-weight: 700; color: var(--text); }
+.cp-diag .metric__num { font-family: var(--font-display); font-size: 26px; font-weight: 700; line-height: 1; }
+.cp-diag .metric__rank { font-family: var(--font-mono); font-size: 12px; color: var(--ghost); font-weight: 600; }
+.cp-diag .metric__lvl { display: inline-block; margin-top: 6px; font-size: 11px; font-weight: 700; letter-spacing: .3px; padding: 3px 9px; border-radius: 20px; }
+.cp-diag .metric__mean { font-size: 12.5px; color: var(--ghost); margin-top: 9px; line-height: 1.45; }
 .cp-diag .r-val { font-size: 16px; font-weight: 800; }
 .cp-diag .r-accent { color: var(--accent); }
 .cp-diag .r-violet { color: var(--violet); }
@@ -181,7 +215,7 @@
 .cp-diag .q-label { font-size: 14px; font-weight: 700; margin-bottom: 10px; display: flex; align-items: flex-start; gap: 8px; line-height: 1.5; }
 .cp-diag .q-id { font-family: 'JetBrains Mono', monospace; font-size: 10px; color: var(--ghost); background: rgba(var(--overlay-rgb),.05); padding: 3px 6px; border-radius: 3px; flex-shrink: 0; margin-top: 2px; }
 .cp-diag .q-sub { font-size: 12px; color: var(--ghost); margin: -6px 0 10px 0; }
-.cp-diag .q-input { width: 100%; padding: 12px 16px; background: var(--card); border: 1px solid var(--line2); border-radius: 8px; color: var(--text); font-family: 'Manrope', sans-serif; font-size: 14px; transition: border-color .2s; outline: none; }
+.cp-diag .q-input { width: 100%; padding: 12px 16px; background: var(--card); border: 1px solid var(--line2); border-radius: 8px; color: var(--text); font-family: 'Golos Text', sans-serif; font-size: 14px; transition: border-color .2s; outline: none; }
 .cp-diag .q-input:focus { border-color: var(--accent); }
 .cp-diag .q-input::placeholder { color: var(--ghost); }
 .cp-diag select.q-input { appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%239898b8' stroke-width='1.5' fill='none'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 14px center; padding-right: 36px; cursor: pointer; }
@@ -245,7 +279,8 @@
 
 /* ── TABLET (≤1024px) ── */
 @media (max-width: 1024px) {
-  .cp-diag .topbar { padding: 14px 20px; }
+  /* правый отступ резервирует место под фиксированный бургер (AppNav) */
+  .cp-diag .topbar { padding: 14px 64px 14px 20px; }
   .cp-diag .block-title { font-size: 32px; }
   .cp-diag .opt-grid.cols-3 { grid-template-columns: 1fr 1fr; }
 }
@@ -262,6 +297,9 @@
   .cp-diag .dtrack-lbl { width: 64px; }
   .cp-diag .opt-grid.cols-2, .cp-diag .opt-grid.cols-3 { grid-template-columns: 1fr; }
   .cp-diag .tb-block { display: none; }
+  /* На телефоне навигацию даёт глобальный бургер — дублирующую кнопку прячем,
+     чтобы она не налезала на бургер. */
+  .cp-diag .tb-btn { display: none; }
   .cp-diag .int-row { flex-wrap: wrap; }
 }
 

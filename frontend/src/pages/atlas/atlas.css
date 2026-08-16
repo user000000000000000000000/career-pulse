@@ -22,7 +22,7 @@
 
 .atlas-chip{background:var(--card2);border:1px solid var(--line2);border-radius:9px;
   color:var(--sub);font-size:13px;font-weight:700;padding:9px 16px;cursor:pointer;
-  transition:all .15s;white-space:nowrap;font-family:'Manrope',sans-serif}
+  transition:all .15s;white-space:nowrap;font-family:'Golos Text',sans-serif}
 .atlas-chip:hover{border-color:var(--accent);color:var(--text);transform:translateY(-1px)}
 .atlas-chip.active{background:var(--accent);border-color:var(--accent);color:var(--on-accent)}
 

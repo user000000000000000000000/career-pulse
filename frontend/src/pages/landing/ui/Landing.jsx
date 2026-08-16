@@ -150,7 +150,9 @@ export default function Landing() {
     <div ref={rootRef} className="cp-landing">
 <nav id="nav">
   <a href="/" className="nav-logo" style={{textDecoration:'none'}}>
-    <div className="nav-logo-icon">⚡</div>
+    <div className="nav-logo-icon">
+      <svg viewBox="0 0 32 32" width="17" height="17" aria-hidden="true"><path d="M17.8 4.5 8.5 18.2h6.1L13 27.5 23.5 13.4h-6.1z" fill="#fff"/></svg>
+    </div>
     <div className="nav-logo-text">CAREER<span>PULSE</span></div>
   </a>
   <ul className="nav-links">
@@ -176,7 +178,7 @@ export default function Landing() {
     ) : (
       <>
         <a href="#register" className="btn-ghost nav-hide-phone">Зарегистрироваться</a>
-        <a href="/login" className="btn-nav" style={{marginRight:'6px',background:'transparent',color:'var(--nav-text)',border:'1px solid rgba(var(--overlay-rgb),0.2)'}}>Войти</a><a href="#register" className="btn-nav">Начать бесплатно</a>
+        <a href="/login" className="btn-nav" style={{marginRight:'6px',background:'rgba(255,255,255,0.06)',color:'var(--nav-text)',border:'1px solid rgba(255,255,255,0.22)',boxShadow:'none'}}>Войти</a><a href="#register" className="btn-nav">Начать бесплатно</a>
       </>
     )}
   </div>
@@ -191,7 +193,7 @@ export default function Landing() {
     <div className="hero-badge"><span className="badge-dot"></span>Карьерная диагностика нового поколения</div>
     <h1 className="hero-title">
       <span className="t1">НАЙДИ СВОЙ</span>
-      <span className="t2" style={{fontFamily:'\'Manrope\',sans-serif',fontWeight:'800',fontSize:'clamp(54px,8vw,114px)',letterSpacing:'2px'}}>КАРЬЕРНЫЙ</span>
+      <span className="t2">КАРЬЕРНЫЙ</span>
       <span className="t3">пульс · вектор · путь</span>
     </h1>
     <p className="hero-sub">

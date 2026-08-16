@@ -14,3 +14,16 @@ node_modules/
 *.log
 .DS_Store
 Thumbs.db
+frontend/results-lab.html
+
+# ── ключи и секреты (НИКОГДА не коммитить) ──
+id_rsa
+id_rsa.pub
+*.pem
+
+# ── локальный тулинг сессии (playwright / impeccable design-hook) ──
+.playwright/
+.playwright-cli/
+.impeccable/
+.github/hooks/
+.claude/skills/playwright-cli/

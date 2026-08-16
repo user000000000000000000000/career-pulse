@@ -198,38 +198,52 @@ export default function Dashboard() {
 
           {/* ── PROGRESS ── */}
           <div className="progress-block">
-            <div className="pb-header">
-              <div className="pb-title">Прогресс профориентационной диагностики</div>
-              <div className="pb-pct-wrap">
-                <span className="pb-pct">{pct}%</span>
-                <span className="pb-pct-sub">пройдено</span>
+            <div className="pb-ring-wrap">
+              <div className="pb-ring">
+                <svg className="pb-ring-svg" viewBox="0 0 100 100" aria-hidden="true">
+                  <defs>
+                    <linearGradient id="pb-grad" x1="0" y1="0" x2="1" y2="1">
+                      <stop offset="0" stopColor="var(--accent)" />
+                      <stop offset="1" stopColor="var(--violet)" />
+                    </linearGradient>
+                  </defs>
+                  <circle className="pb-ring-bg" cx="50" cy="50" r="42" />
+                  <circle
+                    className="pb-ring-fg" cx="50" cy="50" r="42"
+                    transform="rotate(-90 50 50)"
+                    style={{
+                      strokeDasharray: 263.9,
+                      strokeDashoffset: 263.9 * (1 - pct / 100),
+                      strokeLinecap: pct >= 100 ? 'butt' : 'round',
+                    }}
+                  />
+                </svg>
+                <div className="pb-ring-num">
+                  <span className="pb-ring-pct">{pct}%</span>
+                  <span className="pb-ring-sub">пройдено</span>
+                </div>
+              </div>
+              <div className="pb-steps">
+                <div className="pb-title">Прогресс профориентационной диагностики</div>
+                <ul className="pb-steplist">
+                  {[
+                    { pos: 10, label: 'Блок 1 — анкета и интересы' },
+                    { pos: 45, label: 'Блоки 2–4 — способности и ценности' },
+                    { pos: 65, label: 'Письмо в будущее — ключевой', key: true },
+                    { pos: 100, label: 'Все 10 блоков' },
+                  ].map(m => {
+                    const reached = pct >= m.pos
+                    return (
+                      <li key={m.pos} className={'pb-step' + (reached ? ' reached' : '') + (m.key ? ' key' : '')}>
+                        <span className="pb-step-tick">{reached ? '✓' : m.pos + '%'}</span>
+                        <span className="pb-step-label">{m.label}</span>
+                      </li>
+                    )
+                  })}
+                </ul>
+                <div className="pb-hint">Минимум для первой консультации — блоки 1, 2, 3, 4 + Письмо в будущее (блок 10)</div>
               </div>
             </div>
-            <div className="pb-bar">
-              <div className="pb-track"><div className="pb-fill" style={{ width: pct + '%' }}></div></div>
-              {[
-                { pos: 10, label: 'Блок 1' },
-                { pos: 45, label: 'Блоки 2–4' },
-                { pos: 65, label: '+ Письмо', key: true },
-                { pos: 100, label: 'Всё' },
-              ].map(m => {
-                const reached = pct >= m.pos
-                return (
-                  <div
-                    key={m.pos}
-                    className={'pb-mark' + (reached ? ' reached' : '') + (m.key ? ' key' : '')}
-                    style={{ left: m.pos + '%' }}
-                  >
-                    <span className="pb-mark-dot">{reached ? '✓' : ''}</span>
-                    <span className="pb-mark-label">
-                      <b>{m.pos}%</b>
-                      <span>{m.label}</span>
-                    </span>
-                  </div>
-                )
-              })}
-            </div>
-            <div className="pb-hint">Минимум для первой консультации — блоки 1, 2, 3, 4 + Письмо в будущее (блок 10)</div>
           </div>
 
           {/* ── ОСИ ── */}
@@ -312,6 +326,8 @@ export default function Dashboard() {
                   ))}
                 </ul>
               </div>
+              {/* ── Блок «Активность» временно отключён по просьбе — вернуть позже ── */}
+              {false && (
               <div className="panel" style={{padding:'16px'}}>
                 <div className="panel-title">Активность</div>
                 <div className="activity-item" style={{padding:'8px 0',borderBottom:'none'}}>
@@ -325,6 +341,7 @@ export default function Dashboard() {
                   <div className="a-time">Сегодня</div>
                 </div>
               </div>
+              )}
             </div>
           </div>
 
@@ -374,7 +391,7 @@ export default function Dashboard() {
           {Object.entries(DEV_PROFILES).map(([key, p]) => (
             <button key={key}
               onClick={async () => { await applyDevProfile(key); navigate('/diagnostic') }}
-              style={{ background: 'var(--violet)', color: '#fff', border: 'none', borderRadius: 8, padding: '8px 14px', fontSize: 12, fontWeight: 700, cursor: 'pointer', fontFamily: "'Manrope',sans-serif", textAlign: 'left' }}>
+              style={{ background: 'var(--violet)', color: '#fff', border: 'none', borderRadius: 8, padding: '8px 14px', fontSize: 12, fontWeight: 700, cursor: 'pointer', fontFamily: "'Golos Text',sans-serif", textAlign: 'left' }}>
               ⚡ {p.label}
             </button>
           ))}
@@ -385,7 +402,7 @@ export default function Dashboard() {
             }
             window.location.reload()
           }}
-            style={{ background: 'transparent', color: 'var(--sub)', border: '1px solid var(--line2)', borderRadius: 8, padding: '6px 14px', fontSize: 11, fontWeight: 700, cursor: 'pointer', fontFamily: "'Manrope',sans-serif" }}>
+            style={{ background: 'transparent', color: 'var(--sub)', border: '1px solid var(--line2)', borderRadius: 8, padding: '6px 14px', fontSize: 11, fontWeight: 700, cursor: 'pointer', fontFamily: "'Golos Text',sans-serif" }}>
             🗑 Сбросить диагностику
           </button>
         </div>

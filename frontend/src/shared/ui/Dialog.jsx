@@ -20,7 +20,7 @@ export function alertDialog(opts = {}) {
   })
 }
 
-const btnBase = { padding: '10px 20px', borderRadius: 8, fontWeight: 700, fontSize: 13, cursor: 'pointer', fontFamily: "'Manrope',sans-serif", border: 'none' }
+const btnBase = { padding: '10px 20px', borderRadius: 8, fontWeight: 700, fontSize: 13, cursor: 'pointer', fontFamily: "'Golos Text',sans-serif", border: 'none' }
 const btnAccent = { ...btnBase, background: 'var(--accent,#5f96e9)', color: '#ffffff' }
 const btnDanger = { ...btnBase, background: 'var(--danger,#ff4d6d)', color: '#fff' }
 const btnGhost = { ...btnBase, background: 'transparent', color: 'var(--sub,#626185)', border: '1px solid var(--line2,rgba(255,255,255,.12))' }
@@ -50,7 +50,7 @@ export function DialogHost() {
 
   return (
     <div onClick={onOverlay} style={{ position: 'fixed', inset: 0, zIndex: 1000, background: 'rgba(0,0,0,.65)', backdropFilter: 'blur(4px)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 20, animation: 'cpDlgFade .15s ease' }}>
-      <div role="dialog" aria-modal="true" style={{ width: '100%', maxWidth: 400, background: 'var(--card,#eef0fb)', border: '1px solid var(--line2,rgba(255,255,255,.12))', borderRadius: 16, boxShadow: '0 24px 70px rgba(0,0,0,.6)', padding: 24, fontFamily: "'Manrope',sans-serif", animation: 'cpDlgIn .18s ease' }}>
+      <div role="dialog" aria-modal="true" style={{ width: '100%', maxWidth: 400, background: 'var(--card,#eef0fb)', border: '1px solid var(--line2,rgba(255,255,255,.12))', borderRadius: 16, boxShadow: '0 24px 70px rgba(0,0,0,.6)', padding: 24, fontFamily: "'Golos Text',sans-serif", animation: 'cpDlgIn .18s ease' }}>
         {d.title && <div style={{ fontFamily: "'Bebas Neue',sans-serif", fontSize: 24, letterSpacing: 1.5, color: 'var(--text,#25205c)', marginBottom: 10 }}>{d.title}</div>}
         <div style={{ fontSize: 14, lineHeight: 1.6, color: 'var(--sub,#626185)', whiteSpace: 'pre-line' }}>{d.message}</div>
         <div style={{ display: 'flex', gap: 10, justifyContent: 'flex-end', marginTop: 22 }}>

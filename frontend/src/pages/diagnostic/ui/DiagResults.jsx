@@ -6,7 +6,6 @@ import { getCareerTracksForProfessions } from '../../../shared/api'
 import { matchProfessions } from '../../../entities/profession'
 import { HOLLAND_PLAIN, buildHollandPortrait } from '../model/hollandPlain.js'
 import { PERSONALITY_PLAIN, buildPersonalityPortrait, COGNITIVE_PLAIN, buildCognitivePortrait, VALUES_PLAIN, MOTIVATION_PLAIN, READINESS_PLAIN } from '../model/resultsPlain.js'
-import { HOLLAND_SHORT as TYPE_NAMES } from '../model/hollandTypes'
 import Mascot from './mascot/Mascot'
 import ThemeToggle from '../../../shared/ui/ThemeToggle.jsx'
 import { MASCOT_RESULTS_LINE } from '../model/mascotLines'
@@ -22,28 +21,44 @@ const MOTIV = MOTIVATION_PLAIN
 const READY_NAMES = Object.fromEntries(Object.entries(READINESS_PLAIN).map(([k, v]) => [k, v.title]))
 const READY_COLORS = { HH: 'var(--accent)', HT: 'var(--violet)', HZ: 'var(--ember)', HX: 'var(--gold)', HP: 'var(--ok)' }
 const SE_NAMES = { S: 'Люди', I: 'Аналитика', A: 'Творчество', E: 'Лидерство', C: 'Системность' }
+// Цвета типов Holland — согласованы с плашками на странице результата (result.css).
+const HOLLAND_COLOR = { R: '#c25686', I: '#3f77cf', A: '#7a5bd6', S: '#2b8f6b', E: '#b57e1f', C: '#d63456' }
 
-function HollandRadar({ scores }) {
-  const types = ['R', 'I', 'A', 'S', 'E', 'C']
-  const cx = 130, cy = 125, R = 92
-  const pt = (i, v) => { const ang = (Math.PI * 2 * i / 6) - Math.PI / 2; return [cx + R * v * Math.cos(ang), cy + R * v * Math.sin(ang)] }
-  const poly = types.map((t, i) => pt(i, (scores[t] || 0) / 100).map(n => n.toFixed(1)).join(',')).join(' ')
-  const rings = [1, 0.66, 0.33].map((s, k) => (
-    <polygon key={k} points={types.map((_, i) => pt(i, s).map(n => n.toFixed(1)).join(',')).join(' ')} fill="none" stroke={`rgba(var(--overlay-rgb),${0.06 * s})`} strokeWidth="1" />
-  ))
-  const axes = types.map((_, i) => { const [x, y] = pt(i, 1); return <line key={i} x1={cx} y1={cy} x2={x.toFixed(1)} y2={y.toFixed(1)} stroke="rgba(var(--overlay-rgb),0.08)" /> })
-  const labels = types.map((t, i) => {
-    const [lx, ly] = pt(i, 1.18); const anchor = lx < cx - 5 ? 'end' : lx > cx + 5 ? 'start' : 'middle'
-    return <text key={i} x={lx.toFixed(1)} y={(ly + 4).toFixed(1)} textAnchor={anchor} fill="var(--sub)" fontSize="10" fontFamily="Manrope">{TYPE_NAMES[t]}</text>
-  })
-  const dots = types.map((t, i) => { const [x, y] = pt(i, (scores[t] || 0) / 100); return <circle key={i} cx={x.toFixed(1)} cy={y.toFixed(1)} r="4" fill="var(--accent)" /> })
+// Уровень словами по баллу (нейтрально, без оценки «хорошо/плохо» — годится и для тревожности).
+function levelInfo(v) {
+  if (v >= 75) return { label: 'Ярко выражено', color: '#1a9d5c' }
+  if (v >= 55) return { label: 'Заметно', color: '#4079d3' }
+  if (v >= 35) return { label: 'Умеренно', color: '#b57e1f' }
+  return { label: 'Слабо', color: '#82819b' }
+}
+
+function BlockHead({ icon, color, title, sub }) {
   return (
-    <svg viewBox="-48 -6 356 290" style={{ width: '100%', maxWidth: 320 }} xmlns="http://www.w3.org/2000/svg">
-      <defs><linearGradient id="rg" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stopColor="var(--violet)" stopOpacity="0.3" /><stop offset="100%" stopColor="var(--accent)" stopOpacity="0.3" /></linearGradient></defs>
-      {rings}{axes}
-      <polygon points={poly} fill="url(#rg)" stroke="var(--accent)" strokeWidth="2" />
-      {dots}{labels}
-    </svg>
+    <>
+      <div className="block-head"><span className="bh-ic" style={{ background: color + '18', color }}>{icon}</span><h3>{title}</h3></div>
+      {sub && <div className="block-head-sub">{sub}</div>}
+    </>
+  )
+}
+
+// Метрики-карточки: число + уровень словами + смысл (шаблонный текст из *_PLAIN).
+function MetricGrid({ items }) {
+  return (
+    <div className="metrics">
+      {items.map(it => {
+        const lv = levelInfo(it.v)
+        return (
+          <div key={it.key} className="metric">
+            <div className="metric__top">
+              <span className="metric__name">{it.name}</span>
+              <span className="metric__num" style={{ color: it.color }}>{it.v}</span>
+            </div>
+            <span className="metric__lvl" style={{ background: lv.color + '1f', color: lv.color }}>{lv.label}</span>
+            {it.mean && <div className="metric__mean">{it.mean}</div>}
+          </div>
+        )
+      })}
+    </div>
   )
 }
 
@@ -103,7 +118,7 @@ export default function DiagResults() {
   if (!has) {
     return (
       <div className="cp-diag">
-        <div className="topbar"><div className="tb-left"><div className="tb-logo" onClick={() => navigate('/dashboard')}><div className="tb-logo-mark">⚡</div>CAREER<span>PULSE</span></div></div><div style={{ display: 'flex', alignItems: 'center', gap: 12 }}><ThemeToggle /><button className="tb-btn" onClick={() => navigate('/dashboard')}>← В кабинет</button></div></div>
+        <div className="topbar"><div className="tb-left"><div className="tb-logo" onClick={() => navigate('/dashboard')}><div className="tb-logo-mark"><svg viewBox="0 0 32 32" width="13" height="13" aria-hidden="true"><path d="M17.8 4.5 8.5 18.2h6.1L13 27.5 23.5 13.4h-6.1z" fill="#fff"/></svg></div>CAREER<span>PULSE</span></div></div><div style={{ display: 'flex', alignItems: 'center', gap: 12 }}><ThemeToggle /><button className="tb-btn" onClick={() => navigate('/dashboard')}>← В кабинет</button></div></div>
         <div className="container">
           <div className="block-title" style={{ marginTop: 40 }}>РЕЗУЛЬТАТОВ ПОКА НЕТ</div>
           <div className="block-desc">Пройди хотя бы один блок диагностики — и здесь появится твой профиль.</div>
@@ -127,7 +142,7 @@ export default function DiagResults() {
   return (
     <div className="cp-diag">
       <div className="topbar">
-        <div className="tb-left"><div className="tb-logo" onClick={() => navigate('/dashboard')}><div className="tb-logo-mark">⚡</div>CAREER<span>PULSE</span></div><div className="tb-divider"></div><div className="tb-block">Готовность профиля: <b>{progress.pct}%</b></div></div>
+        <div className="tb-left"><div className="tb-logo" onClick={() => navigate('/dashboard')}><div className="tb-logo-mark"><svg viewBox="0 0 32 32" width="13" height="13" aria-hidden="true"><path d="M17.8 4.5 8.5 18.2h6.1L13 27.5 23.5 13.4h-6.1z" fill="#fff"/></svg></div>CAREER<span>PULSE</span></div><div className="tb-divider"></div><div className="tb-block">Готовность профиля: <b>{progress.pct}%</b></div></div>
         <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
           <ThemeToggle />
           <button className="tb-btn" onClick={() => navigate('/dashboard')}>← В кабинет</button>
@@ -149,7 +164,7 @@ export default function DiagResults() {
               </div>
               {repLoading && <div style={{ color: 'var(--sub)', fontSize: 14 }}>Пока думаю над твоим разбором… ⏳</div>}
               {!repLoading && report?.full_report && (
-                <div style={{ fontSize: 14.5, lineHeight: 1.8, color: 'var(--text)' }}>
+                <div style={{ fontSize: 16, lineHeight: 1.75, color: 'var(--text)', maxWidth: '65ch' }}>
                   {String(report.full_report).split(/\n+/).map(s => s.trim()).filter(Boolean).map((para, i) => (
                     <p key={i} style={{ margin: i === 0 ? 0 : '12px 0 0' }}>{para}</p>
                   ))}
@@ -245,8 +260,8 @@ export default function DiagResults() {
 
         {arche.length > 0 && (
           <div style={{ marginTop: 24 }}>
-            <div className="r-label" style={{ color: 'var(--accent)', marginBottom: 4 }}>Типология личности</div>
-            <div style={{ fontSize: 12, color: 'var(--ghost)', marginBottom: 10 }}>Один и тот же человек можно описать с четырёх разных сторон — ниже эти четыре взгляда на тебя</div>
+            <BlockHead icon="🧩" color="#4079d3" title="Типология личности"
+              sub="Один и тот же человек можно описать с четырёх разных сторон — ниже эти четыре взгляда на тебя." />
             <div className="r-grid" style={{ gridTemplateColumns: 'repeat(2,1fr)' }}>
               {arche.map(([label, val, hint]) => (
                 <div key={label} className="r-card">
@@ -261,85 +276,94 @@ export default function DiagResults() {
 
         {profile.holland_scores && (
           <div className="r-card" style={{ marginTop: 18 }}>
-            <div className="r-label" style={{ marginBottom: 8 }}>Что тебе интересно на самом деле</div>
+            <BlockHead icon="🧭" color="#3f77cf" title="Что тебе интересно" />
             {profile.holland_top2?.length === 2 && (
-              <div style={{ fontSize: 14.5, lineHeight: 1.7, color: 'var(--text)', marginBottom: 16 }}>
+              <div className="block-intro">
                 {buildHollandPortrait(profile.holland_top2, profile.career_archetype)}
               </div>
             )}
-            <div style={{ display: 'flex', justifyContent: 'center', textAlign: 'center' }}>
-              <HollandRadar scores={profile.holland_scores} />
-            </div>
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))', gap: 8, marginTop: 14 }}>
-              {['R', 'I', 'A', 'S', 'E', 'C'].map(t => {
-                const isTop = profile.holland_top2?.includes(t)
-                const p = HOLLAND_PLAIN[t]
-                return (
-                  <div key={t} style={{
-                    padding: '8px 10px', borderRadius: 8, fontSize: 12, lineHeight: 1.5,
-                    background: isTop ? 'rgba(95,150,233,.08)' : 'transparent',
-                    border: `1px solid ${isTop ? 'rgba(95,150,233,.3)' : 'var(--line)'}`,
-                    color: isTop ? 'var(--text)' : 'var(--ghost)',
-                  }}>
-                    <div style={{ fontWeight: 700, marginBottom: 2 }}>{p.emoji} {p.title}</div>
-                    <div>{p.tags.join(' · ')}</div>
+            {(() => {
+              const ranked = ['R', 'I', 'A', 'S', 'E', 'C']
+                .map(t => ({ t, v: Math.round(profile.holland_scores[t] || 0), p: HOLLAND_PLAIN[t], c: HOLLAND_COLOR[t] }))
+                .sort((a, b) => b.v - a.v)
+              const [lead, ...rest] = ranked
+              return (
+                <div className="holland-soty">
+                  <div className="hs-lead" style={{ borderLeftColor: lead.c }}>
+                    <span className="hs-lead-badge" style={{ color: lead.c, background: lead.c + '1f' }}>★ Твой ведущий тип</span>
+                    <div className="hs-lead-name" style={{ color: lead.c }}>{lead.p.emoji} {lead.p.title}</div>
+                    <div className="hs-lead-mean">{lead.p.hook}</div>
+                    <div className="hs-metric">
+                      <span className="hs-metric-cap">Насколько это про тебя</span>
+                      <div className="hs-track"><div className="hs-fill" style={{ width: lead.v + '%', background: lead.c }} /></div>
+                      <span className="hs-val">{lead.v}%</span>
+                    </div>
                   </div>
-                )
-              })}
-            </div>
+                  <div className="hs-grid">
+                    {rest.map(({ t, v, p, c }) => (
+                      <div key={t} className="hs-card">
+                        <div className="hs-card-top">
+                          <span className="hs-card-name" style={{ color: c }}>{p.emoji} {p.title}</span>
+                          <span className="hs-val">{v}%</span>
+                        </div>
+                        <div className="hs-card-mean">{p.tags.join(' · ')}</div>
+                        <div className="hs-track"><div className="hs-fill" style={{ width: v + '%', background: c }} /></div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )
+            })()}
           </div>
         )}
 
         {persOrder.some(s => pers[s] != null) && (
           <div className="r-card" style={{ marginTop: 18 }}>
-            <div className="r-label" style={{ marginBottom: 8 }}>Твой характер</div>
+            <BlockHead icon="🎭" color="#8b6fe8" title="Твой характер" />
             {buildPersonalityPortrait(pers, persOrder) && (
-              <div style={{ fontSize: 13.5, color: 'var(--text)', marginBottom: 12 }}>{buildPersonalityPortrait(pers, persOrder)}</div>
+              <div className="block-intro">{buildPersonalityPortrait(pers, persOrder)}</div>
             )}
-            {persOrder.filter(s => pers[s] != null).map(s => (
-              <div key={s} className="bar-row"><div className="bar-lbl">{SCALE_NAMES[s]}</div><div className="bar-track"><div className="bar-fill" style={{ width: pers[s] + '%', background: SCALE_COLORS[s] }}></div></div><div className="bar-val">{Math.round(pers[s])}</div></div>
-            ))}
+            <MetricGrid items={persOrder.filter(s => pers[s] != null).map(s => ({ key: s, name: SCALE_NAMES[s], v: Math.round(pers[s]), color: SCALE_COLORS[s], mean: PERSONALITY_PLAIN[s]?.hook }))} />
           </div>
         )}
 
         {cogSorted.length > 0 && (
           <div className="r-card" style={{ marginTop: 18 }}>
-            <div className="r-label" style={{ marginBottom: 8 }}>Как тебе легче думать и учиться {profile.vark_style ? `· стиль ${VARK_NAMES[profile.vark_style] || profile.vark_style}` : ''}</div>
+            <BlockHead icon="🧠" color="#4079d3" title={`Как тебе легче думать и учиться${profile.vark_style ? ` · ${VARK_NAMES[profile.vark_style] || profile.vark_style}` : ''}`} />
             {buildCognitivePortrait(cogSorted) && (
-              <div style={{ fontSize: 13.5, color: 'var(--text)', marginBottom: 12 }}>{buildCognitivePortrait(cogSorted)}</div>
+              <div className="block-intro">{buildCognitivePortrait(cogSorted)}</div>
             )}
-            {cogSorted.map(([k, v], i) => (
-              <div key={k} className="bar-row"><div className="bar-lbl">{COG_NAMES[k] || k}</div><div className="bar-track"><div className="bar-fill" style={{ width: v + '%', background: COG_COLORS[i % 7] }}></div></div><div className="bar-val">{Math.round(v)}</div></div>
-            ))}
+            <MetricGrid items={cogSorted.map(([k, v], i) => ({ key: k, name: COG_NAMES[k] || k, v: Math.round(v), color: COG_COLORS[i % 7], mean: COGNITIVE_PLAIN[k]?.hook }))} />
           </div>
         )}
 
         {(profile.values_archetype || profile.values_top3) && (
           <div className="r-card" style={{ marginTop: 18 }}>
-            <div className="r-label" style={{ marginBottom: 4 }}>Что для тебя важно в работе</div>
-            <div style={{ fontSize: 12, color: 'var(--ghost)', marginBottom: 10 }}>Все 8 ценностей, от самой важной для тебя до наименее важной — не абсолютные баллы, а то, что ты выбирал(а) чаще при сравнении друг с другом</div>
+            <BlockHead icon="💎" color="#4a82db" title="Что для тебя важно в работе"
+              sub="Все 8 ценностей — от самой важной к наименее важной (по тому, что ты выбирал(а) чаще при сравнении друг с другом)." />
             {profile.motivation_type && MOTIV[profile.motivation_type] && (
-              <div style={{ fontSize: 14, color: 'var(--text)', marginBottom: 12 }}>В целом {MOTIV[profile.motivation_type]}.</div>
+              <div className="block-intro">В целом {MOTIV[profile.motivation_type]}.</div>
             )}
-            {Object.keys(VALUES_PLAIN)
-              .map(k => [k, profile[k]])
-              .filter(([, v]) => v != null)
-              .sort((a, b) => b[1] - a[1])
-              .map(([k, v], i) => (
-                <div key={k} className="bar-row" title={VALUES_PLAIN[k]?.hint || ''}>
-                  <div className="bar-lbl">{i + 1}. {VALUE_NAMES[k] || k}</div>
-                  <div className="bar-track"><div className="bar-fill" style={{ width: v + '%', background: COG_COLORS[i % 7] }}></div></div>
-                  <div className="bar-val">{Math.round(v)}</div>
-                </div>
-              ))}
-            {profile.values_consistency != null && <div style={{ fontSize: 12, color: 'var(--ghost)', marginTop: 8 }}>Насколько твои ответы были последовательны: {profile.values_consistency}%</div>}
+            <div className="metrics">
+              {Object.keys(VALUES_PLAIN)
+                .map(k => [k, profile[k]])
+                .filter(([, v]) => v != null)
+                .sort((a, b) => b[1] - a[1])
+                .map(([k], i) => (
+                  <div key={k} className="metric">
+                    <div className="metric__top"><span className="metric__name">{VALUE_NAMES[k] || k}</span><span className="metric__rank">#{i + 1}</span></div>
+                    <div className="metric__mean">{VALUES_PLAIN[k]?.hint}</div>
+                  </div>
+                ))}
+            </div>
+            {profile.values_consistency != null && <div style={{ fontSize: 12, color: 'var(--ghost)', marginTop: 10 }}>Насколько твои ответы были последовательны: {profile.values_consistency}%</div>}
           </div>
         )}
 
         {profile.readiness_scores && (
           <div className="r-card" style={{ marginTop: 18 }}>
-            <div className="r-label" style={{ marginBottom: 4 }}>Насколько ты готов(а) к разным видам работы</div>
-            <div style={{ fontSize: 12, color: 'var(--ghost)', marginBottom: 12 }}>Верхняя полоса — как ты сам(а) себя оцениваешь, нижняя — что показал реальный опыт (кружки, проекты, подработки)</div>
+            <BlockHead icon="🎯" color="#e8a0c4" title="Насколько ты готов(а) к разным видам работы"
+              sub="Верхняя полоса — как ты сам(а) себя оцениваешь, нижняя — что показал реальный опыт (кружки, проекты, подработки)." />
             {Object.entries(profile.readiness_scores).sort((a, b) => (b[1].combined || 0) - (a[1].combined || 0)).map(([code, d]) => {
               const c = READY_COLORS[code] || 'var(--accent)'
               return (
@@ -357,10 +381,8 @@ export default function DiagResults() {
 
         {profile.se_confidence && (
           <div className="r-card" style={{ marginTop: 18 }}>
-            <div className="r-label" style={{ marginBottom: 12 }}>В чём ты увереннее всего</div>
-            {Object.entries(profile.se_confidence).sort((a, b) => b[1] - a[1]).map(([d, v], i) => (
-              <div key={d} className="bar-row"><div className="bar-lbl">{SE_NAMES[d] || d}</div><div className="bar-track"><div className="bar-fill" style={{ width: v + '%', background: COG_COLORS[i % 7] }}></div></div><div className="bar-val">{Math.round(v)}</div></div>
-            ))}
+            <BlockHead icon="⭐" color="#1a9d5c" title="В чём ты увереннее всего" />
+            <MetricGrid items={Object.entries(profile.se_confidence).sort((a, b) => b[1] - a[1]).map(([d, v], i) => ({ key: d, name: SE_NAMES[d] || d, v: Math.round(v), color: COG_COLORS[i % 7] }))} />
           </div>
         )}
 
