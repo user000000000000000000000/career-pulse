@@ -4,7 +4,7 @@
  */
 export const config = {
   // === ЖЁСТКО ЗАДАННЫЕ ЗНАЧЕНИЯ ДЛЯ SELF-HOSTED SUPABASE ===
-  supabaseUrl: 'http://158.160.195.69:8000',
+  supabaseUrl: 'https://ave-organic-purposes-mate.trycloudflare.com',
   supabaseAnonKey: 'SqE93G9MQHC0Ou9Mt3MRnl3H3K94M/3bhjxlXl8ahAijRfKHvf68dQ==',
 
   // === ОСТАЛЬНЫЕ ПЕРЕМЕННЫЕ (если нужны) ===
