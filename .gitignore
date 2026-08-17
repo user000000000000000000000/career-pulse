@@ -27,3 +27,13 @@ id_rsa.pub
 .impeccable/
 .github/hooks/
 .claude/skills/playwright-cli/
+id_ed25519.pub
+id_ed25519.txt
+id_rsa_yc.pub
+id_rsa_yc.txt
+supabase_backup.dump
+supabase_backup.sql
+supabase_data_only.sql
+supabase_my_tables.sql
+ubuntu.pub
+ubuntu.txt
