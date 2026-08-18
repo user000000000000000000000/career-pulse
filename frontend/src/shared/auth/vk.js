@@ -76,45 +76,22 @@ export async function handleVkRedirect(navigate) {
       throw new Error('Не найден code_verifier для PKCE')
     }
 
-    // ─── ПРЯМОЙ ЗАПРОС К SUPABASE AUTH ───
-    const response = await fetch('https://supabase.careerpulse.ru/auth/v1/token', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'apikey': config.supabaseAnonKey,
-      },
-      body: JSON.stringify({
-        grant_type: 'pkce',
-        auth_code: code,
-        code_verifier: verifier,
-      }),
-    })
+    // ─── ИСПОЛЬЗУЕМ СТАНДАРТНЫЙ МЕТОД SDK ───
+    const { data, error } = await supabase.auth.exchangeCodeForSession(code, verifier)
 
-    // ─── ВЫВОДИМ ПОЛНЫЙ ОТВЕТ ───
-    const data = await response.json()
-    console.log('📦 Ответ Supabase:', data)
-
-    if (!response.ok) {
-      throw new Error(`HTTP ${response.status}: ${JSON.stringify(data)}`)
+    if (error) {
+      console.error('[VK] Ошибка обмена кода:', error)
+      throw new Error(error.message)
     }
 
     console.log('[VK] Сессия получена:', data)
 
-    if (data.access_token) {
-      await supabase.auth.setSession({
-        access_token: data.access_token,
-        refresh_token: data.refresh_token,
-      })
-    } else {
-      throw new Error('Не удалось получить access_token')
-    }
-
-    localStorage.removeItem(STORAGE_KEYS.vkVerifier)
-
+    // Если сессия получена, пробуем получить пользователя
     const { data: { user }, error: userError } = await supabase.auth.getUser()
     if (userError) throw userError
 
     if (user) {
+      // Проверяем, есть ли профиль в таблице profiles
       const { data: profile } = await supabase
         .from('profiles')
         .select('full_name, avatar_url')
