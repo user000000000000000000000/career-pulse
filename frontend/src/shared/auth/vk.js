@@ -76,17 +76,17 @@ export async function handleVkRedirect(navigate) {
       throw new Error('Не найден code_verifier для PKCE')
     }
 
-    // ─── ОБМЕН КОДА НА СЕССИЮ (ВАРИАНТ 2) ───
-    const response = await fetch('https://supabase.careerpulse.ru/auth/v1/token?grant_type=authorization_code', {
+    // ─── ПРАВИЛЬНЫЙ ЗАПРОС ДЛЯ SELF-HOSTED SUPABASE ───
+    const response = await fetch('https://supabase.careerpulse.ru/auth/v1/token', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
         'apikey': config.supabaseAnonKey,
       },
       body: JSON.stringify({
-        code: code,
+        grant_type: 'pkce',
+        auth_code: code,
         code_verifier: verifier,
-        grant_type: 'authorization_code',
       }),
     })
 
