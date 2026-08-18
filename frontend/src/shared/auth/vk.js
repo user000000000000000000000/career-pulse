@@ -79,7 +79,7 @@ export async function handleVkRedirect(navigate) {
     console.log('🔑 Код:', code)
     console.log('🔑 Верификатор:', verifier)
 
-    // ─── ПРЯМОЙ FETCH ЗАПРОС (гарантированно работает) ───
+    // ─── ПРЯМОЙ FETCH ЧЕРЕЗ authorization_code ───
     const response = await fetch('https://supabase.careerpulse.ru/auth/v1/token', {
       method: 'POST',
       headers: {
@@ -87,9 +87,11 @@ export async function handleVkRedirect(navigate) {
         'apikey': config.supabaseAnonKey,
       },
       body: JSON.stringify({
-        grant_type: 'pkce',
-        auth_code: code,
-        code_verifier: verifier,
+        grant_type: 'authorization_code',
+        code: code,
+        redirect_uri: vkRedirectUri(),
+        client_id: config.supabaseAnonKey,
+        client_secret: config.jwtSecret,
       }),
     })
 
