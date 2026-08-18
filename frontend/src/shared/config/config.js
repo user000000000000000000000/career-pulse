@@ -9,7 +9,7 @@ export const config = {
 
   // === ОСТАЛЬНЫЕ ПЕРЕМЕННЫЕ (если нужны) ===
   vkAppId: import.meta.env.VITE_VK_APP_ID || '',
-  vkAuthUrl: 'https://supabase.careerpulse.ru/auth/v1/callback',
+  vkAuthUrl: 'https://careerpulse.ru/login',
   analyzeDiagnosticUrl: import.meta.env.VITE_ANALYZE_DIAGNOSTIC_URL || '',
   roadmapUrl: import.meta.env.VITE_ROADMAP_URL || '',
 }
