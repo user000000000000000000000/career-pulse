@@ -55,10 +55,8 @@ export async function handleVkRedirect(navigate) {
   const state = sp.get('state')
   const savedState = localStorage.getItem(STORAGE_KEYS.vkState)
   
-  // Чистим URL от параметров
   window.history.replaceState({}, '', window.location.origin + window.location.pathname + window.location.hash)
 
-  // Проверяем CSRF защиту
   if (!savedState || state !== savedState) {
     localStorage.removeItem(STORAGE_KEYS.vkVerifier)
     localStorage.removeItem(STORAGE_KEYS.vkState)
@@ -78,7 +76,7 @@ export async function handleVkRedirect(navigate) {
       throw new Error('Не найден code_verifier для PKCE')
     }
 
-    // ─── ПРЯМОЙ FETCH ЗАПРОС (работает всегда) ───
+    // ─── ОБМЕН КОДА НА СЕССИЮ (ВАРИАНТ 2) ───
     const response = await fetch('https://supabase.careerpulse.ru/auth/v1/token?grant_type=authorization_code', {
       method: 'POST',
       headers: {
@@ -86,11 +84,9 @@ export async function handleVkRedirect(navigate) {
         'apikey': config.supabaseAnonKey,
       },
       body: JSON.stringify({
-        client_id: config.supabaseAnonKey,
         code: code,
         code_verifier: verifier,
         grant_type: 'authorization_code',
-        redirect_uri: vkRedirectUri(),
       }),
     })
 
@@ -102,7 +98,6 @@ export async function handleVkRedirect(navigate) {
     const data = await response.json()
     console.log('[VK] Сессия получена:', data)
 
-    // Сохраняем сессию в Supabase клиент
     if (data.access_token) {
       await supabase.auth.setSession({
         access_token: data.access_token,
@@ -114,7 +109,6 @@ export async function handleVkRedirect(navigate) {
 
     localStorage.removeItem(STORAGE_KEYS.vkVerifier)
 
-    // Получаем данные пользователя
     const { data: { user }, error: userError } = await supabase.auth.getUser()
     if (userError) throw userError
 
