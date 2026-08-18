@@ -66,7 +66,8 @@ export async function handleVkRedirect(navigate) {
     return false
   }
 
-  localStorage.removeItem(STORAGE_KEYS.vkVerifier)
+  // НЕ УДАЛЯЕМ verifier ДО ОБМЕНА!
+  const verifier = localStorage.getItem(STORAGE_KEYS.vkVerifier)
   localStorage.removeItem(STORAGE_KEYS.vkState)
 
   try {
@@ -74,10 +75,20 @@ export async function handleVkRedirect(navigate) {
       throw new Error('Supabase не настроен')
     }
 
-    // ─── ГЛАВНОЕ ИЗМЕНЕНИЕ: используем встроенный метод Supabase ───
-    const { data, error } = await supabase.auth.exchangeCodeForSession(code)
+    if (!verifier) {
+      throw new Error('Не найден code_verifier для PKCE')
+    }
+
+    // ─── ПРАВИЛЬНЫЙ ВЫЗОВ С CODE_VERIFIER ───
+    const { data, error } = await supabase.auth.exchangeCodeForSession({
+      authCode: code,
+      codeVerifier: verifier,
+    })
     
     if (error) throw error
+
+    // Удаляем verifier ТОЛЬКО после успешного обмена
+    localStorage.removeItem(STORAGE_KEYS.vkVerifier)
 
     // Получаем данные пользователя
     const { data: { user }, error: userError } = await supabase.auth.getUser()
@@ -93,7 +104,6 @@ export async function handleVkRedirect(navigate) {
 
       // Если профиля нет — создаём
       if (!profile) {
-        // Пытаемся извлечь имя из user_metadata
         const fullName = user.user_metadata?.full_name || user.user_metadata?.name || user.email?.split('@')[0] || 'Пользователь'
         await supabase
           .from('profiles')
