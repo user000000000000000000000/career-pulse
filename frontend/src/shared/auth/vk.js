@@ -64,6 +64,7 @@ export async function handleVkRedirect(navigate) {
     return false
   }
 
+  // ─── НЕ УДАЛЯЕМ verifier ДО ОБМЕНА ───
   const verifier = localStorage.getItem(STORAGE_KEYS.vkVerifier)
   localStorage.removeItem(STORAGE_KEYS.vkState)
 
@@ -79,7 +80,7 @@ export async function handleVkRedirect(navigate) {
     console.log('🔑 Код:', code)
     console.log('🔑 Верификатор:', verifier)
 
-    // ─── ИСПОЛЬЗУЕМ СТАНДАРТНЫЙ МЕТОД SDK ───
+    // ─── ОБМЕН КОДА ───
     const { data, error } = await supabase.auth.exchangeCodeForSession(code, verifier)
 
     if (error) {
@@ -89,6 +90,7 @@ export async function handleVkRedirect(navigate) {
 
     console.log('[VK] Сессия получена:', data)
 
+    // ─── УДАЛЯЕМ verifier ТОЛЬКО ПОСЛЕ УСПЕШНОГО ОБМЕНА ───
     localStorage.removeItem(STORAGE_KEYS.vkVerifier)
 
     // Получаем данные пользователя
