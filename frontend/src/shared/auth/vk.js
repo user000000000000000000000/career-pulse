@@ -76,7 +76,7 @@ export async function handleVkRedirect(navigate) {
       throw new Error('Не найден code_verifier для PKCE')
     }
 
-    // ─── ПРАВИЛЬНЫЙ ЗАПРОС ДЛЯ SELF-HOSTED SUPABASE ───
+    // ─── ПРЯМОЙ ЗАПРОС К SUPABASE AUTH ───
     const response = await fetch('https://supabase.careerpulse.ru/auth/v1/token', {
       method: 'POST',
       headers: {
@@ -90,12 +90,14 @@ export async function handleVkRedirect(navigate) {
       }),
     })
 
+    // ─── ВЫВОДИМ ПОЛНЫЙ ОТВЕТ ───
+    const data = await response.json()
+    console.log('📦 Ответ Supabase:', data)
+
     if (!response.ok) {
-      const errorText = await response.text()
-      throw new Error(`HTTP ${response.status}: ${errorText}`)
+      throw new Error(`HTTP ${response.status}: ${JSON.stringify(data)}`)
     }
 
-    const data = await response.json()
     console.log('[VK] Сессия получена:', data)
 
     if (data.access_token) {
