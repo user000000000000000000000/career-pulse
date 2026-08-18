@@ -66,7 +66,6 @@ export async function handleVkRedirect(navigate) {
     return false
   }
 
-  // НЕ УДАЛЯЕМ verifier ДО ОБМЕНА!
   const verifier = localStorage.getItem(STORAGE_KEYS.vkVerifier)
   localStorage.removeItem(STORAGE_KEYS.vkState)
 
@@ -79,22 +78,46 @@ export async function handleVkRedirect(navigate) {
       throw new Error('Не найден code_verifier для PKCE')
     }
 
-    // ─── ИСПРАВЛЕННЫЙ ВЫЗОВ: объект с authCode и codeVerifier ───
-    const { data, error } = await supabase.auth.exchangeCodeForSession({
-      authCode: code,
-      codeVerifier: verifier,
+    // ─── ПРЯМОЙ FETCH ЗАПРОС (работает всегда) ───
+    const response = await fetch('https://supabase.careerpulse.ru/auth/v1/token?grant_type=authorization_code', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'apikey': config.supabaseAnonKey,
+      },
+      body: JSON.stringify({
+        client_id: config.supabaseAnonKey,
+        code: code,
+        code_verifier: verifier,
+        grant_type: 'authorization_code',
+        redirect_uri: vkRedirectUri(),
+      }),
     })
-    
-    if (error) throw error
 
-    // Удаляем verifier ТОЛЬКО после успешного обмена
+    if (!response.ok) {
+      const errorText = await response.text()
+      throw new Error(`HTTP ${response.status}: ${errorText}`)
+    }
+
+    const data = await response.json()
+    console.log('[VK] Сессия получена:', data)
+
+    // Сохраняем сессию в Supabase клиент
+    if (data.access_token) {
+      await supabase.auth.setSession({
+        access_token: data.access_token,
+        refresh_token: data.refresh_token,
+      })
+    } else {
+      throw new Error('Не удалось получить access_token')
+    }
+
     localStorage.removeItem(STORAGE_KEYS.vkVerifier)
 
     // Получаем данные пользователя
     const { data: { user }, error: userError } = await supabase.auth.getUser()
     if (userError) throw userError
 
-    // Если есть профиль в ответе — обновляем
     if (user) {
       const { data: profile } = await supabase
         .from('profiles')
@@ -102,7 +125,6 @@ export async function handleVkRedirect(navigate) {
         .eq('id', user.id)
         .single()
 
-      // Если профиля нет — создаём
       if (!profile) {
         const fullName = user.user_metadata?.full_name || user.user_metadata?.name || user.email?.split('@')[0] || 'Пользователь'
         await supabase
@@ -110,7 +132,6 @@ export async function handleVkRedirect(navigate) {
           .insert({ id: user.id, full_name: fullName, avatar_url: user.user_metadata?.avatar_url || null })
       }
       
-      // Перенаправляем
       navigate(user.user_metadata?.consent_at ? '/dashboard' : '/vk-consent')
       return true
     }
