@@ -44,7 +44,7 @@ export async function startVkLogin() {
 
 let vkExchangeInFlight = false
 
-/** Обработка возврата от VK: обмен кода через Supabase Auth. */
+/** Обработка возврата от VK: обмен кода через VK API + ручная сессия. */
 export async function handleVkRedirect(navigate) {
   const sp = new URLSearchParams(window.location.search)
   const code = sp.get('code')
@@ -79,62 +79,112 @@ export async function handleVkRedirect(navigate) {
     console.log('🔑 Код:', code)
     console.log('🔑 Верификатор:', verifier)
 
-    // ─── ПРЯМОЙ FETCH ЧЕРЕЗ authorization_code ───
-    const response = await fetch('https://supabase.careerpulse.ru/auth/v1/token', {
+    // ─── 1️⃣ ОБМЕН КОДА ЧЕРЕЗ VK API ───
+    const vkTokenResponse = await fetch('https://oauth.vk.com/access_token', {
       method: 'POST',
       headers: {
-        'Content-Type': 'application/json',
-        'apikey': config.supabaseAnonKey,
+        'Content-Type': 'application/x-www-form-urlencoded',
       },
-      body: JSON.stringify({
-        grant_type: 'authorization_code',
+      body: new URLSearchParams({
+        client_id: config.vkAppId,
+        client_secret: config.vkSecret,
         code: code,
         redirect_uri: vkRedirectUri(),
-        client_id: config.supabaseAnonKey,
-        client_secret: config.jwtSecret,
       }),
     })
 
-    const data = await response.json()
-    console.log('[VK] Ответ Supabase:', data)
+    const vkData = await vkTokenResponse.json()
+    console.log('[VK] Токен получен:', vkData)
 
-    if (!response.ok) {
-      throw new Error(`HTTP ${response.status}: ${data.message || JSON.stringify(data)}`)
+    if (!vkData.access_token) {
+      throw new Error('Не удалось получить access_token от VK')
     }
 
-    if (data.access_token) {
-      await supabase.auth.setSession({
-        access_token: data.access_token,
-        refresh_token: data.refresh_token,
-      })
+    // ─── 2️⃣ ПОЛУЧАЕМ EMAIL ПОЛЬЗОВАТЕЛЯ ───
+    const userInfoResponse = await fetch(
+      `https://api.vk.com/method/users.get?user_ids=${vkData.user_id}&fields=email&access_token=${vkData.access_token}&v=5.131`
+    )
+    const userInfo = await userInfoResponse.json()
+    console.log('[VK] Данные пользователя:', userInfo)
+
+    const userData = userInfo.response?.[0]
+    if (!userData) {
+      throw new Error('Не удалось получить данные пользователя')
+    }
+
+    // ─── 3️⃣ СОЗДАЁМ ИЛИ НАХОДИМ ПОЛЬЗОВАТЕЛЯ ───
+    const email = userData.email || `${vkData.user_id}@vk.com`
+    const fullName = `${userData.first_name || ''} ${userData.last_name || ''}`.trim() || 'Пользователь VK'
+
+    let { data: existingUser } = await supabase
+      .from('profiles')
+      .select('id')
+      .eq('email', email)
+      .single()
+
+    let userId
+
+    if (existingUser) {
+      userId = existingUser.id
     } else {
-      throw new Error('Не удалось получить access_token')
+      const { data: newUser, error: createError } = await supabase
+        .from('profiles')
+        .insert({
+          email: email,
+          full_name: fullName,
+          avatar_url: userData.photo_200 || null,
+          role: 'student',
+        })
+        .select('id')
+        .single()
+
+      if (createError) {
+        console.error('[VK] Ошибка создания пользователя:', createError)
+        throw new Error('Не удалось создать пользователя')
+      }
+      userId = newUser.id
     }
+
+    // ─── 4️⃣ ГЕНЕРИРУЕМ JWT ТОКЕН ───
+    const jwtPayload = {
+      sub: userId,
+      email: email,
+      role: 'authenticated',
+      exp: Math.floor(Date.now() / 1000) + 60 * 60 * 24 * 7,
+    }
+
+    const header = btoa(JSON.stringify({ alg: 'HS256', typ: 'JWT' }))
+    const payload = btoa(JSON.stringify(jwtPayload))
+    const signature = btoa(
+      String.fromCharCode(
+        ...new Uint8Array(
+          await crypto.subtle.sign(
+            'HMAC',
+            await crypto.subtle.importKey(
+              'raw',
+              new TextEncoder().encode(config.jwtSecret),
+              { name: 'HMAC', hash: 'SHA-256' },
+              false,
+              ['sign']
+            ),
+            new TextEncoder().encode(`${header}.${payload}`)
+          )
+        )
+      )
+    )
+    const token = `${header}.${payload}.${signature}`
+
+    // ─── 5️⃣ СОХРАНЯЕМ СЕССИЮ ───
+    localStorage.setItem('supabase.auth.token', JSON.stringify({
+      access_token: token,
+      refresh_token: token,
+      expires_at: Date.now() + 7 * 24 * 60 * 60 * 1000,
+    }))
 
     localStorage.removeItem(STORAGE_KEYS.vkVerifier)
 
-    const { data: { user }, error: userError } = await supabase.auth.getUser()
-    if (userError) throw userError
-
-    if (user) {
-      const { data: profile } = await supabase
-        .from('profiles')
-        .select('full_name, avatar_url')
-        .eq('id', user.id)
-        .single()
-
-      if (!profile) {
-        const fullName = user.user_metadata?.full_name || user.user_metadata?.name || user.email?.split('@')[0] || 'Пользователь'
-        await supabase
-          .from('profiles')
-          .insert({ id: user.id, full_name: fullName, avatar_url: user.user_metadata?.avatar_url || null })
-      }
-      
-      navigate(user.user_metadata?.consent_at ? '/dashboard' : '/vk-consent')
-      return true
-    }
-
-    return false
+    navigate('/dashboard')
+    return true
   } catch (e) {
     console.error('[VK] auth error', e)
     alertDialog({ title: 'ВКонтакте', message: 'Не удалось войти через ВКонтакте: ' + (e.message || e) })
