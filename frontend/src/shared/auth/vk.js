@@ -79,44 +79,24 @@ export async function handleVkRedirect(navigate) {
     console.log('🔑 Код:', code)
     console.log('🔑 Верификатор:', verifier)
 
-    // ─── ОБМЕН КОДА ЧЕРЕЗ SUPABASE AUTH (с client_secret) ───
-    const response = await fetch('https://supabase.careerpulse.ru/auth/v1/token', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'apikey': config.supabaseAnonKey,
-      },
-      body: JSON.stringify({
-        grant_type: 'authorization_code',
-        client_id: config.supabaseAnonKey,
-        client_secret: config.jwtSecret,
-        code: code,
-        redirect_uri: vkRedirectUri(),
-      }),
-    })
+    // ─── ИСПОЛЬЗУЕМ СТАНДАРТНЫЙ МЕТОД SDK ───
+    const { data, error } = await supabase.auth.exchangeCodeForSession(code, verifier)
 
-    const data = await response.json()
-    console.log('[VK] Ответ Supabase:', data)
-
-    if (!response.ok) {
-      throw new Error(`HTTP ${response.status}: ${data.message || JSON.stringify(data)}`)
+    if (error) {
+      console.error('[VK] Ошибка обмена кода:', error)
+      throw new Error(error.message)
     }
 
-    if (data.access_token) {
-      await supabase.auth.setSession({
-        access_token: data.access_token,
-        refresh_token: data.refresh_token,
-      })
-    } else {
-      throw new Error('Не удалось получить access_token')
-    }
+    console.log('[VK] Сессия получена:', data)
 
     localStorage.removeItem(STORAGE_KEYS.vkVerifier)
 
+    // Получаем данные пользователя
     const { data: { user }, error: userError } = await supabase.auth.getUser()
     if (userError) throw userError
 
     if (user) {
+      // Проверяем, есть ли профиль
       const { data: profile } = await supabase
         .from('profiles')
         .select('full_name, avatar_url')
