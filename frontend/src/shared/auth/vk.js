@@ -79,8 +79,11 @@ export async function handleVkRedirect(navigate) {
       throw new Error('Не найден code_verifier для PKCE')
     }
 
-    // ─── ПРАВИЛЬНЫЙ ВЫЗОВ: два аргумента ───
-    const { data, error } = await supabase.auth.exchangeCodeForSession(code, verifier)
+    // ─── ИСПРАВЛЕННЫЙ ВЫЗОВ: объект с authCode и codeVerifier ───
+    const { data, error } = await supabase.auth.exchangeCodeForSession({
+      authCode: code,
+      codeVerifier: verifier,
+    })
     
     if (error) throw error
 
