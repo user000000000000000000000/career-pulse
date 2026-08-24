@@ -230,18 +230,48 @@ export function getProfessionById(id) {
   return PROFESSIONS.find(p => p.id === id)
 }
 
+// Категория профессии → ось «готовности» (readiness) диагностики.
+// HH=люди HT=техника HZ=данные/тексты HX=творческие образы HP=природа.
+// Нужен как ВТОРОЙ сигнал: у многих профессий одинаковый Holland-код
+// (напр. IT и инженерия обе ['R','I']) — по Holland они неотличимы, и
+// готовность помогает развести их по интересам конкретного человека.
+const CATEGORY_READINESS = {
+  'IT': 'HT', 'Инженерия': 'HT', 'Транспорт': 'HT', 'Энергетика': 'HT',
+  'Медицина': 'HH', 'Образование': 'HH', 'HR': 'HH', 'Продажи': 'HH',
+  'Управление': 'HH', 'Социальная сфера': 'HH', 'Спорт': 'HH',
+  'Предпринимательство': 'HH', 'Международные отношения': 'HH', 'Маркетинг': 'HH',
+  'Финансы': 'HZ', 'Аналитика': 'HZ', 'Наука': 'HZ', 'Право': 'HZ',
+  'Логистика': 'HZ', 'Консалтинг': 'HZ', 'Госслужба': 'HZ', 'История и культура': 'HZ',
+  'Дизайн': 'HX', 'Творчество': 'HX', 'Медиа': 'HX',
+  'Сельское хозяйство': 'HP',
+}
+
+function readinessPct(readiness, dim) {
+  const r = readiness && readiness[dim]
+  if (!r) return null
+  if (r.combined != null) return r.combined
+  const a = r.ability_pct, e = r.experience_pct
+  if (a != null && e != null) return (a + e) / 2
+  return a ?? e ?? null
+}
+
 /**
- * Подбор подходящих профессий ИЗ АТЛАСА по Holland-профилю пользователя.
- * Считает совпадение как средний балл пользователя по Holland-кодам профессии
- * (первый код профессии весит больше). Возвращает топ с полем match (0–100).
+ * Подбор подходящих профессий ИЗ АТЛАСА.
+ * Совпадение = 70% Holland-фит + 30% «готовность» по категории профессии.
+ * Holland-фит масштабируется к топ-баллу человека, поэтому лучшие профессии
+ * читаются как ~85–95% (а не сжато у всех ~50%), а второй сигнал (готовность)
+ * разводит профессии с одинаковым Holland-кодом. Возвращает топ с полем match (0–100).
  *
- * @param {object} profile  агрегированный профиль (нужен holland_scores)
+ * @param {object} profile  агрегированный профиль (нужны holland_scores; readiness_scores — опционально)
  * @param {number} limit    сколько вернуть
  */
 export function matchProfessions(profile = {}, limit = 8) {
   const scores = profile.holland_scores || {}
   if (!Object.keys(scores).length) return []
   const W = [1, 0.7, 0.45] // веса по позиции кода в профессии
+  const maxH = Math.max(...Object.values(scores)) || 1 // топ-балл человека — для масштаба
+  const readiness = profile.readiness_scores || null
+
   const ranked = PROFESSIONS.map(p => {
     let sum = 0, wsum = 0
     p.holland.forEach((code, i) => {
@@ -249,7 +279,12 @@ export function matchProfessions(profile = {}, limit = 8) {
       sum += (scores[code] || 0) * w
       wsum += w
     })
-    return { ...p, match: wsum ? Math.round(sum / wsum) : 0 }
+    const hFit = wsum ? (sum / wsum) / maxH : 0 // 0..1, ~1 когда коды совпали с топ-типами
+
+    const rPct = readinessPct(readiness, CATEGORY_READINESS[p.category])
+    const combined = rPct != null ? 0.7 * hFit + 0.3 * (rPct / 100) : hFit
+
+    return { ...p, match: Math.max(0, Math.min(100, Math.round(combined * 100))) }
   }).sort((a, b) => b.match - a.match)
   return ranked.slice(0, limit)
 }
