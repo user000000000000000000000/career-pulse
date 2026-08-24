@@ -44,7 +44,9 @@ export async function startVkLogin() {
 
 let vkExchangeInFlight = false
 
-/** Обработка возврата от VK: обмен кода через VK API + ручная сессия. */
+/** Обработка возврата от VK: обмен кода делает edge-функция vk-auth (СЕРВЕР),
+ *  фронт лишь ставит сессию Supabase по одноразовому token_hash.
+ *  В браузере обменивать код и держать client_secret нельзя (CORS + утечка секрета). */
 export async function handleVkRedirect(navigate) {
   const sp = new URLSearchParams(window.location.search)
   const code = sp.get('code')
@@ -53,13 +55,15 @@ export async function handleVkRedirect(navigate) {
   vkExchangeInFlight = true
 
   const state = sp.get('state')
+  const deviceId = sp.get('device_id') || ''
   const savedState = localStorage.getItem(STORAGE_KEYS.vkState)
-  
+
   window.history.replaceState({}, '', window.location.origin + window.location.pathname + window.location.hash)
 
   if (!savedState || state !== savedState) {
     localStorage.removeItem(STORAGE_KEYS.vkVerifier)
     localStorage.removeItem(STORAGE_KEYS.vkState)
+    vkExchangeInFlight = false
     alertDialog({ title: 'ВКонтакте', message: 'Не удалось подтвердить запрос входа — попробуй ещё раз.' })
     return false
   }
@@ -68,126 +72,42 @@ export async function handleVkRedirect(navigate) {
   localStorage.removeItem(STORAGE_KEYS.vkState)
 
   try {
-    if (!isSupabaseConfigured) {
-      throw new Error('Supabase не настроен')
-    }
+    if (!isSupabaseConfigured) throw new Error('Supabase не настроен')
+    if (!verifier) throw new Error('Не найден code_verifier для PKCE')
 
-    if (!verifier) {
-      throw new Error('Не найден code_verifier для PKCE')
-    }
-
-    console.log('🔑 Код:', code)
-    console.log('🔑 Верификатор:', verifier)
-
-    // ─── 1️⃣ ОБМЕН КОДА ЧЕРЕЗ VK API ───
-    const vkTokenResponse = await fetch('https://oauth.vk.com/access_token', {
+    // Обмен кода → сессия: на сервере, edge-функция vk-auth.
+    const fnUrl = config.vkAuthUrl || `${config.supabaseUrl}/functions/v1/vk-auth`
+    const res = await fetch(fnUrl, {
       method: 'POST',
       headers: {
-        'Content-Type': 'application/x-www-form-urlencoded',
+        'Content-Type': 'application/json',
+        apikey: config.supabaseAnonKey,
+        Authorization: `Bearer ${config.supabaseAnonKey}`,
       },
-      body: new URLSearchParams({
-        client_id: config.vkAppId,
-        client_secret: config.vkSecret,
-        code: code,
+      body: JSON.stringify({
+        code,
+        code_verifier: verifier,
+        device_id: deviceId,
         redirect_uri: vkRedirectUri(),
+        state,
       }),
     })
+    const data = await res.json().catch(() => ({}))
+    if (!res.ok || data.error) throw new Error(data.error || `vk-auth ${res.status}`)
+    if (!data.token_hash) throw new Error('Сервер не вернул сессию')
 
-    const vkData = await vkTokenResponse.json()
-    console.log('[VK] Токен получен:', vkData)
-
-    if (!vkData.access_token) {
-      throw new Error('Не удалось получить access_token от VK')
-    }
-
-    // ─── 2️⃣ ПОЛУЧАЕМ EMAIL ПОЛЬЗОВАТЕЛЯ ───
-    const userInfoResponse = await fetch(
-      `https://api.vk.com/method/users.get?user_ids=${vkData.user_id}&fields=email&access_token=${vkData.access_token}&v=5.131`
-    )
-    const userInfo = await userInfoResponse.json()
-    console.log('[VK] Данные пользователя:', userInfo)
-
-    const userData = userInfo.response?.[0]
-    if (!userData) {
-      throw new Error('Не удалось получить данные пользователя')
-    }
-
-    // ─── 3️⃣ СОЗДАЁМ ИЛИ НАХОДИМ ПОЛЬЗОВАТЕЛЯ ───
-    const email = userData.email || `${vkData.user_id}@vk.com`
-    const fullName = `${userData.first_name || ''} ${userData.last_name || ''}`.trim() || 'Пользователь VK'
-
-    let { data: existingUser } = await supabase
-      .from('profiles')
-      .select('id')
-      .eq('email', email)
-      .single()
-
-    let userId
-
-    if (existingUser) {
-      userId = existingUser.id
-    } else {
-      const { data: newUser, error: createError } = await supabase
-        .from('profiles')
-        .insert({
-          email: email,
-          full_name: fullName,
-          avatar_url: userData.photo_200 || null,
-          role: 'student',
-        })
-        .select('id')
-        .single()
-
-      if (createError) {
-        console.error('[VK] Ошибка создания пользователя:', createError)
-        throw new Error('Не удалось создать пользователя')
-      }
-      userId = newUser.id
-    }
-
-    // ─── 4️⃣ ГЕНЕРИРУЕМ JWT ТОКЕН ───
-    const jwtPayload = {
-      sub: userId,
-      email: email,
-      role: 'authenticated',
-      exp: Math.floor(Date.now() / 1000) + 60 * 60 * 24 * 7,
-    }
-
-    const header = btoa(JSON.stringify({ alg: 'HS256', typ: 'JWT' }))
-    const payload = btoa(JSON.stringify(jwtPayload))
-    const signature = btoa(
-      String.fromCharCode(
-        ...new Uint8Array(
-          await crypto.subtle.sign(
-            'HMAC',
-            await crypto.subtle.importKey(
-              'raw',
-              new TextEncoder().encode(config.jwtSecret),
-              { name: 'HMAC', hash: 'SHA-256' },
-              false,
-              ['sign']
-            ),
-            new TextEncoder().encode(`${header}.${payload}`)
-          )
-        )
-      )
-    )
-    const token = `${header}.${payload}.${signature}`
-
-    // ─── 5️⃣ СОХРАНЯЕМ СЕССИЮ ───
-    localStorage.setItem('supabase.auth.token', JSON.stringify({
-      access_token: token,
-      refresh_token: token,
-      expires_at: Date.now() + 7 * 24 * 60 * 60 * 1000,
-    }))
+    // Ставим сессию Supabase по одноразовому token_hash (magic link из vk-auth).
+    const { error } = await supabase.auth.verifyOtp({ token_hash: data.token_hash, type: 'magiclink' })
+    if (error) throw error
 
     localStorage.removeItem(STORAGE_KEYS.vkVerifier)
-
     navigate('/dashboard')
     return true
   } catch (e) {
     console.error('[VK] auth error', e)
     alertDialog({ title: 'ВКонтакте', message: 'Не удалось войти через ВКонтакте: ' + (e.message || e) })
     return false
+  } finally {
+    vkExchangeInFlight = false
   }
 }
