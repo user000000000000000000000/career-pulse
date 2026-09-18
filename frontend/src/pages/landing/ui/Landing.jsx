@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { register as doRegister, getCurrentUser, logout as doLogout } from '../../../shared/auth'
-import { isSupabaseConfigured } from '../../../shared/api'
+import { isSupabaseConfigured, publicUserCount } from '../../../shared/api'
 import { startVkLogin } from '../../../shared/auth'
 import { confirmDialog } from '../../../shared/ui/Dialog.jsx'
 import ThemeToggle from '../../../shared/ui/ThemeToggle.jsx'
@@ -28,6 +28,7 @@ export default function Landing() {
   const rootRef = useRef(null)
   const navigate = useNavigate()
   const [user, setUser] = useState(null)
+  const [userCount, setUserCount] = useState(0)
 
   // ── Форма регистрации (контролируемые поля) ──
   const [regForm, setRegForm] = useState(REG_FORM_DEFAULTS)
@@ -220,6 +221,12 @@ export default function Landing() {
         <div className="strip-num">4.8<sub>★</sub></div>
         <div className="strip-label">Средний рейтинг</div>
       </div>
+      {userCount > 0 && (
+        <div className="strip-item">
+          <div className="strip-num">{userCount}</div>
+          <div className="strip-label">Уже с нами</div>
+        </div>
+      )}
     </div>
   </div>
 </div>

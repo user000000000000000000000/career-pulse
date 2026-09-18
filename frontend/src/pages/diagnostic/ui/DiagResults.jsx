@@ -4,9 +4,9 @@ import { CP } from '../../../shared/api'
 import { analyzeDiagnostic } from '../api/diagnosticAPI'
 import { getCareerTracksForProfessions } from '../../../shared/api'
 import { matchProfessions } from '../../../entities/profession'
+import { defaultInstitutionType, filterPrograms } from '../model/careerTrackFilter'
 import { HOLLAND_PLAIN, buildHollandPortrait } from '../model/hollandPlain.js'
 import { PERSONALITY_PLAIN, buildPersonalityPortrait, COGNITIVE_PLAIN, buildCognitivePortrait, VALUES_PLAIN, MOTIVATION_PLAIN, READINESS_PLAIN } from '../model/resultsPlain.js'
-import Mascot from './mascot/Mascot'
 import ThemeToggle from '../../../shared/ui/ThemeToggle.jsx'
 import { MASCOT_RESULTS_LINE } from '../model/mascotLines'
 import '../diagnostic.css'
@@ -69,6 +69,7 @@ export default function DiagResults() {
   const [report, setReport] = useState(null)
   const [repLoading, setRepLoading] = useState(false)
   const [tracks, setTracks] = useState({}) // professionId → { status, specialties }
+  const [typeSel, setTypeSel] = useState(null) // null = авто-дефолт по анкете; иначе выбор в тумблере
 
   useEffect(() => {
     let alive = true
@@ -115,6 +116,18 @@ export default function DiagResults() {
   // Подходящие профессии берём ИЗ АТЛАСА по Holland-профилю (всё на русском, с привязкой к атласу)
   const atlasProfs = matchProfessions(profile, 7)
 
+  // Образовательный путь: тип заведения (вуз/колледж) и фильтр по переезду из анкеты.
+  const ctx = profile.context || {}
+  const relocationReady = ctx.relocation_ready || 'maybe'
+  const userCity = ctx.city || ''
+  // Тумблер типа показываем только когда есть реальный выбор (в базе есть и вузы, и колледжи).
+  const allProgs = Object.values(tracks).flatMap(t => t?.status === 'ready' ? t.specialties.flatMap(s => s.programs) : [])
+  const hasVuz = allProgs.some(p => (p.institution_type || 'university') === 'university')
+  const hasCollege = allProgs.some(p => p.institution_type === 'college')
+  const bothTypes = hasVuz && hasCollege
+  const typeFilter = bothTypes ? (typeSel || defaultInstitutionType(ctx)) : 'all'
+  const typeOptions = bothTypes ? [['all', 'Все'], ['university', 'Вузы'], ['college', 'Колледжи']] : []
+
   if (!has) {
     return (
       <div className="cp-diag">
@@ -149,14 +162,23 @@ export default function DiagResults() {
         </div>
       </div>
       <div className="container" style={{ maxWidth: 820 }}>
+        {/* Шапка только для печатной версии (PDF) */}
+        <div className="print-only" style={{ marginBottom: 16, borderBottom: '2px solid #25205c', paddingBottom: 10 }}>
+          <div style={{ fontSize: 22, fontWeight: 800, letterSpacing: 2, color: '#25205c' }}>CAREERPULSE</div>
+          <div style={{ fontSize: 13 }}>Отчёт по диагностике{profile.context?.name ? ` · ${profile.context.name}` : ''} · {new Date().toLocaleDateString('ru-RU')}</div>
+        </div>
+
         <div className="block-num">РЕЗУЛЬТАТ ДИАГНОСТИКИ</div>
         <div className="block-title">ТВОЙ ПРОФИЛЬ</div>
         <div className="block-desc">Пройдено блоков: {progress.completed.length} / {CP.TOTAL_BLOCKS}. Каждый блок добавляет слой.</div>
 
+        <div className="print-hide" style={{ marginTop: 14 }}>
+          <button className="btn btn-accent" onClick={() => window.print()}>📄 Скачать отчёт (PDF)</button>
+        </div>
+
         {/* ── Разбор от нейросети (представляет маскот) ── */}
         <div className="r-card" style={{ marginTop: 24, borderColor: 'rgba(139,111,232,.3)', background: 'linear-gradient(135deg, rgba(139,111,232,.08), rgba(95,150,233,.04))' }}>
           <div style={{ display: 'flex', gap: 16, alignItems: 'flex-start' }}>
-            <Mascot mood={repLoading ? 'thinking' : 'celebrating'} size="lg" />
             <div style={{ flex: 1, minWidth: 0 }}>
               <div className="r-label" style={{ marginBottom: 10, color: 'var(--violet)' }}>
                 {!repLoading && report?.full_report ? MASCOT_RESULTS_LINE : 'Твой разбор'}
@@ -209,6 +231,16 @@ export default function DiagResults() {
         {atlasProfs.slice(0, 5).length > 0 && (
           <div style={{ marginTop: 18 }}>
             <div className="r-label" style={{ color: 'var(--accent)', marginBottom: 10 }}>Образовательный путь</div>
+            {typeOptions.length > 1 && (
+              <div style={{ display: 'flex', gap: 6, marginBottom: 8, flexWrap: 'wrap' }}>
+                {typeOptions.map(([v, l]) => (
+                  <button key={v} onClick={() => setTypeSel(v)} className={'chip' + (typeFilter === v ? ' selected' : '')} style={{ cursor: 'pointer', font: 'inherit' }}>{l}</button>
+                ))}
+              </div>
+            )}
+            {relocationReady === 'no' && userCity && (
+              <div style={{ fontSize: 11.5, color: 'var(--ghost)', marginBottom: 10 }}>Показаны заведения в городе «{userCity}» — ты отметил(а), что не готов(а) к переезду.</div>
+            )}
             <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
               {atlasProfs.slice(0, 5).map(p => {
                 const track = tracks[p.id]
@@ -226,29 +258,37 @@ export default function DiagResults() {
                       </div>
                     ) : (
                       <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
-                        {track.specialties.map(sp => (
+                        {track.specialties.map(sp => {
+                          const { programs: progs, cityFallback } = filterPrograms(sp.programs, { typeFilter, relocationReady, userCity })
+                          return (
                           <div key={sp.code}>
                             <div style={{ fontSize: 13, fontWeight: 600, marginBottom: 4 }}>{sp.name} <span style={{ color: 'var(--ghost)', fontWeight: 400 }}>· {sp.code}</span></div>
                             <div style={{ fontSize: 12, color: 'var(--sub)', marginBottom: 6 }}>
-                              ЕГЭ: {sp.ege_required.join(', ')}{sp.ege_choose_one_of.length ? ` + один из (${sp.ege_choose_one_of.join(' / ')})` : ''}
+                              {sp.level === 'college' || !sp.ege_required.length
+                                ? 'Приём по аттестату (без ЕГЭ)'
+                                : <>ЕГЭ: {sp.ege_required.join(', ')}{sp.ege_choose_one_of.length ? ` + один из (${sp.ege_choose_one_of.join(' / ')})` : ''}</>}
                             </div>
-                            {sp.programs.length > 0 ? (
+                            {progs.length > 0 ? (
                               <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
-                                {sp.programs.slice(0, 6).map((prog, i) => (
+                                {progs.slice(0, 6).map((prog, i) => (
                                   <div key={i} style={{ fontSize: 12, color: 'var(--text)', display: 'flex', gap: 8 }}>
-                                    <span style={{ flex: 1 }}>{prog.institution_name}{prog.city ? ` · ${prog.city}` : ''}</span>
+                                    <span style={{ flex: 1 }}>{prog.institution_name}{prog.city ? ` · ${prog.city}` : ''}{prog.institution_type === 'college' && <span style={{ color: 'var(--ghost)' }}> · колледж</span>}</span>
                                     {prog.min_score_last_year && <span style={{ color: 'var(--ghost)' }}>от {prog.min_score_last_year} баллов ({prog.admission_year})</span>}
                                   </div>
                                 ))}
-                                {sp.programs.length > 6 && (
-                                  <div style={{ fontSize: 11.5, color: 'var(--ghost)', marginTop: 2 }}>+{sp.programs.length - 6} вузов ещё</div>
+                                {cityFallback && (
+                                  <div style={{ fontSize: 11.5, color: 'var(--ghost)', marginTop: 2 }}>В городе «{userCity}» по этому направлению не нашли — показываем другие города.</div>
+                                )}
+                                {progs.length > 6 && (
+                                  <div style={{ fontSize: 11.5, color: 'var(--ghost)', marginTop: 2 }}>+{progs.length - 6} ещё</div>
                                 )}
                               </div>
                             ) : (
-                              <div style={{ fontSize: 12, color: 'var(--ghost)' }}>Список вузов для этого направления пока не заполнен.</div>
+                              <div style={{ fontSize: 12, color: 'var(--ghost)' }}>{sp.programs.length ? 'Под выбранный фильтр ничего нет — переключи тип выше.' : 'Список для этого направления пока не заполнен.'}</div>
                             )}
                           </div>
-                        ))}
+                          )
+                        })}
                       </div>
                     )}
                   </div>

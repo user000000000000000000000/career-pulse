@@ -82,12 +82,14 @@
   .appnav-burger{ top: 10px; right: 12px; width: 42px; height: 42px; }
 }
 
-/* ── Резервируем место под гамбургер в правом верхнем углу страниц с топбаром ── */
-.cp-diag .topbar{ padding-right: 70px; }
-.cp-dashboard .topbar{ padding-right: 70px; }
-.test-top-row{ padding-right: 56px; }
-/* шапка Header (атлас, профиль, результат, сброс пароля) — чтобы «← В кабинет» не лез под гамбургер */
-.cp-legal nav.legal-nav.nav-reserve-right{ padding-right: 74px; }
+/* ── Резервируем место под гамбургер (fixed, right:16px, 44px) в правом верхнем
+   углу страниц с топбаром. ~90px = ширина+отступ бургера + запас, чтобы кнопки
+   не сливались с ним ни на каких ширинах/зуме. ── */
+.cp-diag .topbar{ padding-right: 90px; }
+.cp-dashboard .topbar{ padding-right: 90px; }
+.test-top-row{ padding-right: 76px; }
+/* шапка Header (атлас, профиль, результат, сброс пароля, админка, дети) */
+.cp-legal nav.legal-nav.nav-reserve-right{ padding-right: 90px; }
 
 /* На дашборде единым меню заменяем собственный мобильный гамбургер сайдбара
    и кнопку выхода в шапке — чтобы не было двух меню одновременно. */

@@ -9,6 +9,8 @@ import { submitConsultRequest } from '../../../shared/api'
 import ContactLinks from '../../../shared/ui/ContactLinks.jsx'
 import SocialIcon from '../../../shared/ui/SocialIcon.jsx'
 import { confirmDialog, alertDialog } from '../../../shared/ui/Dialog.jsx'
+import FamilyCard from './FamilyCard.jsx'
+import RolePlaceholder from './RolePlaceholder.jsx'
 import '../dashboard.css'
 
 // BLOCKS — единый реестр блоков из shared/config/blocks.js (импортируется выше).
@@ -123,6 +125,11 @@ export default function Dashboard() {
   const totalQ = BLOCKS.reduce((s, b) => s + b.questions, 0)
   const totalTime = BLOCKS.reduce((s, b) => s + b.time, 0)
 
+  // Роли-заглушки: кабинеты HR и предпринимателя ещё в разработке.
+  if (userLoaded && (me.role === 'hr' || me.role === 'entrepreneur')) {
+    return <RolePlaceholder role={me.role} />
+  }
+
   return (
     <div className="cp-dashboard">
 
@@ -176,8 +183,6 @@ export default function Dashboard() {
             <div className="page-crumb">CareerPulse / <span>Дашборд диагностики</span></div>
           </div>
           <div className="topbar-right">
-            <button className="topbar-btn btn-tour" onClick={() => setTourOpen(true)}>🗺️ Как это работает</button>
-            <Link to="/" className="topbar-btn">← На главную</Link>
             <button className="topbar-btn sum-danger topbar-logout-mobile" onClick={handleLogout}>🚪 Выйти</button>
           </div>
         </div>
@@ -344,6 +349,10 @@ export default function Dashboard() {
               )}
             </div>
           </div>
+
+          {(me.role === 'parent' || me.role === 'student') && userLoaded && (
+            <FamilyCard role={me.role} />
+          )}
 
         </div>
 

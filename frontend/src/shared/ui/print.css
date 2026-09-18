@@ -1,0 +1,33 @@
+/* Печать страницы результатов в PDF (кнопка → window.print()).
+   Прячем интерактив/навигацию, форсируем светлый читаемый отчёт. */
+@media print {
+  /* вся навигация и интерактив — вон */
+  .appnav-burger, .appnav-drawer, .appnav-overlay,
+  .topbar, .fb-fab, .theme-toggle,
+  .nav-row, .tb-btn, .btn, button,
+  .print-hide { display: none !important; }
+
+  /* печать только отчёта — заголовок над контентом */
+  .print-only { display: block !important; }
+
+  html, body { background: #ffffff !important; }
+  .cp-diag, .container { background: #ffffff !important; }
+
+  /* читаемый тёмный текст на белом (цветные ЗАЛИВКИ полос/бэйджей остаются — это background) */
+  .cp-diag, .cp-diag *:not(.hs-fill):not(.rc-bar-fill):not(.dtrack-fill):not(.pb-ring-fg) {
+    color: #1a1636 !important;
+  }
+
+  .r-card {
+    break-inside: avoid; page-break-inside: avoid;
+    box-shadow: none !important;
+    border: 1px solid #e2e2ee !important;
+    background: #ffffff !important;
+  }
+  .block-title, .block-num { break-after: avoid; page-break-after: avoid; }
+
+  @page { margin: 14mm; }
+}
+
+/* print-only элементы скрыты на экране */
+.print-only { display: none; }

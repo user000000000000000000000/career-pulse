@@ -37,3 +37,5 @@ supabase_data_only.sql
 supabase_my_tables.sql
 ubuntu.pub
 ubuntu.txt
+
+frontend/dist/

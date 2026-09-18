@@ -7,6 +7,7 @@ import Button from '../../../shared/ui/Button.jsx'
 import { login as doLogin, requestPasswordReset } from '../../../shared/auth'
 import { startVkLogin } from '../../../shared/auth'
 import '../../../shared/ui/legal.css'
+import { friendlyError } from '../../../shared/lib/errors'
 import '../../../shared/ui/auth.css'
 
 export default function Login() {
@@ -25,7 +26,7 @@ export default function Login() {
       await requestPasswordReset(email)
       setResetMsg('Письмо для сброса пароля отправлено на ' + email + '. Проверьте почту (и папку «Спам»).')
     } catch (err) {
-      setError(err.message || 'Не удалось отправить письмо')
+      setError(friendlyError(err, 'Не удалось отправить письмо. Попробуйте позже.'))
     } finally {
       setBusy(false)
     }
@@ -40,7 +41,7 @@ export default function Login() {
       await doLogin({ email, password })
       navigate('/')
     } catch (err) {
-      setError(err.message || 'Не удалось войти')
+      setError(friendlyError(err, 'Не удалось войти. Попробуйте позже.'))
       setBusy(false)
     }
   }

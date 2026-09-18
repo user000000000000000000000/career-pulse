@@ -1,0 +1,12 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "career-pulse-dev",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": ["run", "dev", "--", "--base=/"],
+      "cwd": "frontend",
+      "port": 5173
+    }
+  ]
+}

@@ -271,7 +271,7 @@
 /* ── PHONE (≤640px) ── */
 @media(max-width:640px){
   .cp-dashboard .content{padding:18px}
-  .cp-dashboard .topbar{padding:12px 14px}
+  .cp-dashboard .topbar{padding:12px 14px;padding-right:64px}
   /* в шапке оставляем уведомления, второстепенное прячем */
   .cp-dashboard .topbar .btn-tour{display:none}
   .cp-dashboard .topbar-right .topbar-btn[href="/"]{display:none}

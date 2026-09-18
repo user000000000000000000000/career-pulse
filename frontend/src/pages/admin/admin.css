@@ -1,0 +1,61 @@
+/* legal-nav фиксированная (~60px) — отступаем сверху, чтобы заголовок не был под ней */
+.adm-wrap{max-width:1060px;margin:0 auto;padding:88px 16px 72px}
+.adm-eyebrow{font-size:11px;letter-spacing:2px;color:var(--ghost);font-family:'JetBrains Mono',monospace}
+.adm-title{font-size:clamp(24px,4vw,34px);margin:4px 0 2px;line-height:1.1}
+.adm-sub{font-size:13px;color:var(--sub);margin-bottom:20px}
+
+/* ── статистика ── */
+.adm-tiles{display:grid;grid-template-columns:repeat(auto-fit,minmax(158px,1fr));gap:12px}
+.adm-tile{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:15px 17px}
+.adm-tile__ic{font-size:16px}
+.adm-tile__val{font-family:'JetBrains Mono',monospace;font-weight:800;font-size:27px;line-height:1.05;margin-top:8px;color:var(--text)}
+.adm-tile__label{font-size:12px;color:var(--sub);margin-top:3px}
+.adm-tile__sub{font-size:11px;color:var(--ghost);margin-top:4px}
+
+/* ── разбивка по ролям ── */
+.adm-roles{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:16px 18px;margin-top:12px}
+.adm-roles__head{font-size:12px;color:var(--sub);margin-bottom:10px}
+.adm-rolebar{display:flex;height:10px;border-radius:6px;overflow:hidden;background:var(--line)}
+.adm-rolebar span{display:block}
+.adm-legend{display:flex;flex-wrap:wrap;gap:9px 16px;margin-top:12px}
+.adm-legend-item{display:flex;align-items:center;gap:7px;font-size:12px;color:var(--sub)}
+.adm-legend-item b{color:var(--text)}
+.adm-dot{width:9px;height:9px;border-radius:3px;flex-shrink:0}
+
+/* ── тулбар ── */
+.adm-toolbar{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin:20px 0 12px}
+.adm-input,.adm-select{padding:9px 12px;border-radius:10px;border:1px solid var(--line2);background:var(--bg);color:var(--text);font-size:13px;font-family:inherit}
+.adm-input{flex:1;min-width:190px}
+.adm-input:focus,.adm-select:focus{outline:none;border-color:var(--accent)}
+.adm-count{margin-left:auto;font-size:12px;color:var(--ghost);white-space:nowrap}
+
+/* ── таблица ── */
+.adm-tablewrap{border:1px solid var(--line);border-radius:16px;overflow:hidden}
+.adm-scroll{overflow-x:auto}
+table.adm-table{width:100%;border-collapse:collapse;font-size:13px;min-width:820px}
+.adm-table thead th{position:sticky;top:0;z-index:1;background:var(--card);text-align:left;font-size:10.5px;letter-spacing:.6px;text-transform:uppercase;color:var(--ghost);padding:12px 14px;border-bottom:1px solid var(--line);white-space:nowrap}
+.adm-table tbody td{padding:11px 14px;border-bottom:1px solid var(--line);vertical-align:middle}
+.adm-table tbody tr:last-child td{border-bottom:none}
+.adm-table tbody tr:hover{background:color-mix(in srgb,var(--accent) 6%,transparent)}
+.adm-user-name{font-weight:700;white-space:nowrap;max-width:220px;overflow:hidden;text-overflow:ellipsis}
+.adm-user-contact{font-size:11.5px;color:var(--ghost);white-space:nowrap;max-width:220px;overflow:hidden;text-overflow:ellipsis}
+.adm-chip{display:inline-block;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:600;white-space:nowrap}
+.adm-mini{display:flex;align-items:center;gap:8px}
+.adm-mini-track{width:56px;height:6px;border-radius:3px;background:var(--line);overflow:hidden;flex-shrink:0}
+.adm-mini-fill{height:100%;background:var(--accent);border-radius:3px}
+.adm-mini-val{font-size:11px;color:var(--sub);font-family:'JetBrains Mono',monospace}
+.adm-yes{color:var(--ok);font-weight:800}
+.adm-no{color:var(--ghost)}
+.adm-badge-ai{background:color-mix(in srgb,var(--violet) 16%,transparent);color:var(--violet);padding:2px 8px;border-radius:6px;font-size:10.5px;font-weight:700;white-space:nowrap}
+.adm-date{color:var(--ghost);white-space:nowrap;font-size:12px}
+.adm-open{background:transparent;border:1px solid var(--line2);color:var(--sub);border-radius:8px;padding:5px 11px;font-size:11px;font-weight:600;cursor:pointer;white-space:nowrap}
+.adm-open:hover{border-color:var(--accent);color:var(--accent)}
+.adm-empty{padding:26px;text-align:center;color:var(--ghost)}
+
+/* ── пагинация ── */
+.adm-pager{display:flex;align-items:center;justify-content:space-between;margin-top:14px;font-size:12px;color:var(--sub);gap:10px}
+.adm-pager-btns{display:flex;gap:8px}
+
+@media(max-width:720px){
+  table.adm-table .col-city,table.adm-table .col-date{display:none}
+}
