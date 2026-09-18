@@ -16,6 +16,8 @@ const Roadmap       = lazy(() => import('../pages/diagnostic').then(m => ({ defa
 const Result        = lazy(() => import('../pages/result').then(m => ({ default: m.Result })))
 const Profile       = lazy(() => import('../pages/profile').then(m => ({ default: m.Profile })))
 const Atlas         = lazy(() => import('../pages/atlas').then(m => ({ default: m.Atlas })))
+const ChildResults  = lazy(() => import('../pages/child-results').then(m => ({ default: m.ChildResults })))
+const AdminPanel    = lazy(() => import('../pages/admin').then(m => ({ default: m.AdminPanel })))
 const LegalHub  = lazy(() => import('../pages/legal').then(m => ({ default: m.LegalHub })))
 const Privacy   = lazy(() => import('../pages/legal').then(m => ({ default: m.Privacy })))
 const Terms     = lazy(() => import('../pages/legal').then(m => ({ default: m.Terms })))
@@ -28,6 +30,7 @@ import VkAuthHandler from './VkAuthHandler.jsx'
 import AuthRecoveryHandler from './AuthRecoveryHandler.jsx'
 import AppNav from './AppNav.jsx'
 import { DialogHost } from '../shared/ui/Dialog.jsx'
+import FeedbackWidget from '../shared/ui/FeedbackWidget.jsx'
 
 const PageLoader = () => (
   <div style={{
@@ -43,6 +46,7 @@ export default function App() {
     <AuthRecoveryHandler />
     <AppNav />
     <DialogHost />
+    <FeedbackWidget />
     <Suspense fallback={<PageLoader />}>
     <Routes>
       <Route path="/" element={<Landing />} />
@@ -59,6 +63,8 @@ export default function App() {
       <Route path="/result"    element={<RequireAuth><Result /></RequireAuth>} />
       <Route path="/profile"   element={<RequireAuth><Profile /></RequireAuth>} />
       <Route path="/atlas"     element={<RequireAuth><Atlas /></RequireAuth>} />
+      <Route path="/child/:id" element={<RequireAuth><ChildResults /></RequireAuth>} />
+      <Route path="/admin"     element={<RequireAuth><AdminPanel /></RequireAuth>} />
 
       <Route path="/legal"           element={<LegalHub />} />
       <Route path="/legal/privacy"   element={<Privacy />} />

@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from 'react'
 import { useNavigate, useLocation } from 'react-router-dom'
 import { getCurrentUser, logout as doLogout } from '../shared/auth'
+import { checkIsAdmin } from '../shared/api'
 import { confirmDialog } from '../shared/ui/Dialog.jsx'
 import './appnav.css'
 
@@ -24,11 +25,13 @@ export default function AppNav() {
   const location = useLocation()
   const [open, setOpen] = useState(false)
   const [authed, setAuthed] = useState(false)
+  const [isAdmin, setIsAdmin] = useState(false)
   const drawerRef = useRef(null)
 
   useEffect(() => {
     let alive = true
     getCurrentUser().then(u => { if (alive) setAuthed(!!u) }).catch(() => {})
+    checkIsAdmin().then(a => { if (alive) setIsAdmin(a) }).catch(() => {})
     return () => { alive = false }
   }, [location.pathname])
 
@@ -86,6 +89,14 @@ export default function AppNav() {
               <span className="appnav-ic">{l.icon}</span>{l.label}
             </button>
           ))}
+          {isAdmin && (
+            <button
+              className={'appnav-item' + (location.pathname === '/admin' ? ' active' : '')}
+              onClick={() => go('/admin')}
+            >
+              <span className="appnav-ic">🛡️</span>Админ-панель
+            </button>
+          )}
           <div className="appnav-div" />
           <button className="appnav-item" onClick={() => go('/')}>
             <span className="appnav-ic">🏠</span>На главную сайта

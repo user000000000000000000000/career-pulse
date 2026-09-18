@@ -8,6 +8,7 @@ import { getCurrentUser, logout as doLogout } from '../../../shared/auth'
 import { supabase, isSupabaseConfigured } from '../../../shared/api'
 import { CP } from '../../../shared/api'
 import { STORAGE_KEYS } from '../../../shared/lib/storageKeys'
+import { friendlyError } from '../../../shared/lib/errors'
 import { config } from '../../../shared/config'
 import { confirmDialog, alertDialog } from '../../../shared/ui/Dialog.jsx'
 import '../../../shared/ui/legal.css'
@@ -75,7 +76,7 @@ export default function Profile() {
     const path = `${userId}/avatar.${ext}`
     const { error: upErr } = await supabase.storage.from('avatars').upload(path, avatar, { upsert: true })
     setUploading(false)
-    if (upErr) { setError('Ошибка загрузки фото: ' + upErr.message); return null }
+    if (upErr) throw new Error(upErr.message)
     const { data } = supabase.storage.from('avatars').getPublicUrl(path)
     return data.publicUrl
   }
@@ -118,12 +119,14 @@ export default function Profile() {
 
     setSaving(true)
     try {
-      let avatar_url = preview
+      // по умолчанию — уже сохранённое фото (preview может быть временным blob:, его в БД нельзя)
+      let avatar_url = user?.avatar_url || ''
+      let photoFailed = false
 
       if (avatar) {
         if (isSupabaseConfigured) {
-          const url = await uploadAvatar(user.id)
-          if (url) avatar_url = url
+          try { const url = await uploadAvatar(user.id); if (url) avatar_url = url }
+          catch { photoFailed = true } // фото не загрузилось — сохраним профиль без замены фото
         } else {
           // демо-режим: храним фото как data-URL, чтобы оно сохранялось и показывалось
           avatar_url = await fileToDataUrl(avatar)
@@ -150,10 +153,14 @@ export default function Profile() {
         }
       }
 
-      setMsg('Профиль сохранён ✓')
-      setTimeout(() => setMsg(''), 3000)
+      if (photoFailed) {
+        setError('Профиль сохранён, но фото не загрузилось. Попробуйте другое фото или чуть позже.')
+      } else {
+        setMsg('Профиль сохранён ✓')
+        setTimeout(() => setMsg(''), 3000)
+      }
     } catch (err) {
-      setError(err.message || 'Не удалось сохранить')
+      setError(friendlyError(err))
     } finally {
       setSaving(false)
     }

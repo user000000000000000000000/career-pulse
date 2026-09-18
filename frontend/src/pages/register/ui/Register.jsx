@@ -7,6 +7,7 @@ import Button from '../../../shared/ui/Button.jsx'
 import { register as doRegister, resendConfirmation } from '../../../shared/auth'
 import { isSupabaseConfigured } from '../../../shared/api'
 import '../../../shared/ui/legal.css'
+import { friendlyError } from '../../../shared/lib/errors'
 import '../../../shared/ui/auth.css'
 
 const ROLES = [
@@ -34,7 +35,7 @@ export default function Register() {
       await resendConfirmation(form.email)
       setResendMsg('Письмо отправлено повторно на ' + form.email + '. Проверьте почту и «Спам».')
     } catch (err) {
-      setResendMsg(err.message || 'Не удалось отправить письмо повторно (возможно, лимит — подождите немного).')
+      setResendMsg(friendlyError(err, 'Не удалось отправить письмо повторно (возможно, лимит — подождите немного).'))
     }
   }
 
@@ -65,7 +66,7 @@ export default function Register() {
         navigate('/')
       }
     } catch (err) {
-      setError(err.message || 'Не удалось зарегистрироваться')
+      setError(friendlyError(err, 'Не удалось зарегистрироваться. Попробуйте позже.'))
       setBusy(false)
     }
   }

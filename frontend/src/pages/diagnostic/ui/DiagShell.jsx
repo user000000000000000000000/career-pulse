@@ -1,6 +1,4 @@
 import { useNavigate } from 'react-router-dom'
-import Mascot from './mascot/Mascot'
-import { getMascotBlockLine } from '../model/mascotLines'
 import { CP } from '../../../shared/api'
 import '../diagnostic.css'
 
@@ -51,8 +49,6 @@ export default function DiagShell({ num, title, desc, meta = [], pct = 0, wide =
         )}
         {children}
       </div>
-
-      <Mascot mood={pct >= 100 ? 'happy' : 'idle'} message={getMascotBlockLine(num)} />
     </div>
   )
 }
