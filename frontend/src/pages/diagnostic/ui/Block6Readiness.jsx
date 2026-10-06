@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { CP } from '../../../shared/api'
 import DiagShell, { ResultNav } from './DiagShell'
+import QuestionNav from './QuestionNav'
 import useDiagBlock from '../model/useDiagBlock'
 import useBlockDraft from '../model/useBlockDraft'
 import { scoreReadiness } from '../model/scoring/readiness'
@@ -50,7 +51,7 @@ const OPEN_PROMPTS = [
 const TOTAL = QS.length + 2
 
 export default function Block6Readiness() {
-  const { ready, timerRef, goNext } = useDiagBlock(6)
+  const { ready, timerRef, goNext, editMode } = useDiagBlock(6)
   const [phase, setPhase] = useState('closed')
   const [idx, setIdx] = useState(0)
   const [ans] = useState(() => ({}))
@@ -135,7 +136,14 @@ export default function Block6Readiness() {
         <div style={{ textAlign: 'center' }}><span className={'q-tag ' + (q.tag === 'self' ? 'tag-self' : 'tag-behav')}>{q.tag === 'self' ? 'Самооценка' : 'Реальный опыт'}</span></div>
         <div className="q-text">{q.t}</div>
         <div className="scale-labels" style={{ maxWidth: 340 }}><span>Совсем нет</span><span>Это моё сильное место</span></div>
-        <div className="scale-row">{[1, 2, 3, 4, 5].map(n => <button key={n} className={'scale-btn' + (sel === n ? ' sel' : '')} onClick={() => pick(n)}>{n}</button>)}</div>
+        <div className="scale-row">{[1, 2, 3, 4, 5].map(n => <button key={n} className={'scale-btn' + ((sel === n || (sel === null && ans[q.id] === n)) ? ' sel' : '')} onClick={() => pick(n)}>{n}</button>)}</div>
+        <QuestionNav
+          total={QS.length} current={idx}
+          isAnswered={(i) => ans[QS[i].id] != null}
+          onJump={(i) => { setSel(null); setIdx(i) }}
+          onBack={() => { setSel(null); setIdx(i => Math.max(0, i - 1)) }}
+          onFinish={() => { setSel(null); if (editMode) submit(); else setPhase('open1') }}
+        />
       </>
     )
   } else {

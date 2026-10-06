@@ -3,7 +3,7 @@ import ContactLinks from '../../../shared/ui/ContactLinks.jsx'
 
 export default function Terms() {
   return (
-    <LegalShell>
+    <LegalShell title="Пользовательское соглашение" description="Условия использования платформы карьерной диагностики CareerPulse.">
       <>
 <nav className="legal-nav">
   <a href="/" className="nav-logo-link">

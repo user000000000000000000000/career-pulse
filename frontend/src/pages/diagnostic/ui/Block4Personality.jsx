@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { CP } from '../../../shared/api'
 import DiagShell, { ResultNav } from './DiagShell'
+import QuestionNav from './QuestionNav'
 import useDiagBlock from '../model/useDiagBlock'
 import useBlockDraft from '../model/useBlockDraft'
 import { scorePersonality, MAIN } from '../model/scoring/personality'
@@ -119,6 +120,7 @@ export default function Block4Personality() {
   }
 
   const q = QS[qIdx]
+  const cur = answers[q.id]   // уже выбранный ответ (при возврате к вопросу подсвечиваем его)
   return (
     <DiagShell num={4} title="ЛИЧНОСТНЫЕ КАЧЕСТВА"
       desc="Оцени каждое утверждение от 1 до 5. Описывай себя как есть, а не как хотелось бы. Каждый профиль по-своему сильный."
@@ -127,8 +129,15 @@ export default function Block4Personality() {
         <div className="q-counter">{qIdx + 1} / {TOTAL}</div>
         <div className="q-text">{q.t}</div>
         <div className="scale-labels" style={{ maxWidth: 360 }}><span>Совсем не про меня</span><span>Точно про меня</span></div>
-        <div className="scale-row">{[1, 2, 3, 4, 5].map(n => <button key={n} className={'scale-btn' + (sel === n ? ' sel' : '')} onClick={() => pick(n)}>{n}</button>)}</div>
+        <div className="scale-row">{[1, 2, 3, 4, 5].map(n => <button key={n} className={'scale-btn' + ((sel === n || (sel === null && cur === n)) ? ' sel' : '')} onClick={() => pick(n)}>{n}</button>)}</div>
         <div className="scale-hint"><span>1 — нет</span><span>2 — скорее нет</span><span>3 — иногда</span><span>4 — скорее да</span><span>5 — да</span></div>
+        <QuestionNav
+          total={TOTAL} current={qIdx}
+          isAnswered={(i) => answers[QS[i].id] != null}
+          onJump={(i) => { setSel(null); setQIdx(i) }}
+          onBack={() => { setSel(null); setQIdx(i => Math.max(0, i - 1)) }}
+          onFinish={submit}
+        />
       </div>
     </DiagShell>
   )

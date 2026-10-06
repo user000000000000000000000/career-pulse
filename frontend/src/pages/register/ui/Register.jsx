@@ -6,6 +6,7 @@ import Input from '../../../shared/ui/Input.jsx'
 import Button from '../../../shared/ui/Button.jsx'
 import { register as doRegister, resendConfirmation } from '../../../shared/auth'
 import { isSupabaseConfigured } from '../../../shared/api'
+import { usePageMeta } from '../../../shared/lib/pageMeta'
 import '../../../shared/ui/legal.css'
 import { friendlyError } from '../../../shared/lib/errors'
 import '../../../shared/ui/auth.css'
@@ -19,6 +20,7 @@ const ROLES = [
 ]
 
 export default function Register() {
+  usePageMeta('Регистрация', 'Создайте аккаунт CareerPulse и пройдите профориентационную диагностику из 10 блоков.')
   const navigate = useNavigate()
   const [form, setForm] = useState({ name: '', email: '', password: '', role: 'parent' })
   const [agree, setAgree]         = useState(false)

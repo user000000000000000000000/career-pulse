@@ -35,18 +35,30 @@ jobs:
         working-directory: frontend
         run: npm run check:arch
 
-      - name: Build
+      - name: Scoring tests
         working-directory: frontend
-        env:
-          VITE_SUPABASE_URL: ${{ secrets.VITE_SUPABASE_URL }}
-          VITE_SUPABASE_ANON_KEY: ${{ secrets.VITE_SUPABASE_ANON_KEY }}
-          VITE_VK_APP_ID: ${{ secrets.VITE_VK_APP_ID }}
-          VITE_VK_AUTH_URL: ${{ secrets.VITE_VK_AUTH_URL }}
+        run: npm test
+
+      - name: Build (GitHub Pages, base=/career-pulse/)
+        working-directory: frontend
         run: npm run build
 
       - uses: actions/upload-pages-artifact@v3
         with:
           path: frontend/dist
+
+      # Prod-сборка для reg.ru (base=/). Выкладываем артефактом, чтобы скачать
+      # гарантированно правильную сборку и залить на reg.ru — без локального build:prod.
+      - name: Build (reg.ru prod, base=/)
+        working-directory: frontend
+        run: npm run build:prod
+
+      - name: Upload reg.ru dist artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: dist-reg-ru
+          path: frontend/dist
+          retention-days: 14
 
   deploy:
     needs: build

@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { generateLinkCode, redeemLinkCode, listFamily, unlinkFamily } from '../../../shared/api'
 import { confirmDialog, alertDialog } from '../../../shared/ui/Dialog.jsx'
+import { friendlyError } from '../../../shared/lib/errors'
 
 // Карточка «Семья» на дашборде.
 //  • Ребёнок (student): показывает код для родителя + список привязанных родителей.
@@ -29,7 +30,7 @@ export default function FamilyCard({ role }) {
   async function onGenerate() {
     setErr('')
     try { setBusy(true); const { code } = await generateLinkCode(); setCode(code) }
-    catch (e) { setErr(e.message || 'Не удалось создать код') }
+    catch (e) { setErr(friendlyError(e, 'Не удалось создать код')) }
     finally { setBusy(false) }
   }
   async function onRedeem() {
@@ -43,12 +44,12 @@ export default function FamilyCard({ role }) {
       setInput('')
       await load()
       alertDialog({ title: 'Готово ✓', message: `Аккаунт «${res.child_name}» привязан. Теперь вы видите его результаты.` })
-    } catch (e) { setErr(e.message || 'Не удалось привязать') }
+    } catch (e) { setErr(friendlyError(e, 'Не удалось привязать')) }
     finally { setBusy(false) }
   }
   async function onUnlink(id, name) {
     if (!await confirmDialog({ title: 'Отвязать', message: `Отвязать ${name || 'аккаунт'}?`, confirmText: 'Отвязать', danger: true })) return
-    try { await unlinkFamily(id); await load() } catch (e) { alertDialog({ message: e.message || 'Ошибка' }) }
+    try { await unlinkFamily(id); await load() } catch (e) { alertDialog({ message: friendlyError(e, 'Не удалось отвязать') }) }
   }
 
   const list = isParent ? links.children : links.parents

@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import { getChildProfile } from '../../../shared/api'
+import { friendlyError } from '../../../shared/lib/errors'
 import { matchProfessions } from '../../../entities/profession'
 import Header from '../../../shared/ui/Header.jsx'
 
@@ -22,7 +23,7 @@ export default function ChildResults() {
     let alive = true
     getChildProfile(id)
       .then(row => { if (alive) setState({ loading: false, error: row ? '' : 'Нет доступа или профиль не найден', row }) })
-      .catch(e => { if (alive) setState({ loading: false, error: e.message || 'Ошибка', row: null }) })
+      .catch(e => { if (alive) setState({ loading: false, error: friendlyError(e, 'Не удалось загрузить результаты'), row: null }) })
     return () => { alive = false }
   }, [id])
 

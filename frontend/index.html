@@ -28,9 +28,36 @@
   <meta name="twitter:description" content="Профориентационная диагностика из 10 блоков с ИИ-разбором и карьерным маршрутом." />
   <meta name="twitter:image" content="https://careerpulse.ru/og-cover.png" />
 
+  <!-- Structured data: статичный JSON-LD читается поисковыми ботами (в отличие от SPA-контента за JS) -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "Organization",
+        "@id": "https://careerpulse.ru/#org",
+        "name": "CareerPulse",
+        "url": "https://careerpulse.ru/",
+        "logo": "https://careerpulse.ru/og-cover.png",
+        "description": "Платформа профориентационной диагностики: профиль личности, сильные стороны и подходящие профессии с ИИ-разбором."
+      },
+      {
+        "@type": "WebSite",
+        "@id": "https://careerpulse.ru/#site",
+        "url": "https://careerpulse.ru/",
+        "name": "CareerPulse",
+        "inLanguage": "ru-RU",
+        "publisher": { "@id": "https://careerpulse.ru/#org" }
+      }
+    ]
+  }
+  </script>
+
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Unbounded:wght@400;500;600;700;800&family=Fraunces:ital,wght@1,400;1,500;1,600&family=Golos+Text:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet" />
+  <!-- Веса урезаны под реальное использование в CSS: вес 500 во всём проекте только у Fraunces,
+       у Unbounded/Golos он не встречается → выброшен. Fraunces грузил 3 начертания, нужно одно (500). -->
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Unbounded:wght@400;600;700;800&family=Fraunces:ital,wght@1,500&family=Golos+Text:wght@400;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet" />
 
   <!-- Yandex.Metrika counter -->
   <script type="text/javascript">
@@ -39,14 +66,30 @@
     for (var j = 0; j < document.scripts.length; j++) {if (document.scripts[j].src === r) { return; }}
     k=e.createElement(t),a=e.getElementsByTagName(t)[0],k.async=1,k.src=r,a.parentNode.insertBefore(k,a)})
     (window, document, "script", "https://mc.yandex.ru/metrika/tag.js", "ym");
-    ym(112717792, "init", { clickmap:true, trackLinks:true, accurateTrackBounce:true, webvisor:true });
-    // SPA на HashRouter — считаем переходы между экранами как отдельные просмотры
-    window.addEventListener('hashchange', function(){ ym(112717792, 'hit', location.href); });
+    ym(112717792, "init", { clickmap:true, trackLinks:true, accurateTrackBounce:true });
+    // SPA на BrowserRouter ходит через History API (pushState/replaceState), а не hashchange —
+    // перехватываем переходы, чтобы Метрика считала смену экрана как отдельный просмотр.
+    (function(){
+      var last = location.href;
+      function hit(){ if (location.href !== last) { last = location.href; ym(112717792, 'hit', location.href); } }
+      ['pushState','replaceState'].forEach(function(m){
+        var orig = history[m];
+        history[m] = function(){ var r = orig.apply(this, arguments); hit(); return r; };
+      });
+      window.addEventListener('popstate', hit);
+    })();
   </script>
   <!-- /Yandex.Metrika counter -->
 </head>
 <body>
-  <div id="root"></div>
+  <!-- Инлайн-лоадер до загрузки JS: убирает белую вспышку на холодном старте.
+       React затирает содержимое #root при первом рендере, поэтому спиннер исчезает сам. -->
+  <div id="root">
+    <div style="position:fixed;inset:0;display:flex;align-items:center;justify-content:center;background:#eef0fb">
+      <div style="width:38px;height:38px;border:3px solid rgba(37,32,92,.15);border-top-color:#4079d3;border-radius:50%;animation:cp-spin .7s linear infinite"></div>
+    </div>
+  </div>
+  <style>@keyframes cp-spin{to{transform:rotate(360deg)}}</style>
   <script type="module" src="/src/app/main.jsx"></script>
 </body>
 </html>

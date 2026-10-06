@@ -1,0 +1,13 @@
+User-agent: *
+Allow: /
+
+# Приватные разделы за авторизацией — не индексировать
+Disallow: /dashboard
+Disallow: /profile
+Disallow: /admin
+Disallow: /test
+Disallow: /diagnostic
+Disallow: /result
+Disallow: /child
+
+Sitemap: https://careerpulse.ru/sitemap.xml

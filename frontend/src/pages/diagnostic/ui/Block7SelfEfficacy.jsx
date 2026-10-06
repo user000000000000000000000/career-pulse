@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { CP } from '../../../shared/api'
 import DiagShell, { ResultNav } from './DiagShell'
+import QuestionNav from './QuestionNav'
 import useDiagBlock from '../model/useDiagBlock'
 import useBlockDraft from '../model/useBlockDraft'
 import { scoreSelfEfficacy } from '../model/scoring/selfEfficacy'
@@ -59,7 +60,7 @@ const ALL_LIKERT = [...GEN, ...PROF, ...DEC]
 const TOTAL = ALL_LIKERT.length + CASES.length
 
 export default function Block7SelfEfficacy() {
-  const { ready, timerRef, goNext } = useDiagBlock(7)
+  const { ready, timerRef, goNext, editMode } = useDiagBlock(7)
   const [phase, setPhase] = useState('likert')
   const [idx, setIdx] = useState(0)
   const [ans] = useState(() => ({}))
@@ -134,7 +135,14 @@ export default function Block7SelfEfficacy() {
         <div className="q-counter">{idx + 1} / {ALL_LIKERT.length}</div>
         <div className="q-text">{q.t}</div>
         <div className="scale-labels" style={{ maxWidth: 340 }}><span>Совсем не уверен(а)</span><span>Полностью уверен(а)</span></div>
-        <div className="scale-row">{[1, 2, 3, 4, 5].map(n => <button key={n} className={'scale-btn' + (sel === n ? ' sel' : '')} onClick={() => pickL(n)}>{n}</button>)}</div>
+        <div className="scale-row">{[1, 2, 3, 4, 5].map(n => <button key={n} className={'scale-btn' + ((sel === n || (sel === null && ans[q.id] === n)) ? ' sel' : '')} onClick={() => pickL(n)}>{n}</button>)}</div>
+        <QuestionNav
+          total={ALL_LIKERT.length} current={idx}
+          isAnswered={(i) => ans[ALL_LIKERT[i].id] != null}
+          onJump={(i) => { setSel(null); setIdx(i) }}
+          onBack={() => { setSel(null); setIdx(i => Math.max(0, i - 1)) }}
+          onFinish={() => { setSel(null); if (editMode) submit(); else setPhase('cases') }}
+        />
       </>
     )
   } else {

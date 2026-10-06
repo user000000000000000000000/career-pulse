@@ -11,6 +11,7 @@ import SocialIcon from '../../../shared/ui/SocialIcon.jsx'
 import { confirmDialog, alertDialog } from '../../../shared/ui/Dialog.jsx'
 import FamilyCard from './FamilyCard.jsx'
 import RolePlaceholder from './RolePlaceholder.jsx'
+import { friendlyError } from '../../../shared/lib/errors'
 import '../dashboard.css'
 
 // BLOCKS — единый реестр блоков из shared/config/blocks.js (импортируется выше).
@@ -53,7 +54,7 @@ export default function Dashboard() {
       await submitConsultRequest(consultForm)
       setConsultSent(true)
     } catch (e) {
-      setConsultErr(e.message || 'Не удалось отправить заявку. Попробуйте написать напрямую ниже.')
+      setConsultErr(friendlyError(e, 'Не удалось отправить заявку. Попробуйте написать напрямую ниже.'))
     } finally {
       setConsultBusy(false)
     }
@@ -84,7 +85,8 @@ export default function Dashboard() {
   const given = parts[1] || parts[0] || 'Пользователь'
   const initials = ((given[0] || '') + (family && family !== given ? family[0] : '')).toUpperCase() || 'ИИ'
   const sbUsername = given + (family && family !== given ? ' ' + family[0] + '.' : '')
-  const roleLabel = !userLoaded ? 'Специалист' : (ROLE_LABELS[me.role] || 'Пользователь')
+  // Пока профиль грузится — нейтральное «…», а не захардкоженная роль (иначе родитель на миг видит «Специалист»)
+  const roleLabel = !userLoaded ? '…' : (ROLE_LABELS[me.role] || 'Пользователь')
 
   useEffect(() => {
     let progAlive = true
@@ -179,7 +181,7 @@ export default function Dashboard() {
       <div className="main">
         <div className="topbar">
           <div className="topbar-left">
-            <button className="mobile-menu-btn" onClick={() => setSidebarOpen(o => !o)}>☰</button>
+            <button className="mobile-menu-btn" aria-label="Меню" aria-expanded={sidebarOpen} onClick={() => setSidebarOpen(o => !o)}>☰</button>
             <div className="page-crumb">CareerPulse / <span>Дашборд диагностики</span></div>
           </div>
           <div className="topbar-right">
@@ -423,7 +425,7 @@ export default function Dashboard() {
           <div className="modal-box" style={{ maxWidth: 520 }}>
             <div className="modal-head">
               <h3>ЗАПИСЬ НА КОНСУЛЬТАЦИЮ</h3>
-              <button className="modal-close" onClick={() => setConsultOpen(false)}>✕</button>
+              <button className="modal-close" aria-label="Закрыть" onClick={() => setConsultOpen(false)}>✕</button>
             </div>
             <div className="modal-body">
               <div className="mentor-card" style={{ marginBottom: 16 }}>
@@ -491,7 +493,7 @@ export default function Dashboard() {
         <div className="modal-box">
           <div className="modal-head">
             <h3>🗺️ КАК РАБОТАЕТ ДИАГНОСТИКА</h3>
-            <button className="modal-close" onClick={() => setTourOpen(false)}>✕</button>
+            <button className="modal-close" aria-label="Закрыть" onClick={() => setTourOpen(false)}>✕</button>
           </div>
           <div className="modal-body">
             <p style={{fontSize:'14px',color:'var(--sub)',marginBottom:'20px',lineHeight:'1.7'}}>

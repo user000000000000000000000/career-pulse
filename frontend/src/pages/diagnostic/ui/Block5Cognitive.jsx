@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { CP } from '../../../shared/api'
 import DiagShell, { ResultNav } from './DiagShell'
+import QuestionNav from './QuestionNav'
 import useDiagBlock from '../model/useDiagBlock'
 import useBlockDraft from '../model/useBlockDraft'
 import { scoreCognitive } from '../model/scoring/cognitive'
@@ -58,7 +59,7 @@ const COLORS = ['#5f96e9', '#8b6fe8', '#e8a0c4', '#72a2eb', '#22d97a', '#72a2eb'
 const TOTAL = SELF_QS.length + TASKS.length + VARK_QS.length
 
 export default function Block5Cognitive() {
-  const { ready, timerRef, goNext } = useDiagBlock(5)
+  const { ready, timerRef, goNext, editMode } = useDiagBlock(5)
   const [phase, setPhase] = useState('self')
   const [idx, setIdx] = useState(0)
   const [selfAns] = useState(() => ({}))
@@ -154,7 +155,14 @@ export default function Block5Cognitive() {
         <div className="q-counter">{idx + 1} / {SELF_QS.length}</div>
         <div className="q-text">{q.t}</div>
         <div className="scale-labels" style={{ maxWidth: 280 }}><span>Совсем не про меня</span><span>Точно про меня</span></div>
-        <div className="scale-row">{[1, 2, 3, 4].map(n => <button key={n} className={'scale-btn' + (sel === n ? ' sel' : '')} onClick={() => pickSelf(n)}>{n}</button>)}</div>
+        <div className="scale-row">{[1, 2, 3, 4].map(n => <button key={n} className={'scale-btn' + ((sel === n || (sel === null && selfAns[q.id] === n)) ? ' sel' : '')} onClick={() => pickSelf(n)}>{n}</button>)}</div>
+        <QuestionNav
+          total={SELF_QS.length} current={idx}
+          isAnswered={(i) => selfAns[SELF_QS[i].id] != null}
+          onJump={(i) => { setSel(null); setIdx(i) }}
+          onBack={() => { setSel(null); setIdx(i => Math.max(0, i - 1)) }}
+          onFinish={() => { setSel(null); if (editMode) submit(); else { setIdx(0); setPhase('tasks') } }}
+        />
       </>
     )
   } else if (phase === 'tasks') {

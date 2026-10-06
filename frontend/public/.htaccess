@@ -1,0 +1,30 @@
+# CareerPulse — конфиг Apache для reg.ru. Кладётся в корень сайта (копируется Vite из public/ в dist/).
+# Задачи: 1) сжатие текстовых ответов, 2) вечный кэш хешированных ассетов, 3) без кэша для index.html
+# (чтобы новый релиз подхватывался сразу), 4) фолбэк на index.html.
+
+# ── Сжатие ──
+<IfModule mod_deflate.c>
+  AddOutputFilterByType DEFLATE text/html text/css text/plain text/xml \
+    application/javascript application/json image/svg+xml
+</IfModule>
+
+# ── Кэширование ──
+<IfModule mod_headers.c>
+  # /assets/* — имена с хешем (index-AbC123.js), контент под именем не меняется → кэшируем навсегда.
+  <FilesMatch "\.(js|css|woff2?|ttf|eot|png|jpe?g|gif|svg|webp|ico)$">
+    Header set Cache-Control "public, max-age=31536000, immutable"
+  </FilesMatch>
+  # index.html — точка входа, имя постоянное → всегда перепроверяем, иначе релиз не виден.
+  <FilesMatch "index\.html$">
+    Header set Cache-Control "no-cache, must-revalidate"
+  </FilesMatch>
+</IfModule>
+
+# ── SPA-фолбэк: любой путь, который не файл/папку, отдаём как index.html ──
+# (HashRouter работает и без этого, но защищает от 404 при прямом заходе на /что-то.)
+<IfModule mod_rewrite.c>
+  RewriteEngine On
+  RewriteCond %{REQUEST_FILENAME} !-f
+  RewriteCond %{REQUEST_FILENAME} !-d
+  RewriteRule ^ index.html [L]
+</IfModule>

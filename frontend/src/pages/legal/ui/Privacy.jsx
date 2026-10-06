@@ -3,7 +3,7 @@ import ContactLinks from '../../../shared/ui/ContactLinks.jsx'
 
 export default function Privacy() {
   return (
-    <LegalShell>
+    <LegalShell title="Политика конфиденциальности" description="Как CareerPulse обрабатывает и защищает персональные данные пользователей.">
       <>
 <nav className="legal-nav">
   <a href="/" className="nav-logo-link">
