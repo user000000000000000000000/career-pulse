@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { CP } from '../../../shared/api'
 import DiagShell, { ResultNav } from './DiagShell'
+import QuestionNav from './QuestionNav'
 import useDiagBlock from '../model/useDiagBlock'
 import useBlockDraft from '../model/useBlockDraft'
 
@@ -26,7 +27,7 @@ const OPEN = [
 const TOTAL = QS.length + OPEN.length
 
 export default function Block8Future() {
-  const { ready, timerRef, goNext } = useDiagBlock(8)
+  const { ready, timerRef, goNext, editMode } = useDiagBlock(8)
   const [phase, setPhase] = useState('closed')
   const [idx, setIdx] = useState(0)
   const [ans] = useState(() => ({}))
@@ -106,8 +107,15 @@ export default function Block8Future() {
         <div className="q-counter">{idx + 1} / {QS.length}</div>
         <div className="q-text">{q.t}</div>
         {q.type === 'radio'
-          ? q.opts.map((o, i) => <div key={i} className={'opt-card' + (sel === i ? ' sel' : '')} onClick={() => pickR(i)}><div className="opt-dot"></div><div>{o}</div></div>)
-          : <><div className="scale-labels"><span>{q.lo}</span><span>{q.hi}</span></div><div className="scale-row">{[1, 2, 3, 4, 5].map(n => <button key={n} className={'scale-btn' + (sel === n ? ' sel' : '')} onClick={() => pickS(n)}>{n}</button>)}</div></>}
+          ? q.opts.map((o, i) => <div key={i} className={'opt-card' + ((sel === i || (sel === null && ans[q.id] === i)) ? ' sel' : '')} onClick={() => pickR(i)}><div className="opt-dot"></div><div>{o}</div></div>)
+          : <><div className="scale-labels"><span>{q.lo}</span><span>{q.hi}</span></div><div className="scale-row">{[1, 2, 3, 4, 5].map(n => <button key={n} className={'scale-btn' + ((sel === n || (sel === null && ans[q.id] === n)) ? ' sel' : '')} onClick={() => pickS(n)}>{n}</button>)}</div></>}
+        <QuestionNav
+          total={QS.length} current={idx}
+          isAnswered={(i) => ans[QS[i].id] != null}
+          onJump={(i) => { setSel(null); setIdx(i) }}
+          onBack={() => { setSel(null); setIdx(i => Math.max(0, i - 1)) }}
+          onFinish={() => { setSel(null); if (editMode) submit(); else { setPhase('open'); setIdx(0) } }}
+        />
       </>
     )
   } else {

@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { CP } from '../../../shared/api'
 import DiagShell, { ResultNav } from './DiagShell'
+import QuestionNav from './QuestionNav'
 import useDiagBlock from '../model/useDiagBlock'
 import useBlockDraft from '../model/useBlockDraft'
 import { scoreHolland } from '../model/scoring/holland'
@@ -65,7 +66,8 @@ export default function Block2Holland() {
 
   const [phase, setPhase] = useState('pairs')
   const [pairIdx, setPairIdx] = useState(0)
-  const [scales] = useState(() => ({ R: 0, I: 0, A: 0, S: 0, E: 0, C: 0 }))
+  // Ответы по парам храним по индексу (перезапись при возврате). Баллы НЕ копим в
+  // choosePair — пересчитываем из pairAnswers на submit, чтобы правка не задваивала счёт.
   const [pairAnswers] = useState(() => [])
   const [matAnswers] = useState(() => ({}))
   const [curChoice, setCurChoice] = useState(null)
@@ -79,10 +81,9 @@ export default function Block2Holland() {
 
   const clearDraft = useBlockDraft({
     blockNum: 2, ready,
-    snapshot: () => ({ phase, pairIdx, scales, pairAnswers, matAnswers, antiSel, energySel, explorationVal, openText }),
+    snapshot: () => ({ phase, pairIdx, pairAnswers, matAnswers, antiSel, energySel, explorationVal, openText }),
     restore: (d) => {
-      if (d.scales) Object.assign(scales, d.scales)
-      if (Array.isArray(d.pairAnswers)) { pairAnswers.length = 0; d.pairAnswers.forEach(x => pairAnswers.push(x)) }
+      if (Array.isArray(d.pairAnswers)) { pairAnswers.length = 0; d.pairAnswers.forEach((x, i) => { pairAnswers[i] = x }) }
       if (d.matAnswers) Object.assign(matAnswers, d.matAnswers)
       if (typeof d.pairIdx === 'number') setPairIdx(d.pairIdx)
       if (Array.isArray(d.antiSel)) setAntiSel(d.antiSel)
@@ -111,11 +112,14 @@ export default function Block2Holland() {
   function choosePair(choice, intensity) {
     const p = PAIRS[pairIdx]
     const type = choice === 'A' ? p.tA : p.tB
-    scales[type] += intensity
-    pairAnswers.push({ qId: p.id, choice, intensity, type })
+    const wasAnswered = pairAnswers[pairIdx] != null
+    pairAnswers[pairIdx] = { qId: p.id, choice, intensity, type }
     const ni = pairIdx + 1
-    setPairIdx(ni)
     setCurChoice(null)
+    // При правке уже отвеченной пары просто переходим к следующей — без повторного
+    // показа «зрелости» и без ухода из фазы (эти переходы только на первом проходе).
+    if (wasAnswered) { if (ni < 30) setPairIdx(ni); return }
+    setPairIdx(ni)
     if (ni % 5 === 0 && ni <= 30) {
       const matIdx = ni / 5 - 1
       if (matIdx < 6) { setCurMatIdx(matIdx); setMatSel(null); setPhase('maturity'); return }
@@ -135,6 +139,9 @@ export default function Block2Holland() {
 
   async function submit() {
     const dur = timerRef.current ? timerRef.current.stop() : 0
+    // Пересчитываем баллы из ответов (а не из накопленного счётчика) — так правка ответов корректна.
+    const scales = { R: 0, I: 0, A: 0, S: 0, E: 0, C: 0 }
+    pairAnswers.forEach(a => { if (a && a.type != null) scales[a.type] += a.intensity })
     const scores = scoreHolland({ scales, matAnswers, antiSel, energySel, explorationVal, durationSec: dur })
     const { flags, ...rest } = scores
 
@@ -176,16 +183,18 @@ export default function Block2Holland() {
   let body = null
   if (phase === 'pairs') {
     const p = PAIRS[pairIdx]
+    const stored = pairAnswers[pairIdx]                    // ответ на эту пару (при возврате)
+    const activeChoice = curChoice || (stored ? stored.choice : null)
     body = (
       <>
         <div className="q-counter">Вопрос {pairIdx + 1} из 30</div>
         <div className="q-text">Что тебе ближе?</div>
         <div className="pair-row">
           {['A', 'B'].map(side => {
-            const sel = curChoice === side
+            const sel = activeChoice === side
             return (
               <div key={side}
-                className={'pair-card' + (sel ? ' sel' : '') + (curChoice && !sel ? ' dim' : '')}
+                className={'pair-card' + (sel ? ' sel' : '') + (activeChoice && !sel ? ' dim' : '')}
                 onClick={() => { if (!sel) setCurChoice(side) }}>
                 <div className="pair-label">{side === 'A' ? 'А' : 'Б'}</div>
                 <div className="pair-text">{side === 'A' ? p.a : p.b}</div>
@@ -195,7 +204,7 @@ export default function Block2Holland() {
                     <div className="ii-row">
                       {[1, 2, 3].map(lvl => (
                         <button key={lvl}
-                          className={`ii-btn ii-${side} lvl${lvl}`}
+                          className={`ii-btn ii-${side} lvl${lvl}` + (stored && stored.choice === side && stored.intensity === lvl ? ' sel' : '')}
                           onClick={(e) => { e.stopPropagation(); choosePair(side, lvl) }}>
                           {['Немного', 'Заметно', 'Намного'][lvl - 1]}
                         </button>
@@ -207,7 +216,14 @@ export default function Block2Holland() {
             )
           })}
         </div>
-        {curChoice && <div className="ii-hint">цвет показывает силу: бледный — немного, насыщенный — намного</div>}
+        {activeChoice && <div className="ii-hint">цвет показывает силу: бледный — немного, насыщенный — намного</div>}
+        <QuestionNav
+          total={30} current={pairIdx}
+          isAnswered={(i) => pairAnswers[i] != null}
+          onJump={(i) => { setCurChoice(null); setPairIdx(i) }}
+          onBack={() => { setCurChoice(null); setPairIdx(i => Math.max(0, i - 1)) }}
+          onFinish={() => { setCurChoice(null); setPhase('anti') }}
+        />
       </>
     )
   } else if (phase === 'maturity') {

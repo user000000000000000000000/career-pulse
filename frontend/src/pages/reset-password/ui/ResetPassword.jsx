@@ -5,6 +5,7 @@ import Card from '../../../shared/ui/Card.jsx'
 import Input from '../../../shared/ui/Input.jsx'
 import Button from '../../../shared/ui/Button.jsx'
 import { updatePassword } from '../../../shared/auth'
+import { friendlyError } from '../../../shared/lib/errors'
 import '../../../shared/ui/legal.css'
 import '../../../shared/ui/auth.css'
 
@@ -25,7 +26,7 @@ export default function ResetPassword() {
       await updatePassword(password)
       setDone(true)
     } catch (err) {
-      setError(err.message || 'Не удалось обновить пароль. Возможно, ссылка устарела — запросите новую.')
+      setError(friendlyError(err, 'Не удалось обновить пароль. Возможно, ссылка устарела — запросите новую.'))
       setBusy(false)
     }
   }

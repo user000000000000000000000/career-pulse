@@ -19,6 +19,13 @@ export function alertDialog(opts = {}) {
     _open({ ...opts, resolve, isAlert: true })
   })
 }
+// Выбор из нескольких вариантов: options = [{ label, value, style }]. Резолвится value кнопки.
+export function choiceDialog(opts = {}) {
+  return new Promise((resolve) => {
+    if (typeof _open !== 'function') { resolve(null); return }
+    _open({ ...opts, resolve, isAlert: false })
+  })
+}
 
 const btnBase = { padding: '10px 20px', borderRadius: 8, fontWeight: 700, fontSize: 13, cursor: 'pointer', fontFamily: "'Golos Text',sans-serif", border: 'none' }
 const btnAccent = { ...btnBase, background: 'var(--accent,#5f96e9)', color: '#ffffff' }
@@ -36,6 +43,7 @@ export function DialogHost() {
   useEffect(() => {
     if (!d) return
     const onKey = (e) => {
+      if (d.options) { if (e.key === 'Escape') close(null); return }
       if (e.key === 'Escape') close(d.isAlert ? undefined : false)
       if (e.key === 'Enter') close(d.isAlert ? undefined : true)
     }
@@ -53,14 +61,25 @@ export function DialogHost() {
       <div role="dialog" aria-modal="true" style={{ width: '100%', maxWidth: 400, background: 'var(--card,#eef0fb)', border: '1px solid var(--line2,rgba(255,255,255,.12))', borderRadius: 16, boxShadow: '0 24px 70px rgba(0,0,0,.6)', padding: 24, fontFamily: "'Golos Text',sans-serif", animation: 'cpDlgIn .18s ease' }}>
         {d.title && <div style={{ fontFamily: "'Bebas Neue',sans-serif", fontSize: 24, letterSpacing: 1.5, color: 'var(--text,#25205c)', marginBottom: 10 }}>{d.title}</div>}
         <div style={{ fontSize: 14, lineHeight: 1.6, color: 'var(--sub,#626185)', whiteSpace: 'pre-line' }}>{d.message}</div>
-        <div style={{ display: 'flex', gap: 10, justifyContent: 'flex-end', marginTop: 22 }}>
-          {!d.isAlert && (
-            <button onClick={() => close(false)} style={btnGhost}>{d.cancelText || 'Отмена'}</button>
-          )}
-          <button onClick={() => close(d.isAlert ? undefined : true)} style={d.danger ? btnDanger : btnAccent}>
-            {d.confirmText || (d.isAlert ? 'Понятно' : 'Да')}
-          </button>
-        </div>
+        {d.options ? (
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 10, marginTop: 22 }}>
+            {d.options.map((o) => (
+              <button key={o.value} onClick={() => close(o.value)}
+                style={o.style === 'danger' ? btnDanger : o.style === 'ghost' ? btnGhost : btnAccent}>
+                {o.label}
+              </button>
+            ))}
+          </div>
+        ) : (
+          <div style={{ display: 'flex', gap: 10, justifyContent: 'flex-end', marginTop: 22 }}>
+            {!d.isAlert && (
+              <button onClick={() => close(false)} style={btnGhost}>{d.cancelText || 'Отмена'}</button>
+            )}
+            <button onClick={() => close(d.isAlert ? undefined : true)} style={d.danger ? btnDanger : btnAccent}>
+              {d.confirmText || (d.isAlert ? 'Понятно' : 'Да')}
+            </button>
+          </div>
+        )}
       </div>
       <style>{`@keyframes cpDlgFade{from{opacity:0}to{opacity:1}}@keyframes cpDlgIn{from{opacity:0;transform:translateY(-8px) scale(.97)}to{opacity:1;transform:none}}`}</style>
     </div>

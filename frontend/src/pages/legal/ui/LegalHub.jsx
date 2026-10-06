@@ -5,7 +5,7 @@ import SocialIcon from '../../../shared/ui/SocialIcon.jsx'
 export default function LegalHub() {
   const [showCookie, setShowCookie] = useState(false)
   return (
-    <LegalShell>
+    <LegalShell title="Правовые документы" description="Политика конфиденциальности, пользовательское соглашение и согласия CareerPulse.">
       <>
 <nav className="legal-nav">
   <a href="/" className="nav-logo-link">

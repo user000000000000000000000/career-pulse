@@ -1,7 +1,8 @@
 import { useEffect, useRef, useState, useCallback } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { CP } from '../../../shared/api'
-import { confirmDialog } from '../../../shared/ui/Dialog.jsx'
+import { choiceDialog } from '../../../shared/ui/Dialog.jsx'
+import { clearBlockDraft, markBlockEdit, seedDraftFromResult } from './useBlockDraft'
 
 /**
  * Общая логика старта диагностического блока (порт init-IIFE из block-N.html):
@@ -14,6 +15,7 @@ import { confirmDialog } from '../../../shared/ui/Dialog.jsx'
 export default function useDiagBlock(blockNum) {
   const navigate = useNavigate()
   const [ready, setReady] = useState(false)
+  const [editMode, setEditMode] = useState(false)
   const timerRef = useRef(null)
 
   useEffect(() => {
@@ -21,12 +23,30 @@ export default function useDiagBlock(blockNum) {
     ;(async () => {
       const ex = await CP.getBlockResult(blockNum)
       if (ex && ex.status === 'completed') {
-        const again = await confirmDialog({ title: 'Блок уже пройден', message: 'Этот блок уже пройден. Пройти заново? Прежние ответы по нему перезапишутся.', confirmText: 'Пройти заново', cancelText: 'В кабинет' })
-        if (!again) {
+        const choice = await choiceDialog({
+          title: 'Блок уже пройден',
+          message: 'Ты уже проходил(а) этот блок. Что сделать?',
+          options: [
+            { label: 'Изменить ответы', value: 'edit' },
+            { label: 'Начать заново', value: 'restart', style: 'ghost' },
+            { label: 'В кабинет', value: 'cancel', style: 'ghost' },
+          ],
+        })
+        if (choice === 'restart') {
+          // Полный сброс блока: и сохранённый результат, и черновик-копия ответов.
+          await CP.clearBlock(blockNum)
+          clearBlockDraft(blockNum)
+        } else if (choice !== 'edit') {
+          // «В кабинет», клик по фону или Escape — ничего не меняем.
           navigate('/dashboard')
           return
+        } else {
+          // 'edit' — восстанавливаем ответы из сохранённого результата в черновик (на случай
+          // старых прохождений без черновика) и открываем блок с первого вопроса.
+          seedDraftFromResult(blockNum, ex)
+          markBlockEdit(blockNum)
+          setEditMode(true)
         }
-        await CP.clearBlock(blockNum)
       }
       if (!alive) return
       timerRef.current = CP.startTimer()
@@ -51,5 +71,5 @@ export default function useDiagBlock(blockNum) {
     navigate(n ? '/test/' + n : '/diagnostic')
   }, [navigate])
 
-  return { ready, timerRef, goNext }
+  return { ready, timerRef, goNext, editMode }
 }

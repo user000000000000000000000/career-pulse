@@ -6,11 +6,13 @@ import Input from '../../../shared/ui/Input.jsx'
 import Button from '../../../shared/ui/Button.jsx'
 import { login as doLogin, requestPasswordReset } from '../../../shared/auth'
 import { startVkLogin } from '../../../shared/auth'
+import { usePageMeta } from '../../../shared/lib/pageMeta'
 import '../../../shared/ui/legal.css'
 import { friendlyError } from '../../../shared/lib/errors'
 import '../../../shared/ui/auth.css'
 
 export default function Login() {
+  usePageMeta('Вход', 'Войдите в личный кабинет CareerPulse, чтобы продолжить карьерную диагностику.')
   const navigate = useNavigate()
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')

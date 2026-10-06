@@ -1,6 +1,9 @@
 import { supabase, isSupabaseConfigured } from './supabase'
+import { config } from '../config'
 
-// Обратная связь. Backend: supabase/migrations/006_feedback.sql (таблица feedback + RLS).
+// Обратная связь. Backend: migration 006_feedback.sql (таблица) + edge-функция
+// feedback (сохраняет + шлёт письмо владельцу). Если функция недоступна —
+// падаем в прямой insert, чтобы отзыв не потерялся (без письма).
 
 /** Отправить отзыв/сообщение о проблеме. */
 export async function submitFeedback({ category = 'other', message, email = '' }) {
@@ -8,14 +11,25 @@ export async function submitFeedback({ category = 'other', message, email = '' }
   if (!isSupabaseConfigured) throw new Error('Supabase не настроен')
   let user = null
   try { ({ data: { user } } = await supabase.auth.getUser()) } catch { /* аноним */ }
-  const { error } = await supabase.from('feedback').insert({
+  const payload = {
     user_id: user?.id || null,
-    email: (email || user?.email || '').trim() || null,
     category,
     message: message.trim().slice(0, 4000),
+    email: (email || user?.email || '').trim() || null,
     page_url: location.href.slice(0, 500),
     user_agent: (navigator.userAgent || '').slice(0, 300),
-  })
+  }
+  // 1) через edge-функцию (сохранит + отправит письмо)
+  try {
+    const res = await fetch(`${config.supabaseUrl}/functions/v1/feedback`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', apikey: config.supabaseAnonKey, Authorization: `Bearer ${config.supabaseAnonKey}` },
+      body: JSON.stringify(payload),
+    })
+    if (res.ok) return
+  } catch { /* функция недоступна — прямой insert ниже */ }
+  // 2) запасной путь — прямой insert (письма не будет, но отзыв сохранится)
+  const { error } = await supabase.from('feedback').insert(payload)
   if (error) throw new Error(error.message)
 }
 

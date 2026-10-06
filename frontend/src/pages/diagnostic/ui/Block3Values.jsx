@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { CP } from '../../../shared/api'
 import DiagShell, { ResultNav } from './DiagShell'
+import QuestionNav from './QuestionNav'
 import useDiagBlock from '../model/useDiagBlock'
 import useBlockDraft from '../model/useBlockDraft'
 import { scoreValues } from '../model/scoring/values'
@@ -43,17 +44,17 @@ export default function Block3Values() {
   const { ready, timerRef, goNext } = useDiagBlock(3)
   const [phase, setPhase] = useState('dilemmas')
   const [qIdx, setQIdx] = useState(0)
-  const [scales] = useState(() => ({ KR: 0, AK: 0, RZ: 0, DU: 0, PR: 0, MB: 0, DO: 0, IN: 0 }))
+  // Ответы храним по индексу дилеммы (перезапись при возврате). Баллы больше НЕ копим
+  // в pick() — пересчитываем из ответов на submit, чтобы правка не задваивала счёт.
   const [answers] = useState(() => [])
   const [antiSel, setAntiSel] = useState([])
   const [openText, setOpenText] = useState('')
   const [result, setResult] = useState(null)
   const clearDraft = useBlockDraft({
     blockNum: 3, ready,
-    snapshot: () => ({ phase, qIdx, scales, answers, antiSel, openText }),
+    snapshot: () => ({ phase, qIdx, answers, antiSel, openText }),
     restore: (d) => {
-      if (d.scales) Object.assign(scales, d.scales)
-      if (Array.isArray(d.answers)) { answers.length = 0; d.answers.forEach(x => answers.push(x)) }
+      if (Array.isArray(d.answers)) { answers.length = 0; d.answers.forEach((x, i) => { answers[i] = x }) }
       if (d.phase) setPhase(d.phase)
       if (typeof d.qIdx === 'number') setQIdx(d.qIdx)
       if (Array.isArray(d.antiSel)) setAntiSel(d.antiSel)
@@ -68,11 +69,10 @@ export default function Block3Values() {
   function pick(ch) {
     const q = QS[qIdx]
     const type = ch === 'A' ? q.tA : q.tB
-    scales[type]++
-    answers.push({ qId: q.id, choice: ch, type })
+    answers[qIdx] = { qId: q.id, choice: ch, type }
     const ni = qIdx + 1
-    setQIdx(ni)
     if (ni >= 28) setPhase('anti')
+    else setQIdx(ni)
   }
   function togAnti(v) {
     if (antiSel.includes(v)) setAntiSel(antiSel.filter(x => x !== v))
@@ -81,6 +81,9 @@ export default function Block3Values() {
 
   async function submit() {
     const dur = timerRef.current ? timerRef.current.stop() : 0
+    // Пересчитываем баллы из ответов (а не из накопленного счётчика) — так правка ответов корректна.
+    const scales = { KR: 0, AK: 0, RZ: 0, DU: 0, PR: 0, MB: 0, DO: 0, IN: 0 }
+    answers.forEach(a => { if (a && a.type != null) scales[a.type]++ })
     const scores = scoreValues({ scales, antiSel, durationSec: dur })
     const { flags, ...rest } = scores
     await CP.saveBlockResult(3, { answers, scores: { ...rest, flags }, durationSec: dur, openAnswers: [{ questionId: 'maturity', text: openText }] })
@@ -117,14 +120,22 @@ export default function Block3Values() {
   let body = null
   if (phase === 'dilemmas') {
     const q = QS[qIdx]
+    const chosen = answers[qIdx] && answers[qIdx].choice
     body = (
       <>
         <div className="q-counter">Дилемма {qIdx + 1} из 28</div>
         <div className="q-context">{q.ctx}</div>
         <div className="pair-row">
-          <div className="pair-card" onClick={() => pick('A')}><div className="pair-label">А</div><div className="pair-text">{q.a}</div></div>
-          <div className="pair-card" onClick={() => pick('B')}><div className="pair-label">Б</div><div className="pair-text">{q.b}</div></div>
+          <div className={'pair-card' + (chosen === 'A' ? ' sel' : '')} onClick={() => pick('A')}><div className="pair-label">А</div><div className="pair-text">{q.a}</div></div>
+          <div className={'pair-card' + (chosen === 'B' ? ' sel' : '')} onClick={() => pick('B')}><div className="pair-label">Б</div><div className="pair-text">{q.b}</div></div>
         </div>
+        <QuestionNav
+          total={28} current={qIdx}
+          isAnswered={(i) => answers[i] != null}
+          onJump={(i) => setQIdx(i)}
+          onBack={() => setQIdx(i => Math.max(0, i - 1))}
+          onFinish={() => setPhase('anti')}
+        />
       </>
     )
   } else if (phase === 'anti') {

@@ -6,6 +6,10 @@ import { supabase, isSupabaseConfigured } from './supabase'
 /** Текущий пользователь — админ? */
 export async function checkIsAdmin() {
   if (!isSupabaseConfigured) return false
+  // is_admin() требует авторизации — для анонима вернёт 401. Не дёргаем RPC без сессии,
+  // чтобы не сыпать 401 в консоль на публичных страницах.
+  const { data: { session } } = await supabase.auth.getSession()
+  if (!session) return false
   const { data, error } = await supabase.rpc('is_admin')
   if (error) return false
   return !!data

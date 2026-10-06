@@ -3,7 +3,7 @@ import ContactLinks from '../../../shared/ui/ContactLinks.jsx'
 
 export default function Recomm() {
   return (
-    <LegalShell>
+    <LegalShell title="Рекомендательные технологии" description="Правила применения рекомендательных технологий на платформе CareerPulse.">
       <>
 <nav className="legal-nav">
   <a href="/" className="nav-logo-link">

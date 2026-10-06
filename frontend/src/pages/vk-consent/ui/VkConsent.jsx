@@ -4,6 +4,7 @@ import Header from '../../../shared/ui/Header.jsx'
 import Card from '../../../shared/ui/Card.jsx'
 import Input from '../../../shared/ui/Input.jsx'
 import Button from '../../../shared/ui/Button.jsx'
+import { friendlyError } from '../../../shared/lib/errors'
 import { supabase } from '../../../shared/api'
 import '../../../shared/ui/legal.css'
 import '../../../shared/ui/auth.css'
@@ -38,7 +39,7 @@ export default function VkConsent() {
       if (err) throw err
       navigate('/dashboard')
     } catch (err) {
-      setError(err.message || 'Не удалось сохранить согласие')
+      setError(friendlyError(err, 'Не удалось сохранить согласие'))
       setBusy(false)
     }
   }

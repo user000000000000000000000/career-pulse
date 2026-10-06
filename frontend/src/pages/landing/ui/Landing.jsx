@@ -4,6 +4,7 @@ import { register as doRegister, getCurrentUser, logout as doLogout } from '../.
 import { isSupabaseConfigured, publicUserCount } from '../../../shared/api'
 import { startVkLogin } from '../../../shared/auth'
 import { confirmDialog } from '../../../shared/ui/Dialog.jsx'
+import { friendlyError } from '../../../shared/lib/errors'
 import ThemeToggle from '../../../shared/ui/ThemeToggle.jsx'
 import '../landing.css'
 
@@ -104,7 +105,7 @@ export default function Landing() {
       if (!needConfirm) setTimeout(() => window.location.reload(), 1600)
     } catch (err) {
       setSubmitting(false)
-      shake('email', (err && err.message) || 'Ошибка регистрации')
+      shake('email', friendlyError(err, 'Ошибка регистрации'))
     }
   }
 

@@ -3,7 +3,7 @@ import ContactLinks from '../../../shared/ui/ContactLinks.jsx'
 
 export default function AdConsent() {
   return (
-    <LegalShell>
+    <LegalShell title="Согласие на рекламную рассылку" description="Согласие на получение рекламных и информационных сообщений от CareerPulse.">
       <>
 <nav className="legal-nav">
   <a href="/" className="nav-logo-link">

@@ -1,11 +1,13 @@
 import { useEffect, useRef } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { usePageMeta } from '../../../shared/lib/pageMeta'
 import '../../../shared/ui/legal.css'
 
-/** Обёртка правовых страниц: скоуп .cp-legal + SPA-навигация по ссылкам. */
-export default function LegalShell({ children }) {
+/** Обёртка правовых страниц: скоуп .cp-legal + SPA-навигация по ссылкам + мета-теги. */
+export default function LegalShell({ children, title, description }) {
   const rootRef = useRef(null)
   const navigate = useNavigate()
+  usePageMeta(title, description)
 
   useEffect(() => {
     const root = rootRef.current

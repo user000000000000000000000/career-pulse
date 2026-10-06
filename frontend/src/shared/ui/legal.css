@@ -81,7 +81,11 @@ nav.legal-nav{
 
 /* ── PHONE (≤640px) ── */
 @media(max-width:640px){
-  .cp-legal nav.legal-nav{padding:14px 20px}
+  .cp-legal nav.legal-nav{padding:14px 16px}
+  /* лого и кнопка «назад» не помещаются на узком экране — ужимаем, чтобы не наезжали */
+  .cp-legal .nav-logo-txt{font-size:16px;letter-spacing:1px}
+  .cp-legal .nav-logo-mark{width:24px;height:24px}
+  .cp-legal .nav-back-link{font-size:12px;padding:7px 11px;white-space:nowrap}
   .cp-legal .container{padding:0 20px}
   .cp-legal .legal-page{padding:96px 0 64px}
   .cp-legal .legal-footer{padding:32px 20px}

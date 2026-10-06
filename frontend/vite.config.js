@@ -12,6 +12,18 @@ export default defineConfig(({ mode }) => {
     plugins: [react()],
     base,
     server: { port: 5173, open: true },
-    build: { outDir: 'dist' }
+    build: {
+      outDir: 'dist',
+      // Вендор в отдельных чанках: React/Router и Supabase меняются редко, поэтому
+      // между релизами их хэш стабилен → браузер берёт их из кэша, качает только наш код.
+      rollupOptions: {
+        output: {
+          manualChunks: {
+            react: ['react', 'react-dom', 'react-router-dom'],
+            supabase: ['@supabase/supabase-js'],
+          },
+        },
+      },
+    }
   }
 })

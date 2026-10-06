@@ -70,6 +70,7 @@ export default function DiagResults() {
   const [repLoading, setRepLoading] = useState(false)
   const [tracks, setTracks] = useState({}) // professionId → { status, specialties }
   const [typeSel, setTypeSel] = useState(null) // null = авто-дефолт по анкете; иначе выбор в тумблере
+  const [expandedProgs, setExpandedProgs] = useState({}) // code специальности → показать все вузы (по умолчанию топ-3)
 
   useEffect(() => {
     let alive = true
@@ -196,6 +197,17 @@ export default function DiagResults() {
             </div>
           </div>
 
+          {!repLoading && report?.key_insights?.length > 0 && (
+            <div style={{ marginTop: 18, background: 'rgba(139,111,232,.07)', border: '1px solid rgba(139,111,232,.22)', borderRadius: 14, padding: '16px 18px' }}>
+              <div className="r-label" style={{ color: 'var(--violet)', marginBottom: 10 }}>💡 Неочевидное о тебе</div>
+              <ul style={{ margin: 0, paddingLeft: 18, display: 'flex', flexDirection: 'column', gap: 8 }}>
+                {report.key_insights.map((x, i) => (
+                  <li key={i} style={{ fontSize: 15, lineHeight: 1.6, color: 'var(--text)' }}>{x}</li>
+                ))}
+              </ul>
+            </div>
+          )}
+
           {!repLoading && report && (report.strengths?.length || report.weaknesses?.length) && (
             <div className="r-grid" style={{ marginTop: 18 }}>
               {report.strengths?.length > 0 && (
@@ -269,8 +281,14 @@ export default function DiagResults() {
                                 : <>ЕГЭ: {sp.ege_required.join(', ')}{sp.ege_choose_one_of.length ? ` + один из (${sp.ege_choose_one_of.join(' / ')})` : ''}</>}
                             </div>
                             {progs.length > 0 ? (
+                              (() => {
+                                // По умолчанию показываем топ-3 (меньше тревоги от длинного списка),
+                                // полный список — по клику «Показать все».
+                                const isOpen = expandedProgs[sp.code]
+                                const shown = isOpen ? progs : progs.slice(0, 3)
+                                return (
                               <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
-                                {progs.slice(0, 6).map((prog, i) => (
+                                {shown.map((prog, i) => (
                                   <div key={i} style={{ fontSize: 12, color: 'var(--text)', display: 'flex', gap: 8 }}>
                                     <span style={{ flex: 1 }}>{prog.institution_name}{prog.city ? ` · ${prog.city}` : ''}{prog.institution_type === 'college' && <span style={{ color: 'var(--ghost)' }}> · колледж</span>}</span>
                                     {prog.min_score_last_year && <span style={{ color: 'var(--ghost)' }}>от {prog.min_score_last_year} баллов ({prog.admission_year})</span>}
@@ -279,10 +297,15 @@ export default function DiagResults() {
                                 {cityFallback && (
                                   <div style={{ fontSize: 11.5, color: 'var(--ghost)', marginTop: 2 }}>В городе «{userCity}» по этому направлению не нашли — показываем другие города.</div>
                                 )}
-                                {progs.length > 6 && (
-                                  <div style={{ fontSize: 11.5, color: 'var(--ghost)', marginTop: 2 }}>+{progs.length - 6} ещё</div>
+                                {progs.length > 3 && (
+                                  <button className="print-hide" onClick={() => setExpandedProgs(p => ({ ...p, [sp.code]: !isOpen }))}
+                                    style={{ alignSelf: 'flex-start', marginTop: 4, background: 'none', border: 'none', padding: 0, cursor: 'pointer', fontSize: 12, fontWeight: 600, color: 'var(--accent)' }}>
+                                    {isOpen ? '− Свернуть' : `Показать все ${progs.length} →`}
+                                  </button>
                                 )}
                               </div>
+                                )
+                              })()
                             ) : (
                               <div style={{ fontSize: 12, color: 'var(--ghost)' }}>{sp.programs.length ? 'Под выбранный фильтр ничего нет — переключи тип выше.' : 'Список для этого направления пока не заполнен.'}</div>
                             )}

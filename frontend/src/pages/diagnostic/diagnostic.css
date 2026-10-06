@@ -17,7 +17,7 @@
 /* topbar */
 .cp-diag .topbar {
   background: rgba(37,32,92,.9); backdrop-filter: blur(16px);
-  border-bottom: 1px solid var(--line); padding: 14px 28px;
+  border-bottom: 1px solid var(--line); padding: 14px 90px 14px 28px;
   display: flex; align-items: center; justify-content: space-between;
   position: sticky; top: 0; z-index: 50;
 }
@@ -308,3 +308,39 @@
   .cp-diag .scale-row { gap: 5px; }
   .cp-diag .scale-btn { width: 40px; height: 40px; font-size: 16px; }
 }
+
+/* ── Навигатор по вопросам (QuestionNav): назад + лента номеров + готово ── */
+.cp-diag .qnav { margin-top: 22px; padding-top: 16px; border-top: 1px solid var(--line); }
+.cp-diag .qnav-top { display: flex; align-items: center; gap: 12px; margin-bottom: 12px; }
+.cp-diag .qnav-back {
+  background: var(--sea-bg); color: var(--sea-text); border: 1px solid var(--sea-border);
+  border-radius: 10px; padding: 7px 14px; font-size: 13px; font-weight: 600; cursor: pointer;
+  font-family: 'Golos Text', sans-serif; transition: background .18s, border-color .18s, opacity .18s;
+}
+.cp-diag .qnav-back:hover:not(:disabled) { background: var(--sea-bg-hover); border-color: var(--sea-border-hover); }
+.cp-diag .qnav-back:disabled { opacity: .4; cursor: default; }
+.cp-diag .qnav-progress { font-size: 12px; color: var(--ghost); font-family: 'JetBrains Mono', monospace; }
+.cp-diag .qnav-finish {
+  margin-left: auto; background: var(--accent); color: var(--on-accent); border: none;
+  border-radius: 10px; padding: 7px 16px; font-size: 13px; font-weight: 700; cursor: pointer;
+  font-family: 'Golos Text', sans-serif; transition: opacity .18s;
+}
+.cp-diag .qnav-finish:hover { opacity: .9; }
+.cp-diag .qnav-ribbon {
+  display: flex; gap: 6px; overflow-x: auto; padding: 4px 2px 8px;
+  scrollbar-width: thin; -webkit-overflow-scrolling: touch;
+}
+.cp-diag .qnav-ribbon::-webkit-scrollbar { height: 4px; }
+.cp-diag .qnav-ribbon::-webkit-scrollbar-thumb { background: var(--line2); border-radius: 2px; }
+.cp-diag .qnav-dot {
+  flex: 0 0 auto; width: 32px; height: 32px; border-radius: 9px; cursor: pointer;
+  border: 1px solid var(--line2); background: var(--card); color: var(--ghost);
+  font-size: 12px; font-weight: 600; font-family: 'JetBrains Mono', monospace;
+  transition: background .15s, border-color .15s, color .15s, transform .1s;
+}
+.cp-diag .qnav-dot:hover { transform: translateY(-1px); border-color: var(--accent); }
+.cp-diag .qnav-dot.done { background: rgba(64,121,211,.12); color: var(--accent); border-color: rgba(64,121,211,.3); }
+.cp-diag .qnav-dot.current { border-color: var(--accent); border-width: 2px; color: var(--accent); box-shadow: 0 0 0 2px rgba(64,121,211,.15); }
+
+/* Подсветка ранее выбранной интенсивности при возврате к паре (Block2) */
+.cp-diag .ii-btn.sel { outline: 2px solid var(--accent); outline-offset: 1px; }

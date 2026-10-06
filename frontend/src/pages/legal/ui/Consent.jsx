@@ -3,7 +3,7 @@ import ContactLinks from '../../../shared/ui/ContactLinks.jsx'
 
 export default function Consent() {
   return (
-    <LegalShell>
+    <LegalShell title="Согласие на обработку персональных данных" description="Согласие на обработку персональных данных на платформе CareerPulse.">
       <>
 <nav className="legal-nav">
   <a href="/" className="nav-logo-link">
