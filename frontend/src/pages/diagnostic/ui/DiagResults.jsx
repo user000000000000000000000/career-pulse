@@ -2,7 +2,9 @@ import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { CP } from '../../../shared/api'
 import { analyzeDiagnostic } from '../api/diagnosticAPI'
-import { getCareerTracksForProfessions } from '../../../shared/api'
+import { getCareerTracksForProfessions, enableResultSharing } from '../../../shared/api'
+import { friendlyError } from '../../../shared/lib/errors'
+import { alertDialog } from '../../../shared/ui/Dialog.jsx'
 import { matchProfessions } from '../../../entities/profession'
 import { defaultInstitutionType, filterPrograms } from '../model/careerTrackFilter'
 import { HOLLAND_PLAIN, buildHollandPortrait } from '../model/hollandPlain.js'
@@ -70,7 +72,21 @@ export default function DiagResults() {
   const [repLoading, setRepLoading] = useState(false)
   const [tracks, setTracks] = useState({}) // professionId → { status, specialties }
   const [typeSel, setTypeSel] = useState(null) // null = авто-дефолт по анкете; иначе выбор в тумблере
-  const [expandedProgs, setExpandedProgs] = useState({}) // code специальности → показать все вузы (по умолчанию топ-3)
+  const [sharing, setSharing] = useState(false)
+
+  async function shareResults() {
+    try {
+      setSharing(true)
+      const token = await enableResultSharing()
+      const base = window.location.origin + import.meta.env.BASE_URL
+      const isHash = window.location.hash.startsWith('#/')   // ссылка под текущий роутер (hash/history)
+      const link = isHash ? `${base}#/r/${token}` : `${base}r/${token}`
+      try { await navigator.clipboard.writeText(link) } catch { /* буфер недоступен — покажем ссылку в диалоге */ }
+      await alertDialog({ title: 'Ссылка на результаты', message: 'Ссылка скопирована. Её можно отправить родителю или наставнику — она открывает результаты без входа.\n\n' + link })
+    } catch (e) {
+      await alertDialog({ title: 'Не получилось', message: friendlyError(e, 'Не удалось создать ссылку. Попробуйте позже.') })
+    } finally { setSharing(false) }
+  }
 
   useEffect(() => {
     let alive = true
@@ -173,8 +189,9 @@ export default function DiagResults() {
         <div className="block-title">ТВОЙ ПРОФИЛЬ</div>
         <div className="block-desc">Пройдено блоков: {progress.completed.length} / {CP.TOTAL_BLOCKS}. Каждый блок добавляет слой.</div>
 
-        <div className="print-hide" style={{ marginTop: 14 }}>
+        <div className="print-hide" style={{ marginTop: 14, display: 'flex', gap: 10, flexWrap: 'wrap' }}>
           <button className="btn btn-accent" onClick={() => window.print()}>📄 Скачать отчёт (PDF)</button>
+          <button className="btn btn-ghost" onClick={shareResults} disabled={sharing}>🔗 {sharing ? 'Создаю ссылку…' : 'Поделиться результатами'}</button>
         </div>
 
         {/* ── Разбор от нейросети (представляет маскот) ── */}
@@ -271,7 +288,7 @@ export default function DiagResults() {
                     ) : (
                       <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
                         {track.specialties.map(sp => {
-                          const { programs: progs, cityFallback } = filterPrograms(sp.programs, { typeFilter, relocationReady, userCity })
+                          const { programs: progs, cityFallback, total } = filterPrograms(sp.programs, { typeFilter, relocationReady, userCity })
                           return (
                           <div key={sp.code}>
                             <div style={{ fontSize: 13, fontWeight: 600, marginBottom: 4 }}>{sp.name} <span style={{ color: 'var(--ghost)', fontWeight: 400 }}>· {sp.code}</span></div>
@@ -281,14 +298,10 @@ export default function DiagResults() {
                                 : <>ЕГЭ: {sp.ege_required.join(', ')}{sp.ege_choose_one_of.length ? ` + один из (${sp.ege_choose_one_of.join(' / ')})` : ''}</>}
                             </div>
                             {progs.length > 0 ? (
-                              (() => {
-                                // По умолчанию показываем топ-3 (меньше тревоги от длинного списка),
-                                // полный список — по клику «Показать все».
-                                const isOpen = expandedProgs[sp.code]
-                                const shown = isOpen ? progs : progs.slice(0, 3)
-                                return (
+                              // Показываем топ-5 (город первым). Без «показать все 252» — из такого
+                              // списка никто не выбирает; точный выбор — на консультации.
                               <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
-                                {shown.map((prog, i) => (
+                                {progs.slice(0, 5).map((prog, i) => (
                                   <div key={i} style={{ fontSize: 12, color: 'var(--text)', display: 'flex', gap: 8 }}>
                                     <span style={{ flex: 1 }}>{prog.institution_name}{prog.city ? ` · ${prog.city}` : ''}{prog.institution_type === 'college' && <span style={{ color: 'var(--ghost)' }}> · колледж</span>}</span>
                                     {prog.min_score_last_year && <span style={{ color: 'var(--ghost)' }}>от {prog.min_score_last_year} баллов ({prog.admission_year})</span>}
@@ -297,15 +310,10 @@ export default function DiagResults() {
                                 {cityFallback && (
                                   <div style={{ fontSize: 11.5, color: 'var(--ghost)', marginTop: 2 }}>В городе «{userCity}» по этому направлению не нашли — показываем другие города.</div>
                                 )}
-                                {progs.length > 3 && (
-                                  <button className="print-hide" onClick={() => setExpandedProgs(p => ({ ...p, [sp.code]: !isOpen }))}
-                                    style={{ alignSelf: 'flex-start', marginTop: 4, background: 'none', border: 'none', padding: 0, cursor: 'pointer', fontSize: 12, fontWeight: 600, color: 'var(--accent)' }}>
-                                    {isOpen ? '− Свернуть' : `Показать все ${progs.length} →`}
-                                  </button>
+                                {total > 5 && (
+                                  <div style={{ fontSize: 11.5, color: 'var(--ghost)', marginTop: 2 }}>…и другие вузы по этому направлению — подберём точный список на консультации</div>
                                 )}
                               </div>
-                                )
-                              })()
                             ) : (
                               <div style={{ fontSize: 12, color: 'var(--ghost)' }}>{sp.programs.length ? 'Под выбранный фильтр ничего нет — переключи тип выше.' : 'Список для этого направления пока не заполнен.'}</div>
                             )}

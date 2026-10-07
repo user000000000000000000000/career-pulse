@@ -4,6 +4,8 @@ import DiagShell, { ResultNav } from './DiagShell'
 import QuestionNav from './QuestionNav'
 import useDiagBlock from '../model/useDiagBlock'
 import useBlockDraft from '../model/useBlockDraft'
+import { blockSummary } from '../model/blockSummary'
+import { MiniRings } from './charts'
 
 const QS = [
   { id: 'A1', t: 'Знаешь ли ты, кем работают твои родители?', sec: '👨‍👩‍👧 Семья', opts: ['Хорошо знаю', 'В общих чертах', 'Почти не знаю'], enc: [5, 3, 1] },
@@ -105,19 +107,20 @@ export default function Block9Social() {
   }
 
   if (result) {
-    const level = v => v >= 60 ? 'Высокая' : v >= 40 ? 'Средняя' : 'Низкая'
-    const clr = v => v >= 60 ? 'r-accent' : v >= 40 ? 'r-violet' : ''
     return (
       <DiagShell num={9} title="КОНТЕКСТ СОХРАНЁН" pct={100}>
         <div className="result">
           <div className="result-icon">🌐</div>
           <div className="result-title">КОНТЕКСТ СОХРАНЁН</div>
           <div className="result-desc">Профиль поддержки, опыта и ресурсов обновлён.</div>
-          <div className="r-grid">
-            <div className="r-card"><div className="r-label">Поддержка семьи</div><div className={'r-val ' + clr(result.family_support)}>{level(result.family_support)} ({result.family_support}%)</div></div>
-            <div className="r-card"><div className="r-label">Поддержка окружения</div><div className={'r-val ' + clr(result.social_support)}>{level(result.social_support)} ({result.social_support}%)</div></div>
-            <div className="r-card"><div className="r-label">Автономия</div><div className={'r-val ' + clr(result.autonomy)}>{level(result.autonomy)} ({result.autonomy}%)</div></div>
-            <div className="r-card"><div className="r-label">Опыт</div><div className={'r-val ' + clr(result.experience)}>{level(result.experience)} ({result.experience}%)</div></div>
+          <div className="result-summary">{blockSummary(9, result)}</div>
+          <div style={{ margin: '4px 0 18px' }}>
+            <MiniRings data={[
+              { label: 'Поддержка семьи', value: result.family_support },
+              { label: 'Поддержка окружения', value: result.social_support },
+              { label: 'Автономия', value: result.autonomy },
+              { label: 'Личный опыт', value: result.experience },
+            ]} />
           </div>
           <ResultNav onNext={goNext} />
         </div>

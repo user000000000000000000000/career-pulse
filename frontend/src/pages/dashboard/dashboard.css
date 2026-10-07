@@ -325,3 +325,16 @@
 }
 .cp-dashboard .consult-divider::before,
 .cp-dashboard .consult-divider::after{content:'';flex:1;height:1px;background:var(--line)}
+/* Мини-результат пройденного блока в карточке (вариант 2) */
+.cp-dashboard .bc-result {
+  display: flex; align-items: center; gap: 7px;
+  font-size: 13px; font-weight: 600; color: var(--accent);
+  background: rgba(64,121,211,.08); border: 1px solid rgba(64,121,211,.2);
+  border-radius: 8px; padding: 7px 10px; margin: 2px 0 8px;
+  line-height: 1.35;
+}
+.cp-dashboard .bc-result-ico {
+  width: 16px; height: 16px; border-radius: 50%; flex-shrink: 0;
+  background: var(--ok); color: #fff; font-size: 10px; font-weight: 800;
+  display: flex; align-items: center; justify-content: center;
+}

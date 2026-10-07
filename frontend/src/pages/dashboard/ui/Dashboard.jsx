@@ -29,6 +29,7 @@ export default function Dashboard() {
   const navigate = useNavigate()
   const menuRef = useRef(null)
   const [completed, setCompleted] = useState([])
+  const [profile, setProfile] = useState({})
   const [pct, setPct] = useState(0)
   const [me, setMe] = useState({ name: '', phone: '', role: '', avatar_url: '' })
   const [userLoaded, setUserLoaded] = useState(false)
@@ -90,6 +91,7 @@ export default function Dashboard() {
 
   useEffect(() => {
     let progAlive = true
+    CP.getProfile().then((p) => { if (progAlive) setProfile(p || {}) })
     CP.getProgress().then((p) => {
       if (!progAlive) return
       setCompleted(p.completed || [])
@@ -126,6 +128,24 @@ export default function Dashboard() {
 
   const totalQ = BLOCKS.reduce((s, b) => s + b.questions, 0)
   const totalTime = BLOCKS.reduce((s, b) => s + b.time, 0)
+
+  // Короткий итог пройденного блока из агрегированного профиля (для карточек в сетке).
+  function blockResult(n) {
+    const p = profile || {}
+    switch (n) {
+      case 1: return p.context?.name ? `${p.context.grade || ''}${p.context.grade ? ' класс' : ''}${p.context.city ? ', ' + p.context.city : ''}`.trim() || 'Контекст собран' : 'Контекст собран'
+      case 2: return p.career_archetype || (p.holland_code ? 'Код ' + p.holland_code : 'Готово')
+      case 3: return p.values_archetype || 'Готово'
+      case 4: return p.personality_archetype || 'Готово'
+      case 5: return p.cognitive_archetype || 'Готово'
+      case 6: return p.career_maturity != null ? `Зрелость ${p.career_maturity}%` : 'Готово'
+      case 7: return p.se_general != null ? `Уверенность ${p.se_general}/100` : 'Готово'
+      case 8: return p.career_clarity != null ? `Ясность будущего ${p.career_clarity}/5` : 'Готово'
+      case 9: return 'Соц. ресурсы учтены'
+      case 10: return 'Письмо сохранено'
+      default: return 'Готово'
+    }
+  }
 
   // Роли-заглушки: кабинеты HR и предпринимателя ещё в разработке.
   if (userLoaded && (me.role === 'hr' || me.role === 'entrepreneur')) {
@@ -281,7 +301,9 @@ export default function Dashboard() {
                       {blk.special && <div className="bc-star" title="Ключевой блок">★</div>}
                     </div>
                     <div className="bc-title">{blk.title}</div>
-                    <div className="bc-desc">{blk.desc}</div>
+                    {done
+                      ? <div className="bc-result"><span className="bc-result-ico">✓</span>{blockResult(blk.n)}</div>
+                      : <div className="bc-desc">{blk.desc}</div>}
                     <div className="bc-meta">
                       <span>📝 {blk.questions} вопросов</span>
                       <span>⏱ ~{blk.time} мин</span>

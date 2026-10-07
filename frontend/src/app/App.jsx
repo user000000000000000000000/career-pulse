@@ -18,6 +18,7 @@ const Profile       = lazy(() => import('../pages/profile').then(m => ({ default
 const Atlas         = lazy(() => import('../pages/atlas').then(m => ({ default: m.Atlas })))
 const ChildResults  = lazy(() => import('../pages/child-results').then(m => ({ default: m.ChildResults })))
 const AdminPanel    = lazy(() => import('../pages/admin').then(m => ({ default: m.AdminPanel })))
+const SharedResults = lazy(() => import('../pages/shared-results').then(m => ({ default: m.SharedResults })))
 const LegalHub  = lazy(() => import('../pages/legal').then(m => ({ default: m.LegalHub })))
 const Privacy   = lazy(() => import('../pages/legal').then(m => ({ default: m.Privacy })))
 const Terms     = lazy(() => import('../pages/legal').then(m => ({ default: m.Terms })))
@@ -54,6 +55,7 @@ export default function App() {
       <Route path="/vk-consent" element={<RequireAuth><VkConsent /></RequireAuth>} />
       <Route path="/login" element={<Login />} />
       <Route path="/reset-password" element={<ResetPassword />} />
+      <Route path="/r/:token" element={<SharedResults />} />
 
       <Route path="/dashboard" element={<RequireAuth><Dashboard /></RequireAuth>} />
       <Route path="/test"        element={<Navigate to="/test/1" replace />} />

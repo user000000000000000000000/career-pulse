@@ -4,6 +4,8 @@ import DiagShell, { ResultNav } from './DiagShell'
 import QuestionNav from './QuestionNav'
 import useDiagBlock from '../model/useDiagBlock'
 import useBlockDraft from '../model/useBlockDraft'
+import { blockSummary } from '../model/blockSummary'
+import { RadarChart } from './charts'
 import { scoreHolland } from '../model/scoring/holland'
 import { HOLLAND_FULL as TYPE_NAMES } from '../model/hollandTypes'
 
@@ -167,6 +169,10 @@ export default function Block2Holland() {
           <div className="result-icon">🎯</div>
           <div className="result-title">{result.career_archetype.toUpperCase()}</div>
           <div className="result-desc">Твой карьерный архетип по Holland RIASEC: <b>{TYPE_NAMES[result.holland_top2[0]]}</b> + <b>{TYPE_NAMES[result.holland_top2[1]]}</b></div>
+          <div className="result-summary">{blockSummary(2, result)}</div>
+          <div style={{ margin: '4px 0 18px' }}>
+            <RadarChart data={['R', 'I', 'A', 'S', 'E', 'C'].map(k => ({ label: TYPE_NAMES[k], value: result[k] || 0 }))} />
+          </div>
           <div className="r-grid">
             <div className="r-card"><div className="r-label">Код Holland</div><div className="r-val r-accent">{result.holland_code}</div></div>
             <div className="r-card"><div className="r-label">Ясность профиля</div><div className="r-val r-violet">{result.profile_clarity}%</div></div>

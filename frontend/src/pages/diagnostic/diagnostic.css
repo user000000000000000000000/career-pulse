@@ -344,3 +344,10 @@
 
 /* Подсветка ранее выбранной интенсивности при возврате к паре (Block2) */
 .cp-diag .ii-btn.sel { outline: 2px solid var(--accent); outline-offset: 1px; }
+
+/* Краткое саммари по итогам блока (blockSummary) */
+.cp-diag .result-summary {
+  max-width: 520px; margin: 0 auto 18px; padding: 14px 18px;
+  background: rgba(64,121,211,.07); border: 1px solid rgba(64,121,211,.2);
+  border-radius: 12px; font-size: 14px; line-height: 1.6; color: var(--text); text-align: left;
+}

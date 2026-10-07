@@ -4,6 +4,7 @@ import DiagShell, { ResultNav } from './DiagShell'
 import QuestionNav from './QuestionNav'
 import useDiagBlock from '../model/useDiagBlock'
 import useBlockDraft from '../model/useBlockDraft'
+import { blockSummary } from '../model/blockSummary'
 import { scoreCognitive } from '../model/scoring/cognitive'
 
 const SELF_QS = [
@@ -116,6 +117,7 @@ export default function Block5Cognitive() {
           <div className="result-icon">🧠</div>
           <div className="result-title">{result.archetype.toUpperCase()}</div>
           <div className="result-desc">Топ-3 по самооценке: <b>{result.top3.map(k => SCALE_NAMES[k]).join(', ')}</b></div>
+          <div className="result-summary">{blockSummary(5, result)}</div>
           <div style={{ maxWidth: 480, margin: '0 auto 20px' }}>
             {allKeys.map(([k, v], i) => {
               const tested = result.testedPct[k]

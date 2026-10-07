@@ -4,6 +4,8 @@ import DiagShell, { ResultNav } from './DiagShell'
 import QuestionNav from './QuestionNav'
 import useDiagBlock from '../model/useDiagBlock'
 import useBlockDraft from '../model/useBlockDraft'
+import { blockSummary } from '../model/blockSummary'
+import { MiniRings } from './charts'
 import { scoreSelfEfficacy } from '../model/scoring/selfEfficacy'
 
 const GEN = [
@@ -110,11 +112,16 @@ export default function Block7SelfEfficacy() {
           <div className="result-icon">🎯</div>
           <div className="result-title">{(STYLE_NAMES[result.dominant_style] || 'СМЕШАННЫЙ').toUpperCase()} СТИЛЬ</div>
           <div className="result-desc">Общая уверенность в себе: <b>{result.se_general}/100</b>. Решительность: <b>{result.decisiveness}/100</b></div>
+          <div className="result-summary">{blockSummary(7, result)}</div>
+          <div style={{ margin: '4px 0 18px' }}>
+            <MiniRings data={[
+              { label: 'Общая уверенность', value: result.se_general },
+              { label: 'Решительность', value: result.decisiveness },
+              { label: 'Индекс реализации', value: result.career_execution },
+            ]} />
+          </div>
           <div className="r-grid">
-            <div className="r-card"><div className="r-label">Уверенность (общая)</div><div className="r-val r-accent">{result.se_general}</div></div>
-            <div className="r-card"><div className="r-label">Решительность</div><div className="r-val r-violet">{result.decisiveness}</div></div>
-            <div className="r-card"><div className="r-label">Индекс реализации</div><div className="r-val" style={{ color: result.career_execution >= 60 ? 'var(--ok)' : 'var(--gold)' }}>{result.career_execution}/100</div></div>
-            <div className="r-card"><div className="r-label">Время</div><div className="r-val">{Math.ceil(result.durationSec / 60)} мин</div></div>
+            <div className="r-card"><div className="r-label">Время прохождения</div><div className="r-val">{Math.ceil(result.durationSec / 60)} мин</div></div>
           </div>
           <ResultNav onNext={goNext} />
         </div>

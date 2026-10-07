@@ -4,6 +4,7 @@ import { CP } from '../../../shared/api'
 import DiagShell from './DiagShell'
 import useDiagBlock from '../model/useDiagBlock'
 import useBlockDraft from '../model/useBlockDraft'
+import { blockSummary } from '../model/blockSummary'
 
 const SECTIONS = [
   { id: 'now', icon: '🙂', title: 'Я сейчас', desc: 'Опиши себя — каким ты видишь себя прямо сейчас', questions: [
@@ -119,6 +120,7 @@ export default function Block10Letter() {
           <div className="result-title">ПИСЬМО ОТПРАВЛЕНО</div>
           <div className="result-desc">Твоё письмо в будущее сохранено. ИИ проанализирует его и найдёт то, что закрытые тесты не показывают: мотивы, ценности, образ будущего из твоих собственных слов.</div>
           <div className="letter-stat"><span>📝 {result.word_count} слов</span><span>🕐 {Math.ceil(result.durationSec / 60)} мин</span><span>⚡ Агентность: {agencyLabel}</span></div>
+          <div className="result-summary">{blockSummary(10, result)}</div>
           <div style={{ background: 'var(--card)', border: '1px solid rgba(245,200,66,.2)', borderRadius: 12, padding: 20, marginBottom: 24, textAlign: 'left', maxWidth: 440, margin: '0 auto 24px' }}>
             <div style={{ fontSize: 12, color: 'var(--gold)', fontWeight: 700, letterSpacing: 1, marginBottom: 8, fontFamily: "'JetBrains Mono',monospace" }}>ЧТО ДАЛЬШЕ</div>
             <div style={{ fontSize: 13, color: 'var(--sub)', lineHeight: 1.7 }}>Наставник получит твоё письмо вместе с результатами всех тестов. ИИ-анализ выделит ключевые мотивы, противоречия и скрытые ресурсы.</div>
