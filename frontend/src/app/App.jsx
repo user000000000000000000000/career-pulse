@@ -13,11 +13,15 @@ const Dashboard     = lazy(() => import('../pages/dashboard').then(m => ({ defau
 const DiagnosticBlock = lazy(() => import('../pages/diagnostic').then(m => ({ default: m.DiagnosticBlock })))
 const DiagResults   = lazy(() => import('../pages/diagnostic').then(m => ({ default: m.DiagResults })))
 const Roadmap       = lazy(() => import('../pages/diagnostic').then(m => ({ default: m.Roadmap })))
+const ProbaBlock    = lazy(() => import('../pages/diagnostic').then(m => ({ default: m.ProbaBlock })))
+const ProbaResult   = lazy(() => import('../pages/diagnostic').then(m => ({ default: m.ProbaResult })))
+const SharedProba   = lazy(() => import('../pages/diagnostic').then(m => ({ default: m.SharedProba })))
 const Result        = lazy(() => import('../pages/result').then(m => ({ default: m.Result })))
 const Profile       = lazy(() => import('../pages/profile').then(m => ({ default: m.Profile })))
 const Atlas         = lazy(() => import('../pages/atlas').then(m => ({ default: m.Atlas })))
 const ChildResults  = lazy(() => import('../pages/child-results').then(m => ({ default: m.ChildResults })))
 const AdminPanel    = lazy(() => import('../pages/admin').then(m => ({ default: m.AdminPanel })))
+const SharedResults = lazy(() => import('../pages/shared-results').then(m => ({ default: m.SharedResults })))
 const LegalHub  = lazy(() => import('../pages/legal').then(m => ({ default: m.LegalHub })))
 const Privacy   = lazy(() => import('../pages/legal').then(m => ({ default: m.Privacy })))
 const Terms     = lazy(() => import('../pages/legal').then(m => ({ default: m.Terms })))
@@ -54,6 +58,13 @@ export default function App() {
       <Route path="/vk-consent" element={<RequireAuth><VkConsent /></RequireAuth>} />
       <Route path="/login" element={<Login />} />
       <Route path="/reset-password" element={<ResetPassword />} />
+      <Route path="/r/:token" element={<SharedResults />} />
+
+      {/* Бесплатный мини-тест без регистрации (блоки 2/4/5) + шаринг результата */}
+      <Route path="/proba" element={<Navigate to="/proba/2" replace />} />
+      <Route path="/proba/result" element={<ProbaResult />} />
+      <Route path="/proba/:n" element={<ProbaBlock />} />
+      <Route path="/t/:data" element={<SharedProba />} />
 
       <Route path="/dashboard" element={<RequireAuth><Dashboard /></RequireAuth>} />
       <Route path="/test"        element={<Navigate to="/test/1" replace />} />

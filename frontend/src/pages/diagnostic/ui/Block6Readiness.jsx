@@ -4,6 +4,8 @@ import DiagShell, { ResultNav } from './DiagShell'
 import QuestionNav from './QuestionNav'
 import useDiagBlock from '../model/useDiagBlock'
 import useBlockDraft from '../model/useBlockDraft'
+import { blockSummary } from '../model/blockSummary'
+import { SegmentScale } from './charts'
 import { scoreReadiness } from '../model/scoring/readiness'
 
 const TYPES = [
@@ -102,19 +104,11 @@ export default function Block6Readiness() {
           <div className="result-icon">⚙️</div>
           <div className="result-title">{TYPE_NAMES[result.top2[0]]} + {TYPE_NAMES[result.top2[1]]}</div>
           <div className="result-desc">Лучше всего у тебя получается: <b>{TYPE_NAMES[result.top2[0]]}</b> и <b>{TYPE_NAMES[result.top2[1]]}</b></div>
-          <div style={{ maxWidth: 460, margin: '0 auto 20px' }}>
-            {Object.entries(result.readiness).sort((a, b) => b[1].combined - a[1].combined).map(([code, d]) => {
-              const c = TYPE_COLORS[code]
-              return (
-                <div key={code} className="dual-bar">
-                  <div className="dual-label">{TYPE_NAMES[code]}</div>
-                  <div className="dual-tracks">
-                    <div className="dtrack"><div className="dtrack-lbl">Самооценка</div><div className="dtrack-bar"><div className="dtrack-fill" style={{ width: d.ability_pct + '%', background: c, opacity: .6 }}></div></div><div className="dtrack-val">{Math.round(d.ability_pct)}</div></div>
-                    <div className="dtrack"><div className="dtrack-lbl">Опыт</div><div className="dtrack-bar"><div className="dtrack-fill" style={{ width: d.experience_pct + '%', background: c }}></div></div><div className="dtrack-val">{Math.round(d.experience_pct)}</div></div>
-                  </div>
-                </div>
-              )
-            })}
+          <div className="result-summary">{blockSummary(6, result)}</div>
+          <div style={{ maxWidth: 460, margin: '0 auto 20px', textAlign: 'left' }}>
+            <SegmentScale data={Object.entries(result.readiness)
+              .sort((a, b) => b[1].combined - a[1].combined)
+              .map(([code, d]) => ({ label: TYPE_NAMES[code], value: d.combined }))} />
           </div>
           <div className="r-grid">
             <div className="r-card"><div className="r-label">Проф. зрелость</div><div className="r-val" style={{ color: result.careerMaturity >= 60 ? 'var(--accent)' : result.careerMaturity >= 40 ? 'var(--violet)' : 'var(--ember)' }}>{result.careerMaturity}/100</div></div>

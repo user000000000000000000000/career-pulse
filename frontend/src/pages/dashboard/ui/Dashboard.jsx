@@ -29,6 +29,8 @@ export default function Dashboard() {
   const navigate = useNavigate()
   const menuRef = useRef(null)
   const [completed, setCompleted] = useState([])
+  const [profile, setProfile] = useState({})
+  const [results, setResults] = useState({})
   const [pct, setPct] = useState(0)
   const [me, setMe] = useState({ name: '', phone: '', role: '', avatar_url: '' })
   const [userLoaded, setUserLoaded] = useState(false)
@@ -90,6 +92,8 @@ export default function Dashboard() {
 
   useEffect(() => {
     let progAlive = true
+    CP.getProfile().then((p) => { if (progAlive) setProfile(p || {}) })
+    CP.getAllResults().then((r) => { if (progAlive) setResults(r || {}) })
     CP.getProgress().then((p) => {
       if (!progAlive) return
       setCompleted(p.completed || [])
@@ -126,6 +130,40 @@ export default function Dashboard() {
 
   const totalQ = BLOCKS.reduce((s, b) => s + b.questions, 0)
   const totalTime = BLOCKS.reduce((s, b) => s + b.time, 0)
+
+  // Короткий итог пройденного блока: берём из агрегированного профиля, а если там
+  // поля нет — из сохранённого результата блока (scores). Блок 10 (письмо) без
+  // сводки намеренно — его разбирает ИИ. Нигде не показываем голое «Готово».
+  function blockResult(n) {
+    const p = profile || {}
+    const s = results[n]?.scores || {}
+    switch (n) {
+      case 1: {
+        const c = p.context || {}
+        const label = `${c.grade ? c.grade + ' класс' : ''}${c.grade && c.city ? ', ' : ''}${c.city || ''}`.trim()
+        return label || 'Контекст собран'
+      }
+      case 2: return p.career_archetype || s.career_archetype || (s.profile_clarity != null ? `Ясность профиля ${s.profile_clarity}%` : 'Склонности определены')
+      case 3: return p.values_archetype || s.values_archetype || 'Ценностный профиль собран'
+      case 4: return p.personality_archetype || s.personality_archetype || s.archetype || 'Тип личности определён'
+      case 5: return p.cognitive_archetype || s.cognitive_archetype || s.archetype || 'Когнитивный профиль готов'
+      case 6: {
+        const m = p.career_maturity ?? s.careerMaturity
+        return m != null ? `Зрелость ${m}%` : 'Готовность оценена'
+      }
+      case 7: {
+        const se = p.se_general ?? s.se_general
+        return se != null ? `Уверенность ${se}/100` : 'Самоэффективность оценена'
+      }
+      case 8: {
+        const c = p.career_clarity ?? s.career_clarity
+        return c != null ? `Ясность будущего ${c}/5` : 'Образ будущего собран'
+      }
+      case 9: return 'Соц. ресурсы учтены'
+      case 10: return 'Письмо сохранено'
+      default: return 'Пройдено'
+    }
+  }
 
   // Роли-заглушки: кабинеты HR и предпринимателя ещё в разработке.
   if (userLoaded && (me.role === 'hr' || me.role === 'entrepreneur')) {
@@ -281,7 +319,9 @@ export default function Dashboard() {
                       {blk.special && <div className="bc-star" title="Ключевой блок">★</div>}
                     </div>
                     <div className="bc-title">{blk.title}</div>
-                    <div className="bc-desc">{blk.desc}</div>
+                    {done
+                      ? <div className="bc-result"><span className="bc-result-ico">✓</span>{blockResult(blk.n)}</div>
+                      : <div className="bc-desc">{blk.desc}</div>}
                     <div className="bc-meta">
                       <span>📝 {blk.questions} вопросов</span>
                       <span>⏱ ~{blk.time} мин</span>

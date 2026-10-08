@@ -4,6 +4,8 @@ import DiagShell, { ResultNav } from './DiagShell'
 import QuestionNav from './QuestionNav'
 import useDiagBlock from '../model/useDiagBlock'
 import useBlockDraft from '../model/useBlockDraft'
+import { blockSummary } from '../model/blockSummary'
+import { BarList } from './charts'
 import { scorePersonality, MAIN } from '../model/scoring/personality'
 
 const QS = [
@@ -100,14 +102,9 @@ export default function Block4Personality() {
           <div className="result-icon">🧠</div>
           <div className="result-title">{result.archetype.toUpperCase()}</div>
           <div className="result-desc">Твои сильные стороны: <b>{result.top3.map(s => SCALE_NAMES[s]).join(', ')}</b></div>
-          <div style={{ maxWidth: 480, margin: '0 auto 20px' }}>
-            {MAIN.map(s => (
-              <div key={s} className="bar-row">
-                <div className="bar-lbl">{SCALE_NAMES[s]}</div>
-                <div className="bar-track"><div className="bar-fill" style={{ width: result.sc[s].pct + '%', background: SCALE_COLORS[s] }}></div></div>
-                <div className="bar-val">{Math.round(result.sc[s].pct)}</div>
-              </div>
-            ))}
+          <div className="result-summary">{blockSummary(4, result)}</div>
+          <div style={{ maxWidth: 480, margin: '0 auto 20px', textAlign: 'left' }}>
+            <BarList data={MAIN.map(s => ({ label: SCALE_NAMES[s], value: result.sc[s].pct }))} />
           </div>
           <div className="r-grid">
             <div className="r-card"><div className="r-label">Индекс искренности</div><div className={'r-val ' + (result.sincerity >= 70 ? 'r-accent' : 'r-violet')}>{result.sincerity}%</div></div>

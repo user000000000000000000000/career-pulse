@@ -4,6 +4,8 @@ import DiagShell, { ResultNav } from './DiagShell'
 import QuestionNav from './QuestionNav'
 import useDiagBlock from '../model/useDiagBlock'
 import useBlockDraft from '../model/useBlockDraft'
+import { blockSummary } from '../model/blockSummary'
+import { RankCards } from './charts'
 import { scoreValues } from '../model/scoring/values'
 
 const VNAMES = { KR: 'Креативность', AK: 'Активные контакты', RZ: 'Развитие себя', DU: 'Духовное удовлетворение', PR: 'Собственный престиж', MB: 'Материальное благополучие', DO: 'Достижения', IN: 'Индивидуальность' }
@@ -105,6 +107,10 @@ export default function Block3Values() {
           <div className="result-icon">💎</div>
           <div className="result-title">{result.values_archetype.toUpperCase()}</div>
           <div className="result-desc">Твои ведущие ценности: <b>{result.values_top3.map(k => VNAMES[k]).join(', ')}</b></div>
+          <div className="result-summary">{blockSummary(3, result)}</div>
+          <div style={{ maxWidth: 360, margin: '4px auto 18px', textAlign: 'left' }}>
+            <RankCards items={result.values_top3.map(k => VNAMES[k])} />
+          </div>
           <div className="r-grid">
             <div className="r-card"><div className="r-label">Мотивационный профиль</div><div className="r-val r-accent">{motMap[result.motivation_type]}</div></div>
             <div className="r-card"><div className="r-label">Согласованность</div><div className="r-val r-violet">{result.values_consistency}%</div></div>

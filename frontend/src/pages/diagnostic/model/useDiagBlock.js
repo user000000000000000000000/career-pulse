@@ -1,8 +1,9 @@
-import { useEffect, useRef, useState, useCallback } from 'react'
+import { useEffect, useRef, useState, useCallback, useContext } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { CP } from '../../../shared/api'
 import { choiceDialog } from '../../../shared/ui/Dialog.jsx'
 import { clearBlockDraft, markBlockEdit, seedDraftFromResult } from './useBlockDraft'
+import { ProbaContext } from './probaContext'
 
 /**
  * Общая логика старта диагностического блока (порт init-IIFE из block-N.html):
@@ -14,6 +15,7 @@ import { clearBlockDraft, markBlockEdit, seedDraftFromResult } from './useBlockD
  */
 export default function useDiagBlock(blockNum) {
   const navigate = useNavigate()
+  const proba = useContext(ProbaContext)
   const [ready, setReady] = useState(false)
   const [editMode, setEditMode] = useState(false)
   const timerRef = useRef(null)
@@ -22,7 +24,8 @@ export default function useDiagBlock(blockNum) {
     let alive = true
     ;(async () => {
       const ex = await CP.getBlockResult(blockNum)
-      if (ex && ex.status === 'completed') {
+      // В мини-тесте не спрашиваем «уже пройден» — просто прогоняем блок заново.
+      if (!proba && ex && ex.status === 'completed') {
         const choice = await choiceDialog({
           title: 'Блок уже пройден',
           message: 'Ты уже проходил(а) этот блок. Что сделать?',
@@ -66,10 +69,11 @@ export default function useDiagBlock(blockNum) {
   }, [ready])
 
   const goNext = useCallback(async () => {
+    if (proba) { navigate(proba.nextPath(blockNum)); return }
     const n = await CP.getNextBlock()
     // если остались непройденные блоки — на следующий; иначе сразу на страницу результатов
     navigate(n ? '/test/' + n : '/diagnostic')
-  }, [navigate])
+  }, [navigate, proba, blockNum])
 
   return { ready, timerRef, goNext, editMode }
 }

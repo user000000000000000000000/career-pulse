@@ -4,6 +4,7 @@ import DiagShell, { ResultNav } from './DiagShell'
 import QuestionNav from './QuestionNav'
 import useDiagBlock from '../model/useDiagBlock'
 import useBlockDraft from '../model/useBlockDraft'
+import { blockSummary } from '../model/blockSummary'
 
 const QS = [
   { id: 'BUD1', t: 'Что для тебя важнее в будущей работе?', type: 'radio', opts: ['Стабильность', 'Рост и вызовы', 'Оба одинаково'] },
@@ -87,6 +88,7 @@ export default function Block8Future() {
           <div className="result-icon">🔮</div>
           <div className="result-title">ОБРАЗ БУДУЩЕГО</div>
           <div className="result-desc">Параметры будущей работы и готовность к пути сохранены в твой профиль.</div>
+          <div className="result-summary">{blockSummary(8, result)}</div>
           <div className="r-grid">
             <div className="r-card"><div className="r-label">Среда</div><div className="r-val r-accent">{envMap[result.work_profile.stability_vs_growth]}</div></div>
             <div className="r-card"><div className="r-label">Амбиции</div><div className="r-val r-violet">{ambMap[result.work_profile.ambition_level]}</div></div>

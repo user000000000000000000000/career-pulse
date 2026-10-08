@@ -1,3 +1,6 @@
 export { default as DiagnosticBlock } from './ui/DiagnosticBlock.jsx'
 export { default as DiagResults } from './ui/DiagResults.jsx'
 export { default as Roadmap } from './ui/Roadmap.jsx'
+export { default as ProbaBlock } from './ui/ProbaBlock.jsx'
+export { default as ProbaResult } from './ui/ProbaResult.jsx'
+export { default as SharedProba } from './ui/SharedProba.jsx'

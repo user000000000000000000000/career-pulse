@@ -3,6 +3,7 @@ import { CP } from '../../../shared/api'
 import DiagShell, { ResultNav } from './DiagShell'
 import useDiagBlock from '../model/useDiagBlock'
 import useBlockDraft from '../model/useBlockDraft'
+import { blockSummary } from '../model/blockSummary'
 import { scoreAnketa } from '../model/scoring/anketa'
 
 const EGE = [
@@ -130,6 +131,7 @@ export default function Block1Anketa() {
         <div className="result">
           <div className="result-icon">✅</div>
           <div className="result-desc">Контекстный профиль создан. Все блоки настроены под твою ситуацию.</div>
+          <div className="result-summary">{blockSummary(1, result)}</div>
           <div className="result-cards">
             <div className="r-card"><div className="rc-label">Определённость</div><div className={'rc-value ' + cClr[result.choice_clarity]}>{cMap[result.choice_clarity]}</div></div>
             <div className="r-card"><div className="rc-label">Тревога</div><div className={'rc-value ' + aClr[result.career_anxiety]}>{aMap[result.career_anxiety]}</div></div>

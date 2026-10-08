@@ -38,7 +38,7 @@
   box-shadow: -16px 0 48px rgba(0,0,0,0.5);
   transform: translateX(100%); transition: transform .28s cubic-bezier(.4,0,.2,1);
   display: flex; flex-direction: column;
-  font-family: 'Golos Text', sans-serif;
+  font-family: var(--font-body);
 }
 .appnav-drawer.open{ transform: translateX(0); }
 
@@ -64,7 +64,7 @@
   padding: 13px 14px; border-radius: 10px;
   background: none; border: 1px solid transparent;
   color: var(--sub, #9898b8); font-size: 14px; font-weight: 600;
-  font-family: 'Golos Text', sans-serif; text-align: left; cursor: pointer;
+  font-family: var(--font-body); text-align: left; cursor: pointer;
   transition: all .15s; width: 100%;
 }
 .appnav-item:hover{ background: rgba(var(--overlay-rgb),0.05); color: var(--text, #ecedf8); }
