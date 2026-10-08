@@ -1,21 +1,9 @@
 import { useEffect, useRef, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { register as doRegister, getCurrentUser, logout as doLogout } from '../../../shared/auth'
-import { isSupabaseConfigured, publicUserCount } from '../../../shared/api'
-import { startVkLogin } from '../../../shared/auth'
-import { confirmDialog } from '../../../shared/ui/Dialog.jsx'
-import { friendlyError } from '../../../shared/lib/errors'
-import ThemeToggle from '../../../shared/ui/ThemeToggle.jsx'
-import '../landing.css'
+import { getCurrentUser } from '../../../shared/auth'
+import { publicUserCount } from '../../../shared/api'
+import '../landing-v2.css'
 
-// ФИО хранится как «Фамилия Имя Отчество» → показываем «Имя Ф.»
-function shortName(name = '') {
-  const p = name.trim().split(/\s+/).filter(Boolean)
-  if (!p.length) return 'Профиль'
-  const family = p[0]
-  const given = p[1] || p[0]
-  return (p[1] && family !== given) ? `${given} ${family[0].toUpperCase()}.` : given
-}
 function initials(name = '') {
   const p = name.trim().split(/\s+/).filter(Boolean)
   const family = p[0] || ''
@@ -23,98 +11,28 @@ function initials(name = '') {
   return ((given[0] || '') + (family && family !== given ? family[0] : '')).toUpperCase() || 'И'
 }
 
-const REG_FORM_DEFAULTS = { name: '', surname: '', email: '', phone: '', pass: '', parentName: '', parentEmail: '' }
-
 export default function Landing() {
   const rootRef = useRef(null)
   const navigate = useNavigate()
   const [user, setUser] = useState(null)
   const [userCount, setUserCount] = useState(0)
 
-  // ── Форма регистрации (контролируемые поля) ──
-  const [regForm, setRegForm] = useState(REG_FORM_DEFAULTS)
-  const [role, setRole] = useState('student')
-  const [adult, setAdult] = useState(false)
-  const [agree, setAgree] = useState(false)
-  const [fieldError, setFieldError] = useState({})
-  const [agreeError, setAgreeError] = useState(false)
-  const [submitting, setSubmitting] = useState(false)
-  const [successState, setSuccessState] = useState(null) // null | { needConfirm, email }
-
   useEffect(() => {
     let alive = true
     getCurrentUser().then((u) => { if (alive) setUser(u) })
+    publicUserCount().then((n) => { if (alive && n) setUserCount(n) }).catch(() => {})
     return () => { alive = false }
   }, [])
 
-  async function onLogout() {
-    const ok = await confirmDialog({ title: 'Выход', message: 'Выйти из аккаунта?', confirmText: 'Выйти', danger: true })
-    if (!ok) return
-    await doLogout()
-    setUser(null)
-  }
-
-  function setField(id, v) { setRegForm(f => ({ ...f, [id]: v })); setFieldError(e => ({ ...e, [id]: undefined })) }
-  function shake(field, msg) {
-    setFieldError(e => ({ ...e, [field]: msg }))
-    setTimeout(() => setFieldError(e => ({ ...e, [field]: undefined })), 2000)
-  }
-  function shakeAgree() {
-    setAgreeError(true)
-    setTimeout(() => setAgreeError(false), 2500)
-  }
-  function onPhoneChange(e) {
-    let v = e.target.value.replace(/\D/g, '')
-    if (v.startsWith('7') || v.startsWith('8')) v = v.slice(1)
-    let f = '+7 '
-    if (v.length > 0) f += '(' + v.slice(0, 3)
-    if (v.length >= 3) f += ') ' + v.slice(3, 6)
-    if (v.length >= 6) f += '-' + v.slice(6, 8)
-    if (v.length >= 8) f += '-' + v.slice(8, 10)
-    setField('phone', f)
-  }
-
-  async function handleSubmit(e) {
-    e.preventDefault()
-    if (submitting) return
-
-    const name = regForm.name.trim()
-    const surname = regForm.surname.trim()
-    const email = regForm.email.trim()
-    const pass = regForm.pass
-    const parentName = regForm.parentName.trim()
-    const parentEmail = regForm.parentEmail.trim()
-
-    if (!name) return shake('name', 'Введите имя')
-    if (!email || !email.includes('@')) return shake('email', 'Введите корректный email')
-    if (pass.length < 8) return shake('pass', 'Пароль минимум 8 символов')
-    if (!adult && (!parentName || !parentEmail.includes('@'))) return shake('parentName', 'Укажите данные родителя')
-    if (!agree) { shakeAgree(); return }
-
-    // Храним в порядке «Фамилия Имя» (как и в остальном приложении),
-    // чтобы отображение имени работало одинаково везде.
-    const fullName = (surname ? surname + ' ' : '') + name
-
-    try {
-      setSubmitting(true)
-      const { user: created } = await doRegister({ name: fullName, email, password: pass, role, isMinor: !adult, parentName: adult ? '' : parentName, parentEmail: adult ? '' : parentEmail })
-      // Нужно ли подтверждение email (только при настроенном Supabase и неподтверждённом аккаунте)
-      const needConfirm = isSupabaseConfigured && created && !created.confirmed_at && !created.email_confirmed_at
-      setSuccessState({ needConfirm, email })
-      // Без подтверждения (демо или confirm выключен) — просто обновляем лендинг авторизованными
-      if (!needConfirm) setTimeout(() => window.location.reload(), 1600)
-    } catch (err) {
-      setSubmitting(false)
-      shake('email', friendlyError(err, 'Ошибка регистрации'))
-    }
-  }
+  // Куда ведёт основной CTA: авторизованный — в кабинет, иначе — в бесплатный мини-тест (без регистрации).
+  const startHref = user ? '/dashboard' : '/proba'
 
   useEffect(() => {
     const root = rootRef.current
     if (!root) return
     const cleanups = []
 
-    // ── Появление при скролле
+    // Появление при скролле
     const obs = new IntersectionObserver(
       (entries) => entries.forEach((e) => { if (e.isIntersecting) e.target.classList.add('visible') }),
       { threshold: 0.08 }
@@ -122,13 +40,7 @@ export default function Landing() {
     root.querySelectorAll('.reveal').forEach((el) => obs.observe(el))
     cleanups.push(() => obs.disconnect())
 
-    // ── Сжатие навбара
-    const nav = root.querySelector('#nav')
-    const onScroll = () => nav && nav.classList.toggle('scrolled', window.scrollY > 60)
-    window.addEventListener('scroll', onScroll)
-    cleanups.push(() => window.removeEventListener('scroll', onScroll))
-
-    // ── Перехват ссылок: SPA-навигация + плавный скролл к якорям
+    // Перехват ссылок: SPA-навигация + плавный скролл к якорям
     const onClick = (e) => {
       const a = e.target.closest('a')
       if (!a) return
@@ -149,413 +61,244 @@ export default function Landing() {
   }, [navigate])
 
   return (
-    <div ref={rootRef} className="cp-landing">
-<nav id="nav">
-  <a href="/" className="nav-logo" style={{textDecoration:'none'}}>
-    <div className="nav-logo-icon">
-      <svg viewBox="0 0 32 32" width="17" height="17" aria-hidden="true"><path d="M17.8 4.5 8.5 18.2h6.1L13 27.5 23.5 13.4h-6.1z" fill="#fff"/></svg>
-    </div>
-    <div className="nav-logo-text">CAREER<span>PULSE</span></div>
-  </a>
-  <ul className="nav-links">
-    <li><a href="#pain">Проблема</a></li>
-    <li><a href="#product">Продукт</a></li>
-    <li><a href="#audience">Для кого</a></li>
-    <li><a href="#register">Записаться</a></li>
-  </ul>
-  <div className="nav-right">
-    <ThemeToggle />
-    {user ? (
-      <>
-        <a href="/profile" className="nav-user" style={{display:'flex',alignItems:'center',gap:'8px',textDecoration:'none',color:'var(--nav-text)',fontWeight:'700',fontSize:'13px',marginRight:'4px'}}>
-          {user.avatar_url
-            ? <span style={{width:'30px',height:'30px',borderRadius:'50%',backgroundImage:`url(${user.avatar_url})`,backgroundSize:'cover',backgroundPosition:'center',display:'block',flexShrink:0}} />
-            : <span style={{width:'30px',height:'30px',borderRadius:'50%',background:'linear-gradient(135deg,var(--accent2),var(--accent))',display:'flex',alignItems:'center',justifyContent:'center',fontSize:'12px',fontWeight:'800',color:'var(--on-accent)',flexShrink:0}}>{initials(user.name)}</span>}
-          <span className="nav-hide-phone">{shortName(user.name)}</span>
-        </a>
-        <a href="/dashboard" className="btn-nav nav-hide-phone">Пройти диагностику</a>
-        <a href="/dashboard" className="btn-nav nav-phone-only">К тестам</a>
-        <button className="btn-ghost" style={{background:'transparent',cursor:'pointer',fontFamily:'inherit'}} onClick={onLogout}>Выйти</button>
-      </>
-    ) : (
-      <>
-        <a href="#register" className="btn-ghost nav-hide-phone">Зарегистрироваться</a>
-        <a href="/login" className="btn-nav" style={{marginRight:'6px',background:'rgba(255,255,255,0.06)',color:'var(--nav-text)',border:'1px solid rgba(255,255,255,0.22)',boxShadow:'none'}}>Войти</a><a href="#register" className="btn-nav">Начать бесплатно</a>
-      </>
-    )}
-  </div>
-</nav>
+    <div ref={rootRef} className="cp-lv2">
 
-
-<div className="hero">
-  <div className="hero-bg"></div>
-  <div className="hero-grid"></div>
-  <div className="hero-scan"></div>
-  <div className="hero-content">
-    <div className="hero-badge"><span className="badge-dot"></span>Карьерная диагностика нового поколения</div>
-    <h1 className="hero-title">
-      <span className="t1">НАЙДИ СВОЙ</span>
-      <span className="t2">КАРЬЕРНЫЙ</span>
-      <span className="t3">пульс · вектор · путь</span>
-    </h1>
-    <p className="hero-sub">
-      <strong>CareerPulse</strong> — платформа, которая соединяет глубокую диагностику личности, анализ рынка труда и живого карьерного наставника в один персональный маршрут.
-    </p>
-    <div className="hero-actions">
-      <a href="#register" className="btn-primary">Пройти диагностику →</a>
-      <a href="#product" className="btn-secondary">Как это работает</a>
-    </div>
-    <div className="hero-strip">
-      <div className="strip-item">
-        <div className="strip-num">30<sub>мин</sub></div>
-        <div className="strip-label">Тест и результат</div>
-      </div>
-      <div className="strip-item">
-        <div className="strip-num">105</div>
-        <div className="strip-label">Профессий в атласе</div>
-      </div>
-      <div className="strip-item">
-        <div className="strip-num">2</div>
-        <div className="strip-label">Карьерных пути</div>
-      </div>
-      <div className="strip-item">
-        <div className="strip-num">4.8<sub>★</sub></div>
-        <div className="strip-label">Средний рейтинг</div>
-      </div>
-      {userCount > 0 && (
-        <div className="strip-item">
-          <div className="strip-num">{userCount}</div>
-          <div className="strip-label">Уже с нами</div>
-        </div>
-      )}
-    </div>
-  </div>
-</div>
-
-
-<div className="trust-strip reveal">
-  <div className="trust-item"><span>🔒</span> Персональные данные защищены</div>
-  <div className="trust-item"><span>🧠</span> Методология Кеттелла · MBTI · Векторная система</div>
-  <div className="trust-item"><span>📊</span> Данные рынка hh.ru в реальном времени</div>
-  <div className="trust-item"><span>👤</span> Живой наставник по вашему профилю</div>
-</div>
-
-
-<section className="sec" id="pain">
-  <div className="reveal">
-    <div className="eyebrow">Почему это важно</div>
-    <h2 className="sec-title">РЫНОК ТРУДА <span className="acc">СЛЕП.</span><br />ЛЮДИ — ПОТЕРЯНЫ.</h2>
-    <p className="sec-lead">Миллионы людей выбирают профессию вслепую, без анализа своих навыков и без понимания, что требуется на рынке сейчас и в ближайшей перспективе.</p>
-  </div>
-  <div className="pain-grid reveal">
-    <div className="pain-card p1">
-      <span className="pain-emoji">😵</span>
-      <h3>Выпускники выбирают вслепую</h3>
-      <p>11-классники выбирают специальность без системной диагностики, опираясь только на советы родителей и случайные тесты. 60% жалеют о выборе уже на 2-м курсе.</p>
-    </div>
-    <div className="pain-card p2">
-      <span className="pain-emoji">🔄</span>
-      <h3>Специалисты застревают</h3>
-      <p>Сотрудники не понимают, как расти. HR-инструменты компаний не умеют работать с личностным профилем. Выгорание и стагнация — следствие отсутствия вектора.</p>
-    </div>
-    <div className="pain-card p3">
-      <span className="pain-emoji">📊</span>
-      <h3>Аналитика не связана с человеком</h3>
-      <p>Данные о вакансиях, трендах профессий и резюме существуют отдельно от диагностики личности. Никто не объединял их в один персональный отчёт.</p>
-    </div>
-  </div>
-</section>
-
-<div className="divider"></div>
-
-
-<section className="sec" id="product">
-  <div className="reveal">
-    <div className="eyebrow">Как мы решаем это</div>
-    <h2 className="sec-title">ЧТО ТАКОЕ <span className="acc">CAREERPULSE</span></h2>
-    <p className="sec-lead">Платформа объединяет психодиагностику, анализ рынка труда и живого карьерного наставника в одном персональном маршруте.</p>
-  </div>
-  <div className="product-layout">
-    <div className="product-features">
-      <div className="feat reveal d1">
-        <div className="feat-icon">🧠</div>
-        <div>
-          <h4>Глубокая диагностика личности</h4>
-          <p>Многоуровневое тестирование: тип личности (MBTI), ценностный профиль, когнитивные способности, мотивационные драйверы — по методологии Кеттелла, 16Personalities и авторской векторной системе профессиональных ориентаций.</p>
-        </div>
-      </div>
-      <div className="feat reveal d2">
-        <div className="feat-icon">📡</div>
-        <div>
-          <h4>AI-аналитика рынка труда</h4>
-          <p>Парсинг вакансий и резюме в реальном времени. Система находит совпадения между вашим профилем и тем, что ищут работодатели — в вашем городе и удалённо.</p>
-        </div>
-      </div>
-      <div className="feat reveal d3">
-        <div className="feat-icon">🗺️</div>
-        <div>
-          <h4>Два пути развития</h4>
-          <p><strong>Путь A:</strong> Как вырасти на текущем месте — конкретные шаги, навыки, сроки. <strong>Путь B:</strong> Переход в новую сферу — дорожная карта смены карьеры с анализом рисков.</p>
-        </div>
-      </div>
-      <div className="feat reveal d4">
-        <div className="feat-icon">🎯</div>
-        <div>
-          <h4>Карьерный консультант и наставник</h4>
-          <p>После диагностики пользователь проходит сессии с живым экспертом, специализирующимся именно в той сфере, которая подошла по профилю.</p>
-        </div>
-      </div>
-      <div className="feat reveal">
-        <div className="feat-icon">📈</div>
-        <div>
-          <h4>Персональный карьерный трекер</h4>
-          <p>Дашборд прогресса: выполненные шаги, навыки в развитии, изменения на рынке труда по вашей специализации, рекомендации в реальном времени.</p>
-        </div>
-      </div>
-    </div>
-    <div className="product-mock reveal d2">
-      <div className="mock-bar">
-        <div className="mock-dot" style={{background:'#ff5f57'}}></div>
-        <div className="mock-dot" style={{background:'#febc2e'}}></div>
-        <div className="mock-dot" style={{background:'#28c840'}}></div>
-        <div className="mock-url">careerpulse.ru · dashboard</div>
-      </div>
-      <div className="mock-body">
-        <div className="mock-profile-row">
-          <div className="mock-av">НС</div>
-          <div>
-            <div className="mock-name">Никита Соколов</div>
-            <div className="mock-type">ENTJ · Командир · Стратег</div>
+      <nav className="lv-nav" id="nav">
+        <div className="lv-nav-inner">
+          <div className="lv-nav-pill">
+            <a href="/" className="lv-logo">CareerPulse</a>
+            <div className="lv-nav-links">
+              <a href="#how">Диагностика</a>
+              <a href="#professions">Профессии</a>
+              <a href="#about">О нас</a>
+            </div>
+          </div>
+          <div className="lv-nav-right">
+            {user ? (
+              <>
+                <a href="/profile" className="lv-nav-avatar"
+                   style={user.avatar_url ? { backgroundImage:`url(${user.avatar_url})` } : undefined}>
+                  {user.avatar_url ? '' : initials(user.name)}
+                </a>
+                <a href="/dashboard" className="lv-cta-pill">В кабинет</a>
+              </>
+            ) : (
+              <>
+                <a href="/login" className="lv-nav-login">Войти</a>
+                <a href={startHref} className="lv-cta-pill">Начать тест</a>
+              </>
+            )}
           </div>
         </div>
-        <div className="mock-bars-block">
-          <div className="mock-bar-row">
-            <div className="mock-bar-lbl">Лидерство</div>
-            <div className="mock-bar-track"><div className="mock-bar-fill" style={{width:'92%',background:'linear-gradient(90deg,#8b6fe8,#5f96e9)'}}></div></div>
-            <div className="mock-bar-val">92</div>
+      </nav>
+
+      <div className="lv-hero">
+        <div className="dotgrid"></div>
+        <div className="blob a-morphA" style={{width:'620px',height:'620px',top:'-260px',left:'-160px',background:'radial-gradient(circle,#C9A6F5,transparent 70%)',opacity:.7}}></div>
+        <div className="blob a-morphB" style={{width:'560px',height:'560px',top:'-220px',left:'22%',background:'radial-gradient(circle,#8FB3F5,transparent 70%)',opacity:.65}}></div>
+        <div className="blob a-morphC" style={{width:'420px',height:'420px',top:'120px',right:'-100px',background:'radial-gradient(circle,#F5B8E0,transparent 70%)',opacity:.5}}></div>
+        <div className="ring a-spin" style={{width:'120px',height:'120px',top:'90px',right:'22%'}}></div>
+        <div className="ring2 a-spinRev" style={{width:'64px',height:'64px',top:'260px',left:'6%'}}></div>
+        <div className="plus" style={{top:'150px',left:'44%'}}></div>
+        <div className="plus" style={{top:'420px',right:'8%'}}></div>
+        <div className="grain"></div>
+
+        <div className="lv-hero-inner">
+          <div className="lv-hero-left">
+            <div className="lv-badge glass">10 блоков диагностики · ИИ-разбор</div>
+            <h1 className="lv-hero-title">Найди свой<br/><span className="accent">путь</span> в профессии</h1>
+            <p className="lv-hero-sub">Профиль личности, сильные стороны и карьерный маршрут с живым наставником — за один тест.</p>
+            <div className="lv-hero-actions">
+              <a href={startHref} className="lv-btn-primary">Пройти диагностику →</a>
+              <div className="lv-hero-note">
+                {userCount > 0 ? `${userCount.toLocaleString('ru-RU')} уже прошли` : 'Бесплатно · ≈30 минут'}
+              </div>
+            </div>
           </div>
-          <div className="mock-bar-row">
-            <div className="mock-bar-lbl">Коммуникация</div>
-            <div className="mock-bar-track"><div className="mock-bar-fill" style={{width:'88%',background:'linear-gradient(90deg,#5f96e9,#8b6fe8)'}}></div></div>
-            <div className="mock-bar-val">88</div>
-          </div>
-          <div className="mock-bar-row">
-            <div className="mock-bar-lbl">Аналитика</div>
-            <div className="mock-bar-track"><div className="mock-bar-fill" style={{width:'85%',background:'linear-gradient(90deg,#e8a0c4,#8b6fe8)'}}></div></div>
-            <div className="mock-bar-val">85</div>
-          </div>
-          <div className="mock-bar-row">
-            <div className="mock-bar-lbl">Стратегия</div>
-            <div className="mock-bar-track"><div className="mock-bar-fill" style={{width:'90%',background:'linear-gradient(90deg,#8b6fe8,#e8a0c4)'}}></div></div>
-            <div className="mock-bar-val">90</div>
-          </div>
-        </div>
-        <div className="mock-tags-row">
-          <span className="mock-tag">Предприниматель</span>
-          <span className="mock-tag t2">Стратег</span>
-          <span className="mock-tag t3">Продажи</span>
-          <span className="mock-tag">EdTech</span>
-        </div>
-        <div style={{fontSize:'10px',color:'var(--muted2)',marginBottom:'10px',fontFamily:'\'JetBrains Mono\',monospace',letterSpacing:'1.5px',textTransform:'uppercase'}}>Карьерные пути</div>
-        <div className="mock-paths-row">
-          <div className="mock-path-card pa">
-            <div className="mock-path-lbl">Путь A · Рост</div>
-            <div className="mock-path-title">Product Director</div>
-            <div className="mock-path-match" style={{color:'var(--accent)'}}>● 94% совпадение</div>
-          </div>
-          <div className="mock-path-card pb">
-            <div className="mock-path-lbl">Путь B · Переход</div>
-            <div className="mock-path-title">EdTech Founder</div>
-            <div className="mock-path-match" style={{color:'#8b6fe8'}}>● 91% совпадение</div>
+          <div className="lv-hero-right">
+            <div className="lv-profile-card glass">
+              <div className="lv-pc-head"><div className="lv-pc-title">Твой профиль готов</div><div className="lv-pc-dot"></div></div>
+              <div className="lv-pc-rings">
+                <div className="lv-ringstat"><div className="disc" style={{background:'conic-gradient(#5B93E8 0%,#5B93E8 88%,rgba(43,42,74,.1) 88%,rgba(43,42,74,.1) 100%)'}}><div>88%</div></div><div className="lbl">Личность</div></div>
+                <div className="lv-ringstat"><div className="disc" style={{background:'conic-gradient(#5B93E8 0%,#5B93E8 92%,rgba(43,42,74,.1) 92%,rgba(43,42,74,.1) 100%)'}}><div>92%</div></div><div className="lbl">Способности</div></div>
+                <div className="lv-ringstat"><div className="disc" style={{background:'conic-gradient(#5B93E8 0%,#5B93E8 85%,rgba(43,42,74,.1) 85%,rgba(43,42,74,.1) 100%)'}}><div>85%</div></div><div className="lbl">Интересы</div></div>
+              </div>
+              <div className="lv-pc-sep"></div>
+              <div className="lv-pc-cap">Топ-профессия</div>
+              <div className="lv-pc-prof"><b>Data-аналитик</b><span>92%</span></div>
+            </div>
+            <div className="lv-chip-float glass a-float">200 профессий</div>
           </div>
         </div>
       </div>
-    </div>
-  </div>
-</section>
 
-<div className="divider"></div>
-
-
-<div className="sec-full">
-  <div className="sec-inner" id="audience">
-    <div className="reveal">
-      <div className="eyebrow">Для кого</div>
-      <h2 className="sec-title">ЧЕТЫРЕ <span className="acc">АУДИТОРИИ</span></h2>
-      <p className="sec-lead">Четыре ключевых сегмента, боль которых мы закрываем.</p>
-    </div>
-    <div className="aud-grid reveal">
-      <div className="aud-card c1">
-        <span className="aud-emoji">🎓</span>
-        <h3>Обучающиеся и родители</h3>
-        <div className="aud-sub">B2C · 16–18 лет</div>
-        <p>Стоят перед выбором профессии без инструментов и системы. Первый серьёзный выбор в жизни. Высокая тревога — родители готовы платить за определённость.</p>
-        <span className="aud-size">~700 000 выпускников в год</span>
-      </div>
-      <div className="aud-card c2">
-        <span className="aud-emoji">💼</span>
-        <h3>Специалисты & Менеджеры</h3>
-        <div className="aud-sub">B2C · 25–45 лет</div>
-        <p>Ощущают стагнацию, думают о смене работы или сферы. Готовы инвестировать в карьеру. Ищут чёткий план, а не общие слова о «личностном росте».</p>
-        <span className="aud-size">~18 млн активных специалистов</span>
-      </div>
-      <div className="aud-card c3">
-        <span className="aud-emoji">🚀</span>
-        <h3>Предприниматели</h3>
-        <div className="aud-sub">B2C Premium</div>
-        <p>Ищут подтверждение своих сильных сторон, хотят понять — куда развивать бизнес в связке с личным профилем. Готовы платить за Premium-сессии.</p>
-        <span className="aud-size">~6 млн предпринимателей</span>
-      </div>
-      <div className="aud-card c4">
-        <span className="aud-emoji">🏢</span>
-        <h3>Компании & HR-отделы</h3>
-        <div className="aud-sub">B2B · корпоративный</div>
-        <p>Оценка персонала, построение карьерных треков, снижение текучести. Покупают пакеты на команду. Главный канал масштабирования выручки.</p>
-        <span className="aud-size">~2782 HR-компании в РФ</span>
-      </div>
-    </div>
-  </div>
-</div>
-
-
-<div className="reg-section" id="register">
-  <div className="reg-inner">
-    <div className="reg-left reveal">
-      <div className="eyebrow">Записаться</div>
-      <h2>НАЧНИ <span className="acc">ПРЯМО</span><br />СЕЙЧАС</h2>
-      <p>Пройди диагностику за 30 минут и получи персональный карьерный маршрут с двумя путями развития.</p>
-      <div className="reg-benefits">
-        <div className="reg-benefit">Полный отчёт по личности — 10+ методик</div>
-        <div className="reg-benefit">AI-анализ рынка труда по твоему профилю</div>
-        <div className="reg-benefit">Два карьерных пути: рост и переход</div>
-        <div className="reg-benefit">Первая сессия с наставником — бесплатно</div>
-        <div className="reg-benefit">Атлас из 105 профессий с совместимостью</div>
-        <div className="reg-benefit">Персональный трекер прогресса</div>
-      </div>
-    </div>
-    <div className="reg-form reveal d2" id="reg-form-wrap">
-      {successState ? (
-        <div className="success-msg" style={{ display: 'block' }}>
-          {successState.needConfirm ? (
-            <>
-              <span className="s-icon">📬</span>
-              <h3>ПОДТВЕРДИТЕ EMAIL</h3>
-              <p>Мы отправили письмо на <b>{successState.email}</b>. Перейди по ссылке в письме, чтобы активировать аккаунт и войти.</p>
-            </>
-          ) : (
-            <>
-              <span className="s-icon">🎉</span>
-              <h3>АККАУНТ СОЗДАН!</h3>
-              <p>Аккаунт создан. Переходим в ваш личный кабинет CareerPulse.</p>
-              <div style={{marginTop:'24px',fontFamily:'\'JetBrains Mono\',monospace',fontSize:'12px',color:'var(--accent)'}}>Перенаправление через 2 сек...</div>
-            </>
-          )}
-        </div>
-      ) : (
-      <div id="form-content">
-        <div className="reg-form-title">Создать аккаунт</div>
-        <div className="reg-form-sub">Уже есть аккаунт? <a href="/login" style={{color:'var(--accent)'}}>Войти</a></div>
-
-
-        <div style={{marginBottom:'18px'}}>
-          <div style={{fontSize:'12px',fontWeight:'700',color:'var(--muted2)',marginBottom:'10px'}}>Кто вы?</div>
-          <div className="roles-grid">
-            {[['student', '🎓', 'Выпускник'], ['specialist', '💼', 'Специалист'], ['entrepreneur', '🚀', 'Предприниматель'], ['hr', '🏢', 'HR / Компания']].map(([v, icon, label]) => (
-              <label key={v} className={'role-opt' + (role === v ? ' active' : '')}>
-                <input type="radio" name="role" value={v} checked={role === v} onChange={() => setRole(v)} />
-                <span className="role-icon">{icon}</span>{label}
-              </label>
-            ))}
+      <div className="lv-how" id="how">
+        <div className="lv-how-inner">
+          <div className="reveal" style={{display:'flex',flexDirection:'column',gap:'16px'}}>
+            <div className="lv-eyebrow">Как это работает</div>
+            <div className="lv-h2">Пять шагов к своей профессии</div>
+            <p className="lv-lead">От первого вопроса до готового профиля и списка профессий — за один заход, без угадывания и общих фраз.</p>
+          </div>
+          <div className="lv-vsteps reveal">
+            <div className="lv-vstep">
+              <div className="lv-vstep-rail"><div className="lv-vstep-node"><svg viewBox="0 0 24 24"><rect x="5" y="4" width="14" height="17" rx="2"/><path d="M9 4V3h6v1"/><path d="M8.5 10h7M8.5 14h5"/></svg></div></div>
+              <div className="lv-vstep-card"><div className="lv-vstep-tag">ШАГ 01</div><b>Пройди диагностику</b><p>10 блоков и около 250 вопросов о характере, ценностях, способностях и интересах. Это основа, на которой строится весь дальнейший разбор.</p></div>
+            </div>
+            <div className="lv-vstep">
+              <div className="lv-vstep-rail"><div className="lv-vstep-node"><svg viewBox="0 0 24 24"><path d="M12 3l1.7 4.6L18.3 9.3 13.7 11 12 15.6 10.3 11 5.7 9.3 10.3 7.6z"/><path d="M18 14.5l.7 1.8 1.8.7-1.8.7-.7 1.8-.7-1.8-1.8-.7 1.8-.7z"/></svg></div></div>
+              <div className="lv-vstep-card"><div className="lv-vstep-tag">ШАГ 02</div><b>Получи ИИ-разбор</b><p>Система читает ответы по всем блокам и собирает цельный профиль — не набор процентов, а объяснение: какой ты, что тобой движет и что в тебе неочевидно даже тебе.</p></div>
+            </div>
+            <div className="lv-vstep">
+              <div className="lv-vstep-rail"><div className="lv-vstep-node"><svg viewBox="0 0 24 24"><path d="M12 3l2.5 5.1 5.6.8-4.1 4 1 5.6L12 16l-5 2.6 1-5.6-4.1-4 5.6-.8z"/></svg></div></div>
+              <div className="lv-vstep-card"><div className="lv-vstep-tag">ШАГ 03</div><b>Узнай сильные стороны</b><p>Видно, что даётся тебе легко, а что требует усилий — и где эти качества ценятся в работе. Готовый язык, чтобы говорить о себе на собеседовании и в резюме.</p></div>
+            </div>
+            <div className="lv-vstep">
+              <div className="lv-vstep-rail"><div className="lv-vstep-node"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="8"/><circle cx="12" cy="12" r="4"/><circle cx="12" cy="12" r="1.2" fill="currentColor" stroke="none"/></svg></div></div>
+              <div className="lv-vstep-card"><div className="lv-vstep-tag">ШАГ 04</div><b>Посмотри профессии</b><p>Из атласа в 200 профессий подбираются подходящие тебе — с процентом совпадения и пояснением почему. Под каждое направление показываем вузы и специальности под твои предметы ЕГЭ.</p></div>
+            </div>
+            <div className="lv-vstep">
+              <div className="lv-vstep-rail"><div className="lv-vstep-node"><svg viewBox="0 0 24 24"><path d="M6 21V4"/><path d="M6 5c3-2 6 2 9.5 0v7c-3.5 2-6.5-2-9.5 0"/></svg></div></div>
+              <div className="lv-vstep-card"><div className="lv-vstep-tag">ШАГ 05</div><b>Построй маршрут</b><p>Живой наставник из подходящей сферы помогает превратить результат в план: с чего начать, какие навыки подтянуть и куда двигаться дальше.</p></div>
+            </div>
           </div>
         </div>
-
-        <div className="form-row">
-          <div className="form-group">
-            <label>Имя</label>
-            <input className="form-input" type="text" value={regForm.name} onChange={e => setField('name', e.target.value)}
-              placeholder={fieldError.name || 'Иван'}
-              style={fieldError.name ? { borderColor: '#ff4d6d', boxShadow: '0 0 0 3px rgba(255,77,109,0.15)' } : undefined} />
-          </div>
-          <div className="form-group">
-            <label>Фамилия</label>
-            <input className="form-input" type="text" placeholder="Иванов" value={regForm.surname} onChange={e => setField('surname', e.target.value)} />
-          </div>
-        </div>
-        <div className="form-group">
-          <label>Email</label>
-          <input className="form-input" type="email" value={regForm.email} onChange={e => setField('email', e.target.value)}
-            placeholder={fieldError.email || 'ivan@email.com'}
-            style={fieldError.email ? { borderColor: '#ff4d6d', boxShadow: '0 0 0 3px rgba(255,77,109,0.15)' } : undefined} />
-        </div>
-        <div className="form-group">
-          <label>Телефон</label>
-          <input className="form-input" type="tel" placeholder="+7 (___) ___-__-__" value={regForm.phone} onChange={onPhoneChange} />
-        </div>
-        <div className="form-group">
-          <label>Пароль</label>
-          <input className="form-input" type="password" value={regForm.pass} onChange={e => setField('pass', e.target.value)}
-            placeholder={fieldError.pass || 'Минимум 8 символов'}
-            style={fieldError.pass ? { borderColor: '#ff4d6d', boxShadow: '0 0 0 3px rgba(255,77,109,0.15)' } : undefined} />
-        </div>
-
-        <div className="form-agree" style={{marginBottom:'10px'}}>
-          <input type="checkbox" id="f-adult" checked={adult} onChange={e => setAdult(e.target.checked)} />
-          <label htmlFor="f-adult">Мне есть 18 лет</label>
-        </div>
-        {!adult && (
-        <div id="f-parent-block">
-          <div className="form-group">
-            <label>ФИО родителя / представителя (если младше 18)</label>
-            <input className="form-input" type="text" value={regForm.parentName} onChange={e => setField('parentName', e.target.value)}
-              placeholder={fieldError.parentName || 'Иванов Иван Иванович'}
-              style={fieldError.parentName ? { borderColor: '#ff4d6d', boxShadow: '0 0 0 3px rgba(255,77,109,0.15)' } : undefined} />
-          </div>
-          <div className="form-group">
-            <label>Email родителя</label>
-            <input className="form-input" type="email" placeholder="parent@email.com" value={regForm.parentEmail} onChange={e => setField('parentEmail', e.target.value)} />
-          </div>
-        </div>
-        )}
-
-        <div className="form-agree" style={agreeError ? { color: '#ff4d6d', outline: '2px solid rgba(255,77,109,0.6)', outlineOffset: '6px', borderRadius: '8px' } : undefined}>
-          <input type="checkbox" id="f-agree" checked={agree} onChange={e => setAgree(e.target.checked)} />
-          <label htmlFor="f-agree">Я принимаю <a href="/legal/terms" target="_blank" style={{color:'var(--accent)'}}>Условия использования</a> и <a href="/legal/privacy" target="_blank" style={{color:'var(--accent)'}}>Политику конфиденциальности</a>, а также даю <a href="/legal/consent" target="_blank" style={{color:'var(--accent)'}}>согласие на обработку персональных данных</a></label>
-        </div>
-
-        <button className="btn-form" onClick={handleSubmit} disabled={submitting}>{submitting ? 'Отправка...' : 'Начать диагностику →'}</button>
-
-        <div className="form-divider">или</div>
-        <button className="btn-secondary" onClick={(e) => { e.preventDefault(); startVkLogin() }} style={{width:'100%',padding:'13px',fontSize:'14px',borderRadius:'8px',display:'flex',alignItems:'center',justifyContent:'center',gap:'10px',color:'#fff',background:'#0077FF',border:'none'}}>
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="#fff"><path d="M15.07 2H8.93C3.33 2 2 3.33 2 8.93v6.14C2 20.67 3.33 22 8.93 22h6.14C20.67 22 22 20.67 22 15.07V8.93C22 3.33 20.67 2 15.07 2zm3.08 13.5h-1.64c-.62 0-.81-.49-1.92-1.61-1-.95-1.44-.95-1.68-.95-.34 0-.44.1-.44.59v1.47c0 .42-.13.67-1.24.67-1.82 0-3.84-1.1-5.26-3.16C4.8 9.88 4.25 8.24 4.25 7.84c0-.24.1-.46.59-.46h1.64c.44 0 .61.2.78.67.86 2.49 2.3 4.67 2.89 4.67.22 0 .32-.1.32-.66V9.84c-.07-1.18-.69-1.28-.69-1.7 0-.2.17-.4.44-.4h2.58c.37 0 .5.2.5.62v3.34c0 .37.17.5.27.5.22 0 .41-.13.82-.54 1.27-1.42 2.17-3.6 2.17-3.6.12-.24.32-.46.76-.46h1.64c.49 0 .6.25.49.59-.2 1-.2.95-1.87 3.17l-.73.98c-.12.17-.17.27 0 .47.12.17.54.53.81.85.75.83 1.32 1.52 1.47 2 .15.46-.07.7-.54.7z"/></svg>
-          Войти через ВКонтакте
-        </button>
       </div>
-      )}
+
+      <div className="lv-prof" id="professions">
+        <div className="blob a-morphB" style={{width:'460px',height:'460px',top:'-180px',right:'-120px',background:'radial-gradient(circle,#8FB3F5,transparent 70%)',opacity:.4}}></div>
+        <div className="ring a-spin" style={{width:'90px',height:'90px',bottom:'40px',left:'8%'}}></div>
+        <div className="grain"></div>
+        <div className="lv-prof-inner">
+          <div className="reveal" style={{display:'flex',flexDirection:'column',gap:'16px'}}>
+            <div className="lv-eyebrow">Атлас из 200 профессий</div>
+            <div className="lv-h2">Подходящие профессии</div>
+            <p className="lv-lead">Так выглядит часть результата на примере одного профиля: профессии, отсортированные по совпадению, с коротким описанием каждой.</p>
+          </div>
+          <div className="lv-prof-grid reveal">
+            <div className="lv-prof-card glass"><div className="lv-prof-ic"><svg viewBox="0 0 24 24"><path d="M5 20V11M12 20V5M19 20v-6"/><path d="M3.5 20h17"/></svg></div><b>Data-аналитик</b><p>Превращает сырые данные в решения: ищет закономерности, строит отчёты и отвечает на вопросы бизнеса цифрами. Подходит тем, у кого аналитический склад ума и тяга к системности.</p><div className="lv-prof-match">Совпадение 92%</div></div>
+            <div className="lv-prof-card glass"><div className="lv-prof-ic"><svg viewBox="0 0 24 24"><circle cx="10.5" cy="10.5" r="6.5"/><path d="M19.5 19.5l-4.2-4.2"/></svg></div><b>UX-исследователь</b><p>Изучает, как люди пользуются продуктом: проводит интервью, проверяет гипотезы и находит, что мешает пользователям. Для тех, кто сочетает эмпатию с любовью к данным.</p><div className="lv-prof-match">Совпадение 88%</div></div>
+            <div className="lv-prof-card glass"><div className="lv-prof-ic"><svg viewBox="0 0 24 24"><rect x="4" y="4" width="16" height="16" rx="2"/><path d="M4 9h16M9.5 9v11"/></svg></div><b>Продуктовый менеджер</b><p>Решает, что команда делает и зачем: расставляет приоритеты и связывает бизнес, дизайн и разработку вокруг метрик. Для тех, кто любит ответственность и общую картину.</p><div className="lv-prof-match">Совпадение 85%</div></div>
+          </div>
+        </div>
+      </div>
+
+      <div className="lv-about" id="about">
+        <div className="lv-about-inner">
+
+          <div className="lv-about-head reveal">
+            <div className="lv-eyebrow">О нас</div>
+            <div className="lv-h2">Профориентация без угадывания</div>
+            <p className="lv-lead">CareerPulse — это не развлекательный тест из интернета. За каждым вопросом стоит признанная методика, а за результатом — объяснение, а не ярлык из четырёх букв. Мы помогаем выбрать направление осознанно: школьникам, студентам и взрослым.</p>
+            <div className="lv-stats">
+              {userCount > 0 && (
+                <div className="lv-stat glass"><div className="lv-stat-num">{userCount.toLocaleString('ru-RU')}</div><div className="lv-stat-lbl">прошли диагностику</div></div>
+              )}
+              <div className="lv-stat glass"><div className="lv-stat-num">10</div><div className="lv-stat-lbl">блоков диагностики</div></div>
+              <div className="lv-stat glass"><div className="lv-stat-num">200</div><div className="lv-stat-lbl">профессий в атласе</div></div>
+              <div className="lv-stat glass"><div className="lv-stat-num">6</div><div className="lv-stat-lbl">научных методик</div></div>
+            </div>
+          </div>
+
+          <div className="reveal">
+            <div className="lv-subhead">На чём построено</div>
+            <div className="lv-mgrid">
+              <div className="lv-mcard"><span className="tag">Интересы · Holland</span><b>Профессиональные типы</b><p>Модель RIASEC Джона Голланда: шесть типов интересов — какая деятельность тебя естественно притягивает.</p></div>
+              <div className="lv-mcard"><span className="tag">Личность · Big Five</span><b>Большая пятёрка</b><p>Пять базовых черт характера — открытость, добросовестность, экстраверсия и другие. Без ярлыков вроде MBTI.</p></div>
+              <div className="lv-mcard"><span className="tag">Ценности</span><b>Что тобой движет</b><p>Ценностный профиль: что для тебя важнее в работе — смысл или результат, рост или стабильность.</p></div>
+              <div className="lv-mcard"><span className="tag">Способности</span><b>Когнитивный профиль</b><p>Сильные стороны мышления и предпочитаемые способы восприятия (VARK): где ты схватываешь быстрее.</p></div>
+              <div className="lv-mcard"><span className="tag">Самоэффективность</span><b>Вера в свои силы</b><p>По Альберту Бандуре: насколько ты уверен в себе в разных сферах и как принимаешь решения.</p></div>
+              <div className="lv-mcard"><span className="tag">Готовность</span><b>Профессиональная зрелость</b><p>Разрыв между самооценкой и реальным опытом — чтобы карьерный план был честным, а не на словах.</p></div>
+            </div>
+          </div>
+
+          <div className="reveal">
+            <div className="lv-subhead">Чем мы отличаемся</div>
+            <div className="lv-diffs">
+              <div className="lv-diff">
+                <div className="lv-diff-ic"><svg viewBox="0 0 24 24"><path d="M4 5h16v11H9l-5 4z"/><path d="M8 10h8M8 13h5"/></svg></div>
+                <div><b>Объяснение, а не ярлык</b><p>ИИ-разбор пишет связный портрет: кто ты и что тобой движет, — а не выдаёт четыре буквы типа и голый график.</p></div>
+              </div>
+              <div className="lv-diff">
+                <div className="lv-diff-ic"><svg viewBox="0 0 24 24"><path d="M9 3h6M10 3v5l-5 10a2 2 0 0 0 2 3h10a2 2 0 0 0 2-3l-5-10V3"/><path d="M7.5 15h9"/></svg></div>
+                <div><b>Методики, а не угадайка</b><p>Шесть признанных психометрических моделей вместо случайных вопросов «кто ты из персонажей».</p></div>
+              </div>
+              <div className="lv-diff">
+                <div className="lv-diff-ic"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M8 12l3 3 5-6"/></svg></div>
+                <div><b>До конкретных шагов</b><p>Не только «кто ты», но и подходящие профессии, вузы под твои предметы ЕГЭ и живой наставник.</p></div>
+              </div>
+              <div className="lv-diff">
+                <div className="lv-diff-ic"><svg viewBox="0 0 24 24"><circle cx="9" cy="8" r="3"/><path d="M3.5 20a5.5 5.5 0 0 1 11 0"/><path d="M16 5.5a3 3 0 0 1 0 5.5"/><path d="M20.5 20a5.5 5.5 0 0 0-4.5-5.4"/></svg></div>
+                <div><b>Для всей семьи</b><p>Связанные кабинеты родителя и ребёнка: результат виден обоим, решение выбора — общее.</p></div>
+              </div>
+            </div>
+          </div>
+
+          <div className="reveal">
+            <div className="lv-subhead">Для кого</div>
+            <div className="lv-roles">
+              <div className="lv-role"><div className="emo">🎓</div><b>Школьник</b><span>Выбор профиля и вуза перед ЕГЭ</span></div>
+              <div className="lv-role"><div className="emo">📚</div><b>Студент</b><span>Проверить направление или сменить его</span></div>
+              <div className="lv-role"><div className="emo">💼</div><b>Специалист</b><span>Рост или переход в новую сферу</span></div>
+              <div className="lv-role"><div className="emo">🚀</div><b>Предприниматель</b><span>Понять свои сильные стороны</span></div>
+              <div className="lv-role"><div className="emo">👨‍👩‍👧</div><b>Родитель</b><span>Помочь ребёнку выбрать осознанно</span></div>
+            </div>
+          </div>
+
+          <div className="lv-info2 reveal">
+            <div className="lv-infocard glass">
+              <div className="ic"><svg viewBox="0 0 24 24"><rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg></div>
+              <b>Твои данные — твои</b>
+              <p>Ответы и профиль видишь только ты и те, кому ты открыл доступ. Мы не продаём данные третьим лицам, а сервис работает на собственных серверах, а не в чужом облаке.</p>
+            </div>
+            <div className="lv-infocard glass">
+              <div className="ic"><svg viewBox="0 0 24 24"><path d="M3 12h4l2-6 4 13 2-7h6"/></svg></div>
+              <b>О проекте</b>
+              <p>CareerPulse начинался как дипломный проект и вырос в рабочую платформу карьерной диагностики. Мы развиваем методику и атлас профессий, опираясь на обратную связь пользователей.</p>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <div className="lv-ctaband">
+        <div className="blob a-morphC" style={{width:'460px',height:'460px',top:'-180px',left:'6%',background:'radial-gradient(circle,rgba(255,255,255,.55),transparent 70%)',opacity:.8}}></div>
+        <div className="blob a-morphA" style={{width:'340px',height:'340px',bottom:'-180px',right:'10%',background:'radial-gradient(circle,rgba(255,255,255,.4),transparent 70%)',opacity:.7}}></div>
+        <div className="ring a-spinRev" style={{width:'70px',height:'70px',top:'40px',right:'20%',borderColor:'rgba(255,255,255,.5)'}}></div>
+        <div className="grain"></div>
+        <div className="lv-ctaband-inner">
+          <h2>Узнай, куда вести карьеру — за один тест</h2>
+          <p>Бесплатно и без регистрации. Аккаунт понадобится, только если захочешь сохранить результат и пройти полный разбор.</p>
+          <a href={startHref} className="lv-ctaband-btn glass-dark">Начать бесплатно →</a>
+        </div>
+      </div>
+
+      <footer className="lv-foot">
+        <div className="lv-foot-brand">
+          <div className="b">CareerPulse</div>
+          <p>Профориентация без угадывания.</p>
+        </div>
+        <div className="lv-foot-cols">
+          <div className="lv-foot-col">
+            <div className="h">Продукт</div>
+            <a href="#how">Диагностика</a>
+            <a href="#professions">Профессии</a>
+            <a href="#about">О нас</a>
+          </div>
+          <div className="lv-foot-col">
+            <div className="h">Документы</div>
+            <a href="/legal/privacy">Конфиденциальность</a>
+            <a href="/legal/terms">Соглашение</a>
+            <a href="/legal">Все документы</a>
+          </div>
+          <div className="lv-foot-col">
+            <div className="h">Контакты</div>
+            <a href="https://t.me/SokolovNYU" target="_blank" rel="noreferrer">Telegram</a>
+            <a href="https://vk.ru/sokolovnyu" target="_blank" rel="noreferrer">ВКонтакте</a>
+          </div>
+        </div>
+        <div className="lv-foot-copy">© 2026 CareerPulse<br/>careerpulse.ru</div>
+      </footer>
+
     </div>
-  </div>
-</div>
-
-
-<div className="trust-strip reveal">
-  <div className="trust-item"><span>🏆</span> 247+ пользователей в 2026</div>
-  <div className="trust-item"><span>⭐</span> Рейтинг 4.8 из 5</div>
-  <div className="trust-item"><span>🤝</span> Партнёр: Общество «Знание»</div>
-  <div className="trust-item"><span>📍</span> Санкт-Петербург · Работаем по всей России</div>
-</div>
-
-
-<footer>
-  <div className="foot-logo">CAREER<span>PULSE</span></div>
-  <div className="foot-links" style={{flexWrap:'wrap',gap:'16px'}}>
-    <a href="#pain">Проблема</a>
-    <a href="#product">Продукт</a>
-    <a href="#audience">Для кого</a>
-    <a href="#register">Регистрация</a>
-    <a href="/legal/privacy">Конфиденциальность</a>
-    <a href="/legal/terms">Соглашение</a>
-    <a href="/legal">Документы</a>
-  </div>
-  <div className="foot-copy">© 2026 CareerPulse · careerpulse.ru · <a href="https://t.me/SokolovNYU" style={{color:'var(--nav-text-sub)',textDecoration:'none'}}>Telegram</a> · <a href="https://vk.ru/sokolovnyu" style={{color:'var(--nav-text-sub)',textDecoration:'none'}}>VK</a></div>
-</footer>    </div>
   )
 }

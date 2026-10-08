@@ -100,6 +100,9 @@ async function hydrateFromRemote() {
     const remoteCount = (remote.progress?.completed || []).length
     // тянем с сервера только если там прогресс «свежее» — чтобы не затереть локальную работу
     if (remoteCount > localCount) { applyState(remote); return true }
+    // локальный прогресс новее (гость прошёл мини-тест до регистрации) — заливаем в аккаунт,
+    // чтобы блоки были доступны и с других устройств, а не только в этом браузере
+    if (localCount > remoteCount) pushRemote()
   } catch (e) { console.warn('CP sync pull:', e?.message || e) }
   return false
 }

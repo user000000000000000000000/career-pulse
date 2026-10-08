@@ -30,6 +30,7 @@ export default function Dashboard() {
   const menuRef = useRef(null)
   const [completed, setCompleted] = useState([])
   const [profile, setProfile] = useState({})
+  const [results, setResults] = useState({})
   const [pct, setPct] = useState(0)
   const [me, setMe] = useState({ name: '', phone: '', role: '', avatar_url: '' })
   const [userLoaded, setUserLoaded] = useState(false)
@@ -92,6 +93,7 @@ export default function Dashboard() {
   useEffect(() => {
     let progAlive = true
     CP.getProfile().then((p) => { if (progAlive) setProfile(p || {}) })
+    CP.getAllResults().then((r) => { if (progAlive) setResults(r || {}) })
     CP.getProgress().then((p) => {
       if (!progAlive) return
       setCompleted(p.completed || [])
@@ -129,21 +131,37 @@ export default function Dashboard() {
   const totalQ = BLOCKS.reduce((s, b) => s + b.questions, 0)
   const totalTime = BLOCKS.reduce((s, b) => s + b.time, 0)
 
-  // Короткий итог пройденного блока из агрегированного профиля (для карточек в сетке).
+  // Короткий итог пройденного блока: берём из агрегированного профиля, а если там
+  // поля нет — из сохранённого результата блока (scores). Блок 10 (письмо) без
+  // сводки намеренно — его разбирает ИИ. Нигде не показываем голое «Готово».
   function blockResult(n) {
     const p = profile || {}
+    const s = results[n]?.scores || {}
     switch (n) {
-      case 1: return p.context?.name ? `${p.context.grade || ''}${p.context.grade ? ' класс' : ''}${p.context.city ? ', ' + p.context.city : ''}`.trim() || 'Контекст собран' : 'Контекст собран'
-      case 2: return p.career_archetype || (p.holland_code ? 'Код ' + p.holland_code : 'Готово')
-      case 3: return p.values_archetype || 'Готово'
-      case 4: return p.personality_archetype || 'Готово'
-      case 5: return p.cognitive_archetype || 'Готово'
-      case 6: return p.career_maturity != null ? `Зрелость ${p.career_maturity}%` : 'Готово'
-      case 7: return p.se_general != null ? `Уверенность ${p.se_general}/100` : 'Готово'
-      case 8: return p.career_clarity != null ? `Ясность будущего ${p.career_clarity}/5` : 'Готово'
+      case 1: {
+        const c = p.context || {}
+        const label = `${c.grade ? c.grade + ' класс' : ''}${c.grade && c.city ? ', ' : ''}${c.city || ''}`.trim()
+        return label || 'Контекст собран'
+      }
+      case 2: return p.career_archetype || s.career_archetype || (s.profile_clarity != null ? `Ясность профиля ${s.profile_clarity}%` : 'Склонности определены')
+      case 3: return p.values_archetype || s.values_archetype || 'Ценностный профиль собран'
+      case 4: return p.personality_archetype || s.personality_archetype || s.archetype || 'Тип личности определён'
+      case 5: return p.cognitive_archetype || s.cognitive_archetype || s.archetype || 'Когнитивный профиль готов'
+      case 6: {
+        const m = p.career_maturity ?? s.careerMaturity
+        return m != null ? `Зрелость ${m}%` : 'Готовность оценена'
+      }
+      case 7: {
+        const se = p.se_general ?? s.se_general
+        return se != null ? `Уверенность ${se}/100` : 'Самоэффективность оценена'
+      }
+      case 8: {
+        const c = p.career_clarity ?? s.career_clarity
+        return c != null ? `Ясность будущего ${c}/5` : 'Образ будущего собран'
+      }
       case 9: return 'Соц. ресурсы учтены'
       case 10: return 'Письмо сохранено'
-      default: return 'Готово'
+      default: return 'Пройдено'
     }
   }
 

@@ -15,12 +15,12 @@
   --surface: #ffffff;
   --card:    #ffffff;
   --card2:   #eef0fb;
-  --accent:  #4079d3;
-  --accent2: #8b6fe8;
-  --violet:  #8b6fe8;
-  --accent3: #e8a0c4;
-  --ember:   #e8a0c4;
-  --gold:    #4a82db;
+  --accent:  #5B93E8;
+  --accent2: #9E82EC;
+  --violet:  #9E82EC;
+  --accent3: #F5B8E0;
+  --ember:   #F5B8E0;
+  --gold:    #5B93E8;
   --text:    #25205c;
   --sub:     #626185;
   --muted:   #77758f;
@@ -43,8 +43,8 @@
   --shadow-focus: 0 0 0 3px rgba(95,150,233,0.25);
 
   --font-display:       'Unbounded', sans-serif;
-  --font-accent-italic: 'Fraunces', serif;
-  --font-body:          'Golos Text', sans-serif;
+  --font-accent-italic: 'Instrument Serif', serif;
+  --font-body:          'Manrope', 'Golos Text', sans-serif;
   --font-mono:          'JetBrains Mono', monospace;
 
   /* RGB-компоненты (без rgba()) для тонких заливок/бордеров */
@@ -59,7 +59,7 @@
   --hero-glow-1: rgba(223,207,248,0.65);
   --hero-glow-2: rgba(199,214,248,0.55);
   --hero-glow-3: rgba(185,170,245,0.45);
-  --accent-italic: #4079d3;
+  --accent-italic: #5B93E8;
   /* Текст поверх заливки var(--accent) — не путать с --black. */
   --on-accent: #ffffff;
 
@@ -74,11 +74,11 @@
   /* Градиенты style-guide.md §3 — многоточечные, отдельные токены, т.к.
      var(--accent)→var(--violet) двухцветного linear-gradient недостаточно
      для трёхстопового hero/CTA градиента. */
-  --gradient-accent:      linear-gradient(135deg, #4079d3 0%, #6f9def 100%);
-  --gradient-accent-soft: linear-gradient(135deg, #7b9fee 0%, #a8c6f7 100%);
+  --gradient-accent:      linear-gradient(135deg, #5B93E8 0%, #8FB3F5 100%);
+  --gradient-accent-soft: linear-gradient(135deg, #8FB3F5 0%, #C9A6F5 100%);
   --gradient-badge:       linear-gradient(135deg, #ebe4f9 0%, #d9caf2 100%);
-  --gradient-hero:        linear-gradient(135deg, #dfcff8 0%, #c7d6f8 55%, #edeffb 100%);
-  --gradient-cta:         linear-gradient(135deg, #6c9eec 0%, #8cb2f4 55%, #b9aaf5 100%);
+  --gradient-hero:        linear-gradient(135deg, #C9A6F5 0%, #8FB3F5 55%, #F1EEFC 100%);
+  --gradient-cta:         linear-gradient(135deg, #5B93E8 0%, #8FB3F5 55%, #C9A6F5 100%);
   --track-color:          #d8d9e2;
 }
 
@@ -134,9 +134,9 @@
 * { margin: 0; padding: 0; box-sizing: border-box; }
 html { scroll-behavior: smooth; }
 body {
-  background: var(--ink);
+  background: var(--deep);
   color: var(--text);
-  font-family: 'Golos Text', sans-serif;
+  font-family: var(--font-body);
   font-size: 16px;
   line-height: 1.65;
   -webkit-font-smoothing: antialiased;
@@ -163,7 +163,7 @@ a { color: inherit; }
    перекрывают эти правила на своих страницах, так что там ничего не меняется. */
 .btn {
   padding: 11px 22px; border-radius: 8px; font-weight: 700; font-size: 14px;
-  font-family: 'Golos Text', sans-serif; cursor: pointer; border: none;
+  font-family: var(--font-body); cursor: pointer; border: none;
   transition: background .18s, border-color .18s, opacity .18s, color .18s;
   display: inline-flex; align-items: center; justify-content: center; gap: 8px;
   text-decoration: none; line-height: 1;

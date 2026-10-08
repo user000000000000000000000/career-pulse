@@ -1,7 +1,7 @@
 /* Токены — только из app/index.css. См. пояснение в shared/ui/legal.css. */
 .cp-dashboard *{margin:0;padding:0;box-sizing:border-box}
 .cp-dashboard{scroll-behavior:smooth}
-.cp-dashboard{background:var(--ink);color:var(--text);font-family:'Golos Text',sans-serif;font-size:15px;line-height:1.6;display:flex;min-height:100vh}
+.cp-dashboard{background:var(--ink);color:var(--text);font-family:var(--font-body);font-size:15px;line-height:1.6;display:flex;min-height:100vh}
 .cp-dashboard ::-webkit-scrollbar{width:3px}
 .cp-dashboard ::-webkit-scrollbar-thumb{background:var(--violet);border-radius:2px}
 
@@ -39,19 +39,19 @@
 
 .cp-dashboard /* ── TOPBAR ── */
 .topbar{
-  background:rgba(37,32,92,.9);backdrop-filter:blur(16px);
-  border-bottom:1px solid var(--line);
+  background:rgba(255,255,255,.72);backdrop-filter:blur(22px) saturate(180%);
+  border-bottom:1px solid rgba(255,255,255,.6);box-shadow:0 10px 30px -22px rgba(43,42,74,.4);
   padding:14px 32px;display:flex;align-items:center;justify-content:space-between;
   position:sticky;top:0;z-index:50;
 }
 .cp-dashboard .topbar-left{display:flex;align-items:center;gap:12px}
-.cp-dashboard .page-crumb{font-size:13px;color:var(--nav-text-sub)}
-.cp-dashboard .page-crumb span{color:var(--nav-text);font-weight:700}
+.cp-dashboard .page-crumb{font-size:13px;color:var(--muted)}
+.cp-dashboard .page-crumb span{color:var(--text);font-weight:700}
 .cp-dashboard .topbar-right{display:flex;align-items:center;gap:12px}
 .cp-dashboard .topbar-btn{
   padding:8px 15px;border-radius:10px;border:1px solid var(--sea-border);
   font-size:12px;font-weight:700;color:var(--sea-text);background:var(--sea-bg);
-  cursor:pointer;font-family:'Golos Text',sans-serif;transition:all .18s;text-decoration:none;
+  cursor:pointer;font-family:var(--font-body);transition:all .18s;text-decoration:none;
   display:flex;align-items:center;gap:6px;
 }
 .cp-dashboard .topbar-btn:hover{background:var(--sea-bg-hover);border-color:var(--sea-border-hover)}
@@ -72,7 +72,7 @@
 .cp-dashboard .wb-text h2{font-family:'Bebas Neue',sans-serif;font-size:32px;letter-spacing:2px;margin-bottom:4px}
 .cp-dashboard .wb-text p{font-size:14px;color:var(--sub);max-width:480px;line-height:1.6}
 .cp-dashboard .wb-actions{display:flex;gap:10px;flex-wrap:wrap}
-.cp-dashboard .btn{padding:11px 24px;border-radius:6px;font-weight:700;font-size:13px;font-family:'Golos Text',sans-serif;cursor:pointer;border:none;transition:all .2s;text-decoration:none;display:inline-flex;align-items:center;gap:7px}
+.cp-dashboard .btn{padding:11px 24px;border-radius:6px;font-weight:700;font-size:13px;font-family:var(--font-body);cursor:pointer;border:none;transition:all .2s;text-decoration:none;display:inline-flex;align-items:center;gap:7px}
 .cp-dashboard .btn-accent{background:var(--accent);color:var(--ink);box-shadow:0 0 20px rgba(95,150,233,.2)}
 .cp-dashboard .btn-accent:hover{transform:translateY(-1px);box-shadow:0 4px 28px rgba(95,150,233,.35)}
 .cp-dashboard .btn-outline{background:transparent;color:var(--text);border:1px solid var(--line2)}
@@ -177,7 +177,7 @@
 .cp-dashboard .m-name{font-size:14px;font-weight:800}
 .cp-dashboard .m-spec{font-size:11px;color:var(--accent);font-family:'JetBrains Mono',monospace}
 .cp-dashboard .m-stars{font-size:11px;color:var(--gold);margin-top:2px}
-.cp-dashboard .m-btn{margin-left:auto;background:var(--violet);color:white;border:none;border-radius:6px;padding:8px 14px;font-size:11px;font-weight:700;cursor:pointer;font-family:'Golos Text',sans-serif;white-space:nowrap}
+.cp-dashboard .m-btn{margin-left:auto;background:var(--violet);color:white;border:none;border-radius:6px;padding:8px 14px;font-size:11px;font-weight:700;cursor:pointer;font-family:var(--font-body);white-space:nowrap}
 
 .cp-dashboard /* activity */
 .activity-list{display:flex;flex-direction:column;gap:0}
@@ -203,7 +203,7 @@
 .cp-dashboard .ts-icon{font-size:28px;width:44px;height:44px;background:rgba(95,150,233,.07);border-radius:10px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
 .cp-dashboard .ts-title{font-size:15px;font-weight:800;margin-bottom:4px}
 .cp-dashboard .ts-desc{font-size:13px;color:var(--sub);line-height:1.6}
-.cp-dashboard .ts-link{display:inline-flex;align-items:center;gap:5px;margin-top:8px;font-size:12px;font-weight:700;color:var(--accent);cursor:pointer;background:none;border:none;font-family:'Golos Text',sans-serif;padding:0}
+.cp-dashboard .ts-link{display:inline-flex;align-items:center;gap:5px;margin-top:8px;font-size:12px;font-weight:700;color:var(--accent);cursor:pointer;background:none;border:none;font-family:var(--font-body);padding:0}
 .cp-dashboard .ts-link:hover{text-decoration:underline}
 
 /* Футер — сплошная navy-плашка (style-guide.md §4), как в Landing/Legal, а не
@@ -312,7 +312,7 @@
 .cp-dashboard .consult-input,
 .cp-dashboard .consult-textarea{
   width:100%;background:var(--card2);border:1px solid var(--line2);border-radius:8px;
-  color:var(--text);padding:11px 13px;font-size:14px;font-family:'Golos Text',sans-serif;
+  color:var(--text);padding:11px 13px;font-size:14px;font-family:var(--font-body);
   outline:none;transition:border-color .2s;resize:vertical;
 }
 .cp-dashboard .consult-input:focus,
