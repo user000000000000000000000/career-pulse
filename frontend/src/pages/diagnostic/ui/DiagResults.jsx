@@ -9,8 +9,8 @@ import { matchProfessions } from '../../../entities/profession'
 import { defaultInstitutionType, filterPrograms } from '../model/careerTrackFilter'
 import { HOLLAND_PLAIN, buildHollandPortrait } from '../model/hollandPlain.js'
 import { PERSONALITY_PLAIN, buildPersonalityPortrait, COGNITIVE_PLAIN, buildCognitivePortrait, VALUES_PLAIN, MOTIVATION_PLAIN, READINESS_PLAIN } from '../model/resultsPlain.js'
-import ThemeToggle from '../../../shared/ui/ThemeToggle.jsx'
 import { MASCOT_RESULTS_LINE } from '../model/mascotLines'
+import { RadarChart, BarList, MiniRings } from './charts'
 import '../diagnostic.css'
 
 const SCALE_NAMES = Object.fromEntries(Object.entries(PERSONALITY_PLAIN).map(([k, v]) => [k, v.title]))
@@ -169,14 +169,22 @@ export default function DiagResults() {
   const cog = profile.cognitive_scores || {}
   const cogSorted = Object.entries(cog).sort((a, b) => b[1] - a[1])
 
+  // Данные для сводной карточки «Профиль в диаграммах».
+  const vizRadar = profile.holland_scores
+    ? ['R', 'I', 'A', 'S', 'E', 'C'].map(t => ({ label: HOLLAND_PLAIN[t]?.title || t, value: Math.round(profile.holland_scores[t] || 0) }))
+    : null
+  const vizRings = [
+    profile.career_maturity != null && { label: 'Готовность', value: profile.career_maturity },
+    profile.se_general != null && { label: 'Уверенность', value: profile.se_general },
+    profile.career_clarity != null && { label: 'Ясность будущего', value: Math.round(profile.career_clarity * 20) },
+  ].filter(Boolean)
+  const vizBars = persOrder.filter(s => pers[s] != null).map(s => ({ label: SCALE_NAMES[s], value: Math.round(pers[s]) }))
+
   return (
     <div className="cp-diag">
       <div className="topbar">
         <div className="tb-left"><div className="tb-logo" onClick={() => navigate('/dashboard')}><div className="tb-logo-mark"><svg viewBox="0 0 32 32" width="13" height="13" aria-hidden="true"><path d="M17.8 4.5 8.5 18.2h6.1L13 27.5 23.5 13.4h-6.1z" fill="#fff"/></svg></div>CAREER<span>PULSE</span></div><div className="tb-divider"></div><div className="tb-block">Готовность профиля: <b>{progress.pct}%</b></div></div>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-          <ThemeToggle />
-          <button className="tb-btn" onClick={() => navigate('/dashboard')}>← В кабинет</button>
-        </div>
+        <button className="tb-btn" onClick={() => navigate('/dashboard')}>← В кабинет</button>
       </div>
       <div className="container" style={{ maxWidth: 820 }}>
         {/* Шапка только для печатной версии (PDF) */}
@@ -286,31 +294,35 @@ export default function DiagResults() {
                           : 'Вузы и ЕГЭ для этой профессии пока заполняются — скоро появятся здесь.'}
                       </div>
                     ) : (
-                      <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
-                        {track.specialties.map(sp => {
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+                        {track.specialties.map((sp, si) => {
                           const { programs: progs, cityFallback, total } = filterPrograms(sp.programs, { typeFilter, relocationReady, userCity })
                           return (
-                          <div key={sp.code}>
-                            <div style={{ fontSize: 13, fontWeight: 600, marginBottom: 4 }}>{sp.name} <span style={{ color: 'var(--ghost)', fontWeight: 400 }}>· {sp.code}</span></div>
+                          <div key={sp.code} style={si > 0 ? { borderTop: '1px solid var(--line)', paddingTop: 14 } : undefined}>
+                            <div style={{ fontSize: 13.5, fontWeight: 700, marginBottom: 4, color: 'var(--accent)', display: 'flex', alignItems: 'center', gap: 7 }}>
+                              <span style={{ width: 6, height: 6, borderRadius: '50%', background: 'var(--accent)', flexShrink: 0 }}></span>
+                              {sp.name} <span style={{ color: 'var(--ghost)', fontWeight: 400 }}>· {sp.code}</span>
+                            </div>
                             <div style={{ fontSize: 12, color: 'var(--sub)', marginBottom: 6 }}>
                               {sp.level === 'college' || !sp.ege_required.length
                                 ? 'Приём по аттестату (без ЕГЭ)'
                                 : <>ЕГЭ: {sp.ege_required.join(', ')}{sp.ege_choose_one_of.length ? ` + один из (${sp.ege_choose_one_of.join(' / ')})` : ''}</>}
                             </div>
                             {progs.length > 0 ? (
-                              // Показываем топ-5 (город первым). Без «показать все 252» — из такого
+                              // Показываем топ-7 (город первым). Без «показать все 252» — из такого
                               // списка никто не выбирает; точный выбор — на консультации.
-                              <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
-                                {progs.slice(0, 5).map((prog, i) => (
-                                  <div key={i} style={{ fontSize: 12, color: 'var(--text)', display: 'flex', gap: 8 }}>
-                                    <span style={{ flex: 1 }}>{prog.institution_name}{prog.city ? ` · ${prog.city}` : ''}{prog.institution_type === 'college' && <span style={{ color: 'var(--ghost)' }}> · колледж</span>}</span>
-                                    {prog.min_score_last_year && <span style={{ color: 'var(--ghost)' }}>от {prog.min_score_last_year} баллов ({prog.admission_year})</span>}
+                              <div style={{ display: 'flex', flexDirection: 'column' }}>
+                                {progs.slice(0, 7).map((prog, i) => (
+                                  <div key={i} style={{ fontSize: 12.5, color: 'var(--text)', display: 'flex', gap: 10, alignItems: 'baseline', padding: '8px 0', borderTop: i > 0 ? '1px solid var(--line)' : 'none' }}>
+                                    <span style={{ color: 'var(--ghost)', fontFamily: "'JetBrains Mono',monospace", fontSize: 11, minWidth: 16, flexShrink: 0 }}>{i + 1}</span>
+                                    <span style={{ flex: 1, lineHeight: 1.4 }}>{prog.institution_name}{prog.city ? ` · ${prog.city}` : ''}{prog.institution_type === 'college' && <span style={{ color: 'var(--ghost)' }}> · колледж</span>}</span>
+                                    {prog.min_score_last_year && <span style={{ color: 'var(--ghost)', whiteSpace: 'nowrap', flexShrink: 0 }}>от {prog.min_score_last_year} баллов ({prog.admission_year})</span>}
                                   </div>
                                 ))}
                                 {cityFallback && (
                                   <div style={{ fontSize: 11.5, color: 'var(--ghost)', marginTop: 2 }}>В городе «{userCity}» по этому направлению не нашли — показываем другие города.</div>
                                 )}
-                                {total > 5 && (
+                                {total > 7 && (
                                   <div style={{ fontSize: 11.5, color: 'var(--ghost)', marginTop: 2 }}>…и другие вузы по этому направлению — подберём точный список на консультации</div>
                                 )}
                               </div>
@@ -342,6 +354,31 @@ export default function DiagResults() {
                 </div>
               ))}
             </div>
+          </div>
+        )}
+
+        {(vizRadar || vizRings.length > 0 || vizBars.length > 0) && (
+          <div className="r-card" style={{ marginTop: 18 }}>
+            <BlockHead icon="📊" color="#4079d3" title="Профиль в диаграммах"
+              sub="Коротко и наглядно — твои главные показатели по блокам." />
+            {vizRadar && (
+              <div style={{ marginTop: 10 }}>
+                <div className="r-label" style={{ marginBottom: 8 }}>Склонности · Holland</div>
+                <RadarChart data={vizRadar} />
+              </div>
+            )}
+            {vizRings.length > 0 && (
+              <div style={{ marginTop: 18 }}>
+                <div className="r-label" style={{ marginBottom: 10 }}>Ключевые индексы</div>
+                <MiniRings data={vizRings} />
+              </div>
+            )}
+            {vizBars.length > 0 && (
+              <div style={{ marginTop: 18 }}>
+                <div className="r-label" style={{ marginBottom: 10 }}>Личностные качества</div>
+                <BarList data={vizBars} />
+              </div>
+            )}
           </div>
         )}
 

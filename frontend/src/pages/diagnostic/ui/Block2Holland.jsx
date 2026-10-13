@@ -190,39 +190,36 @@ export default function Block2Holland() {
   if (phase === 'pairs') {
     const p = PAIRS[pairIdx]
     const stored = pairAnswers[pairIdx]                    // ответ на эту пару (при возврате)
-    const activeChoice = curChoice || (stored ? stored.choice : null)
     body = (
       <>
         <div className="q-counter">Вопрос {pairIdx + 1} из 30</div>
         <div className="q-text">Что тебе ближе?</div>
         <div className="pair-row">
           {['A', 'B'].map(side => {
-            const sel = activeChoice === side
+            const chosen = stored && stored.choice === side
+            const otherChosen = stored && stored.choice !== side
             return (
               <div key={side}
-                className={'pair-card' + (sel ? ' sel' : '') + (activeChoice && !sel ? ' dim' : '')}
-                onClick={() => { if (!sel) setCurChoice(side) }}>
+                className={'pair-card' + (chosen ? ' sel' : '') + (otherChosen ? ' dim' : '')}>
                 <div className="pair-label">{side === 'A' ? 'А' : 'Б'}</div>
                 <div className="pair-text">{side === 'A' ? p.a : p.b}</div>
-                {sel && (
-                  <div className="ii">
-                    <div className="ii-label">насколько ближе?</div>
-                    <div className="ii-row">
-                      {[1, 2, 3].map(lvl => (
-                        <button key={lvl}
-                          className={`ii-btn ii-${side} lvl${lvl}` + (stored && stored.choice === side && stored.intensity === lvl ? ' sel' : '')}
-                          onClick={(e) => { e.stopPropagation(); choosePair(side, lvl) }}>
-                          {['Немного', 'Заметно', 'Намного'][lvl - 1]}
-                        </button>
-                      ))}
-                    </div>
+                <div className="ii">
+                  <div className="ii-label">насколько ближе?</div>
+                  <div className="ii-row">
+                    {[1, 2, 3].map(lvl => (
+                      <button key={lvl}
+                        className={`ii-btn ii-${side} lvl${lvl}` + (chosen && stored.intensity === lvl ? ' sel' : '')}
+                        onClick={() => choosePair(side, lvl)}>
+                        {['Немного', 'Явно', 'Сильно'][lvl - 1]}
+                      </button>
+                    ))}
                   </div>
-                )}
+                </div>
               </div>
             )
           })}
         </div>
-        {activeChoice && <div className="ii-hint">цвет показывает силу: бледный — немного, насыщенный — намного</div>}
+        <div className="ii-hint">Выбери, какой вариант ближе и насколько — одним нажатием. Цвет кнопки показывает силу: бледный — немного, насыщенный — сильно.</div>
         <QuestionNav
           total={30} current={pairIdx}
           isAnswered={(i) => pairAnswers[i] != null}
