@@ -79,8 +79,7 @@
 
 /* pair cards */
 .cp-diag .pair-row { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 18px; }
-.cp-diag .pair-card { background: var(--card); border: 1px solid var(--line); border-radius: 12px; padding: 18px; cursor: pointer; transition: all .25s; text-align: center; display: flex; flex-direction: column; align-items: center; gap: 8px; min-height: 110px; justify-content: center; }
-.cp-diag .pair-card:hover { border-color: rgba(var(--overlay-rgb),.2); transform: translateY(-2px); }
+.cp-diag .pair-card { background: var(--card); border: 1px solid var(--line); border-radius: 12px; padding: 18px; transition: all .25s; text-align: center; display: flex; flex-direction: column; align-items: center; gap: 8px; min-height: 110px; justify-content: center; }
 .cp-diag .pair-card.sel { border-color: var(--accent); background: rgba(95,150,233,.07); box-shadow: 0 0 20px rgba(95,150,233,.1); }
 .cp-diag .pair-label { font-family: var(--font-display); font-size: 22px; color: var(--accent); letter-spacing: 1px; }
 .cp-diag .pair-text { font-size: 13px; color: var(--sub); line-height: 1.5; }

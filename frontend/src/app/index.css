@@ -5,8 +5,7 @@
    Полная замена прежней бирюзово-фиолетовой палитры — решение от 2026-08-12,
    отменяет более ранний анти-референс из .design/portal-relaunch/DESIGN_BRIEF.md
    («не копировать цвета PDF 1:1») по прямому запросу владельца продукта.
-   Тёмная — по явному выбору пользователя ([data-theme="dark"]), не описана в
-   новом style-guide (он только про светлую тему) — оставлена как есть.
+   Тёмная тема убрана (окт 2026): один цельный светлый бренд как на лендинге.
    ─────────────────────────────────────────────── */
 :root {
   --ink:     #ffffff;
@@ -80,55 +79,6 @@
   --gradient-hero:        linear-gradient(135deg, #C9A6F5 0%, #8FB3F5 55%, #F1EEFC 100%);
   --gradient-cta:         linear-gradient(135deg, #5B93E8 0%, #8FB3F5 55%, #C9A6F5 100%);
   --track-color:          #d8d9e2;
-}
-
-[data-theme="dark"] {
-  --ink:     #07070e;
-  --black:   #08080f;
-  --deep:    #0d0d1a;
-  --surface: #0c0c18;
-  --card:    #111120;
-  --card2:   #161626;
-  --accent:  #00e5c8;
-  --accent2: #7b5cf0;
-  --violet:  #7b5cf0;
-  --accent3: #ff6b35;
-  --ember:   #ff6b35;
-  --gold:    #f5c842;
-  --text:    #ecedf8;
-  --sub:     #9898b8;
-  --muted:   #686888;
-  --muted2:  #9898b8;
-  --ghost:   #55557a;
-  --line:    rgba(255,255,255,0.07);
-  --line2:   rgba(255,255,255,0.12);
-  --border:  rgba(255,255,255,0.07);
-  --border2: rgba(255,255,255,0.13);
-  --ok:      #22d97a;
-  --danger:  #ff4d6d;
-
-  --shadow-sm: 0 2px 8px rgba(0,0,0,0.3);
-  --shadow-md: 0 8px 24px rgba(0,0,0,0.4);
-  --shadow-lg: 0 16px 48px rgba(0,0,0,0.5);
-  --shadow-focus: 0 0 0 3px rgba(0,229,200,0.3);
-
-  --overlay-rgb: 255,255,255;
-  --ink-rgb: 7,7,14;
-
-  --nav-bg: rgba(7,7,14,0.82);
-  --nav-text: var(--text);
-  --nav-text-sub: var(--muted2);
-  --hero-glow-1: rgba(123,92,240,0.22);
-  --hero-glow-2: rgba(0,229,200,0.09);
-  --hero-glow-3: rgba(255,107,53,0.07);
-  --accent-italic: var(--accent2);
-  --on-accent: #08080f;
-
-  --sea-bg:           rgba(255,255,255,0.06);
-  --sea-border:       rgba(255,255,255,0.14);
-  --sea-text:         var(--text);
-  --sea-bg-hover:     rgba(255,255,255,0.12);
-  --sea-border-hover: rgba(255,255,255,0.24);
 }
 
 * { margin: 0; padding: 0; box-sizing: border-box; }

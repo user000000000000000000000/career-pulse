@@ -41,3 +41,6 @@
 @media (max-width: 560px) {
   .cp-proba .p-card-top { flex-direction: column; align-items: flex-start; gap: 6px; }
 }
+
+.cp-proba .p-card-lead { font-size: 13px; color: var(--p-muted); margin: 0; }
+.cp-proba .p-card-lead b { color: var(--p-ink); font-weight: 700; }

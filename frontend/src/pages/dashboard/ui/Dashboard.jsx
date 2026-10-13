@@ -140,7 +140,9 @@ export default function Dashboard() {
     switch (n) {
       case 1: {
         const c = p.context || {}
-        const label = `${c.grade ? c.grade + ' класс' : ''}${c.grade && c.city ? ', ' : ''}${c.city || ''}`.trim()
+        // grade показываем только если это номер класса (не «other» и т.п.)
+        const grade = /\d/.test(String(c.grade || '')) ? `${c.grade} класс` : ''
+        const label = [grade, c.city].filter(Boolean).join(', ')
         return label || 'Контекст собран'
       }
       case 2: return p.career_archetype || s.career_archetype || (s.profile_clarity != null ? `Ясность профиля ${s.profile_clarity}%` : 'Склонности определены')
