@@ -72,7 +72,6 @@ export default function Block2Holland() {
   // choosePair — пересчитываем из pairAnswers на submit, чтобы правка не задваивала счёт.
   const [pairAnswers] = useState(() => [])
   const [matAnswers] = useState(() => ({}))
-  const [curChoice, setCurChoice] = useState(null)
   const [curMatIdx, setCurMatIdx] = useState(0)
   const [matSel, setMatSel] = useState(null)
   const [antiSel, setAntiSel] = useState([])

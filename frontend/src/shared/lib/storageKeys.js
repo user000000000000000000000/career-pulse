@@ -12,7 +12,6 @@ export const STORAGE_KEYS = {
   prefix: 'cp_',
   user: 'cp_user',
   tourSeen: 'cp_tour_seen',
-  theme: 'cp_theme',
   consultRequests: 'cp_consult_requests',
   vkVerifier: 'vk_verifier',
   vkState: 'vk_state',
