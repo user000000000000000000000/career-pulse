@@ -4,7 +4,7 @@ import DiagShell, { ResultNav } from './DiagShell'
 import QuestionNav from './QuestionNav'
 import useDiagBlock from '../model/useDiagBlock'
 import useBlockDraft from '../model/useBlockDraft'
-import { blockSummary } from '../model/blockSummary'
+import { blockSummary } from '../../../shared/lib/blockSummary'
 import { BarList } from './charts'
 import { scorePersonality, MAIN } from '../model/scoring/personality'
 

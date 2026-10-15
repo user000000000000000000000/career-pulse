@@ -1,4 +1,4 @@
-import { blockSummary } from '../model/blockSummary'
+import { blockSummary } from '../../../shared/lib/blockSummary'
 import { blockRings } from '../../../shared/lib/blockRings'
 
 // Общий презентационный рендер экспресс-профиля: три карточки (блоки 2/4/5),

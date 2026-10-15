@@ -4,7 +4,7 @@ import DiagShell, { ResultNav } from './DiagShell'
 import QuestionNav from './QuestionNav'
 import useDiagBlock from '../model/useDiagBlock'
 import useBlockDraft from '../model/useBlockDraft'
-import { blockSummary } from '../model/blockSummary'
+import { blockSummary } from '../../../shared/lib/blockSummary'
 import { RadarChart } from './charts'
 import { scoreHolland } from '../model/scoring/holland'
 import { HOLLAND_FULL as TYPE_NAMES } from '../model/hollandTypes'
@@ -116,7 +116,6 @@ export default function Block2Holland() {
     const wasAnswered = pairAnswers[pairIdx] != null
     pairAnswers[pairIdx] = { qId: p.id, choice, intensity, type }
     const ni = pairIdx + 1
-    setCurChoice(null)
     // При правке уже отвеченной пары просто переходим к следующей — без повторного
     // показа «зрелости» и без ухода из фазы (эти переходы только на первом проходе).
     if (wasAnswered) { if (ni < 30) setPairIdx(ni); return }
@@ -222,9 +221,9 @@ export default function Block2Holland() {
         <QuestionNav
           total={30} current={pairIdx}
           isAnswered={(i) => pairAnswers[i] != null}
-          onJump={(i) => { setCurChoice(null); setPairIdx(i) }}
-          onBack={() => { setCurChoice(null); setPairIdx(i => Math.max(0, i - 1)) }}
-          onFinish={() => { setCurChoice(null); setPhase('anti') }}
+          onJump={(i) => setPairIdx(i)}
+          onBack={() => setPairIdx(i => Math.max(0, i - 1))}
+          onFinish={() => setPhase('anti')}
         />
       </>
     )

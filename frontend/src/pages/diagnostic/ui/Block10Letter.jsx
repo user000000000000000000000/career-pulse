@@ -4,7 +4,7 @@ import { CP } from '../../../shared/api'
 import DiagShell from './DiagShell'
 import useDiagBlock from '../model/useDiagBlock'
 import useBlockDraft from '../model/useBlockDraft'
-import { blockSummary } from '../model/blockSummary'
+import { blockSummary } from '../../../shared/lib/blockSummary'
 
 const SECTIONS = [
   { id: 'now', icon: '🙂', title: 'Я сейчас', desc: 'Опиши себя — каким ты видишь себя прямо сейчас', questions: [
@@ -148,7 +148,7 @@ export default function Block10Letter() {
         <textarea className="q-textarea" style={{ minHeight: 160 }} placeholder="Пиши свободно, как будто рассказываешь близкому другу..." value={answers[q.id] || ''} onChange={e => setText(e.target.value)} />
         <div className="nav-row">
           {globalIdx > 0 && <button className="btn btn-ghost" onClick={goBack}>← Назад</button>}
-          <button className="btn btn-gold" onClick={goForward}>{isLast ? 'Отправить письмо ✉️' : 'Далее →'}</button>
+          <button className="btn btn-gold" disabled={!(answers[q.id] || '').trim()} onClick={goForward}>{isLast ? 'Отправить письмо ✉️' : 'Далее →'}</button>
         </div>
       </div>
     </DiagShell>

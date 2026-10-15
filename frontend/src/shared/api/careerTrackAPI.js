@@ -83,3 +83,15 @@ export async function getCareerTracksForProfessions(professionIds = [], userCity
   const results = await Promise.all(professionIds.map(id => getCareerTrack(id, userCity)))
   return professionIds.map((id, i) => ({ professionId: id, ...results[i] }))
 }
+
+/** Публичный каталог вузов/колледжей (страница «Вузы России»). Фильтры: город, тип, поиск. */
+export async function listInstitutions({ city = '', type = '', q = '', limit = 100 } = {}) {
+  if (!isSupabaseConfigured) return []
+  let query = supabase.from('institutions').select('name, full_name, type, city, region, website').order('name').limit(limit)
+  if (city) query = query.ilike('city', `%${city}%`)
+  if (type) query = query.eq('type', type)
+  if (q) query = query.or(`name.ilike.%${q}%,full_name.ilike.%${q}%`)
+  const { data, error } = await query
+  if (error) return []
+  return data || []
+}

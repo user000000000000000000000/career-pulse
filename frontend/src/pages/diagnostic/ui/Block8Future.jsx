@@ -4,7 +4,7 @@ import DiagShell, { ResultNav } from './DiagShell'
 import QuestionNav from './QuestionNav'
 import useDiagBlock from '../model/useDiagBlock'
 import useBlockDraft from '../model/useBlockDraft'
-import { blockSummary } from '../model/blockSummary'
+import { blockSummary } from '../../../shared/lib/blockSummary'
 
 const QS = [
   { id: 'BUD1', t: 'Что для тебя важнее в будущей работе?', type: 'radio', opts: ['Стабильность', 'Рост и вызовы', 'Оба одинаково'] },
@@ -129,7 +129,7 @@ export default function Block8Future() {
         <div className="q-text" style={{ fontSize: 13, color: 'var(--ghost)', marginTop: -12, fontWeight: 400 }}>{o.text}</div>
         <textarea className="q-textarea" placeholder="Минимум 2–3 предложения..." maxLength={500} value={openTexts[idx]} onChange={e => { const c = [...openTexts]; c[idx] = e.target.value; setOpenTexts(c) }} />
         <div className="char-count">{openTexts[idx].length} / 500</div>
-        <div className="nav-row"><button className="btn btn-accent" onClick={saveOpen}>{idx < OPEN.length - 1 ? 'Далее →' : 'Завершить блок ✓'}</button></div>
+        <div className="nav-row"><button className="btn btn-accent" disabled={!openTexts[idx].trim()} onClick={saveOpen}>{idx < OPEN.length - 1 ? 'Далее →' : 'Завершить блок ✓'}</button></div>
       </>
     )
   }

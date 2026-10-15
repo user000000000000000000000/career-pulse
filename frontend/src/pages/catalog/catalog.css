@@ -1,0 +1,35 @@
+/* Публичные каталоги «Профессии» и «Вузы России». Светлый бренд, под SEO. */
+.cp-catalog {
+  min-height: 100vh; background: var(--deep); color: var(--text);
+  font-family: var(--font-body); padding: 96px clamp(16px, 4vw, 48px) 64px;
+}
+.cp-catalog .cat-inner { max-width: 1100px; margin: 0 auto; }
+.cp-catalog .cat-eyebrow { font-size: 13px; font-weight: 700; letter-spacing: .04em; text-transform: uppercase; color: var(--accent); }
+.cp-catalog .cat-title { font-family: var(--font-display); font-size: clamp(28px, 5vw, 44px); font-weight: 800; color: var(--text); margin: 8px 0 10px; line-height: 1.05; }
+.cp-catalog .cat-sub { font-size: 16px; line-height: 1.55; color: var(--sub); max-width: 640px; }
+
+.cp-catalog .cat-controls { display: flex; flex-wrap: wrap; gap: 10px; margin: 28px 0 10px; }
+.cp-catalog .cat-input { flex: 1 1 240px; min-width: 0; padding: 13px 16px; border-radius: 12px; border: 1px solid var(--line2); background: var(--card, #fff); color: var(--text); font-family: inherit; font-size: 14px; }
+.cp-catalog .cat-input:focus { outline: none; border-color: var(--accent); box-shadow: var(--shadow-focus); }
+.cp-catalog .cat-select { padding: 13px 16px; border-radius: 12px; border: 1px solid var(--line2); background: var(--card, #fff); color: var(--text); font-family: inherit; font-size: 14px; cursor: pointer; }
+
+.cp-catalog .cat-chips { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 10px; }
+.cp-catalog .cat-chip { padding: 8px 14px; border-radius: 100px; border: 1px solid var(--line2); background: var(--card, #fff); color: var(--sub); font-size: 13px; cursor: pointer; transition: all .15s; }
+.cp-catalog .cat-chip:hover { border-color: var(--accent); color: var(--accent); }
+.cp-catalog .cat-chip.active { background: var(--accent); color: var(--on-accent); border-color: var(--accent); }
+
+.cp-catalog .cat-count { font-size: 13px; color: var(--ghost); margin: 6px 0 16px; }
+.cp-catalog .cat-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 14px; }
+.cp-catalog .cat-card { background: var(--card, #fff); border: 1px solid var(--line); border-radius: 16px; padding: 20px; display: flex; flex-direction: column; gap: 8px; box-shadow: var(--shadow-sm); }
+.cp-catalog .cat-card-top { display: flex; justify-content: space-between; align-items: flex-start; gap: 10px; }
+.cp-catalog .cat-card-cat { font-size: 11px; font-weight: 700; letter-spacing: .04em; text-transform: uppercase; color: var(--ghost); }
+.cp-catalog .cat-card-h { font-weight: 700; font-size: 16px; color: var(--text); }
+.cp-catalog .cat-card-p { font-size: 13px; line-height: 1.5; color: var(--sub); margin: 0; }
+.cp-catalog .cat-card-meta { font-size: 12.5px; color: var(--ghost); display: flex; gap: 10px; flex-wrap: wrap; }
+.cp-catalog .cat-htag { font-size: 11px; font-weight: 700; padding: 2px 7px; border-radius: 6px; }
+.cp-catalog .cat-card a { color: var(--accent); text-decoration: none; font-size: 13px; font-weight: 600; }
+.cp-catalog .cat-card a:hover { text-decoration: underline; }
+
+.cp-catalog .cat-empty { text-align: center; color: var(--ghost); padding: 48px 0; font-size: 15px; }
+.cp-catalog .cat-cta { margin-top: 40px; text-align: center; }
+.cp-catalog .cat-cta a { display: inline-block; padding: 15px 30px; border-radius: 14px; background: var(--gradient-accent); color: #fff; font-weight: 700; font-size: 15px; text-decoration: none; }

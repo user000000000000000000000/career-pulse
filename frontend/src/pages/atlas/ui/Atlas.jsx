@@ -1,6 +1,7 @@
 import { useState, useMemo } from 'react'
 import { useNavigate, useLocation } from 'react-router-dom'
 import { PROFESSIONS, PROFESSION_CATEGORIES } from '../../../entities/profession'
+import { getCareerTrack } from '../../../shared/api'
 import Header from '../../../shared/ui/Header.jsx'
 import '../atlas.css'
 
@@ -15,6 +16,7 @@ export default function Atlas() {
   const [activeCategory, setActiveCategory] = useState('Все')
   const [activeHolland, setActiveHolland] = useState([]) // до 3 кодов, логика «И»
   const [expanded, setExpanded] = useState(null)
+  const [tracks, setTracks] = useState({}) // id профессии → { status, specialties }
 
   const categories = ['Все', ...PROFESSION_CATEGORIES]
   const MAX_HOLLAND = 3
@@ -95,7 +97,13 @@ export default function Atlas() {
           <div
             key={p.id}
             className={['atlas-card', expanded === p.id && 'atlas-card--open'].filter(Boolean).join(' ')}
-            onClick={() => setExpanded(prev => prev === p.id ? null : p.id)}
+            onClick={() => {
+              const next = expanded === p.id ? null : p.id
+              setExpanded(next)
+              if (next === p.id && !tracks[p.id]) {
+                getCareerTrack(p.id).then(t => setTracks(cur => ({ ...cur, [p.id]: t }))).catch(() => {})
+              }
+            }}
           >
             <div className="ac-top">
               <div className="ac-category">{p.category}</div>
@@ -107,7 +115,22 @@ export default function Atlas() {
             </div>
             <div className="ac-name">{p.name}</div>
             {expanded === p.id && (
-              <div className="ac-desc">{p.desc}</div>
+              <div className="ac-desc">
+                {p.desc}
+                {(() => {
+                  const t = tracks[p.id]
+                  if (!t) return <div className="ac-okso-note">Загружаю направления…</div>
+                  if (t.status !== 'ready' || !t.specialties?.length) return <div className="ac-okso-note">Направления обучения скоро появятся.</div>
+                  return (
+                    <div className="ac-okso">
+                      <div className="ac-okso-h">Направления обучения (ОКСО)</div>
+                      {t.specialties.map(sp => (
+                        <div key={sp.code} className="ac-okso-row"><span className="ac-okso-code">{sp.code}</span><span>{sp.name}</span></div>
+                      ))}
+                    </div>
+                  )
+                })()}
+              </div>
             )}
             <div className="ac-arrow">{expanded === p.id ? '▲' : '▼'}</div>
           </div>

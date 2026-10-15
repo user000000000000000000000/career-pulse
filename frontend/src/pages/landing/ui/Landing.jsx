@@ -281,7 +281,8 @@ export default function Landing() {
           <div className="lv-foot-col">
             <div className="h">Продукт</div>
             <a href="#how">Диагностика</a>
-            <a href="#professions">Профессии</a>
+            <a href="/professions">Профессии</a>
+            <a href="/vuzy">Вузы России</a>
             <a href="#about">О нас</a>
           </div>
           <div className="lv-foot-col">

@@ -11,6 +11,7 @@ import { HOLLAND_PLAIN, buildHollandPortrait } from '../model/hollandPlain.js'
 import { PERSONALITY_PLAIN, buildPersonalityPortrait, COGNITIVE_PLAIN, buildCognitivePortrait, VALUES_PLAIN, MOTIVATION_PLAIN, READINESS_PLAIN } from '../model/resultsPlain.js'
 import { MASCOT_RESULTS_LINE } from '../model/mascotLines'
 import { RadarChart, BarList, MiniRings } from './charts'
+import InfoHint from '../../../shared/ui/InfoHint.jsx'
 import '../diagnostic.css'
 
 const SCALE_NAMES = Object.fromEntries(Object.entries(PERSONALITY_PLAIN).map(([k, v]) => [k, v.title]))
@@ -34,10 +35,10 @@ function levelInfo(v) {
   return { label: 'Слабо', color: '#82819b' }
 }
 
-function BlockHead({ icon, color, title, sub }) {
+function BlockHead({ icon, color, title, sub, hint }) {
   return (
     <>
-      <div className="block-head"><span className="bh-ic" style={{ background: color + '18', color }}>{icon}</span><h3>{title}</h3></div>
+      <div className="block-head"><span className="bh-ic" style={{ background: color + '18', color }}>{icon}</span><h3>{title}{hint && <InfoHint term={hint} />}</h3></div>
       {sub && <div className="block-head-sub">{sub}</div>}
     </>
   )
@@ -384,7 +385,7 @@ export default function DiagResults() {
 
         {profile.holland_scores && (
           <div className="r-card" style={{ marginTop: 18 }}>
-            <BlockHead icon="🧭" color="#3f77cf" title="Что тебе интересно" />
+            <BlockHead icon="🧭" color="#3f77cf" title="Что тебе интересно" hint="holland" />
             {profile.holland_top2?.length === 2 && (
               <div className="block-intro">
                 {buildHollandPortrait(profile.holland_top2, profile.career_archetype)}
@@ -427,7 +428,7 @@ export default function DiagResults() {
 
         {persOrder.some(s => pers[s] != null) && (
           <div className="r-card" style={{ marginTop: 18 }}>
-            <BlockHead icon="🎭" color="#8b6fe8" title="Твой характер" />
+            <BlockHead icon="🎭" color="#8b6fe8" title="Твой характер" hint="bigfive" />
             {buildPersonalityPortrait(pers, persOrder) && (
               <div className="block-intro">{buildPersonalityPortrait(pers, persOrder)}</div>
             )}
@@ -437,7 +438,7 @@ export default function DiagResults() {
 
         {cogSorted.length > 0 && (
           <div className="r-card" style={{ marginTop: 18 }}>
-            <BlockHead icon="🧠" color="#4079d3" title={`Как тебе легче думать и учиться${profile.vark_style ? ` · ${VARK_NAMES[profile.vark_style] || profile.vark_style}` : ''}`} />
+            <BlockHead icon="🧠" color="#4079d3" hint="vark" title={`Как тебе легче думать и учиться${profile.vark_style ? ` · ${VARK_NAMES[profile.vark_style] || profile.vark_style}` : ''}`} />
             {buildCognitivePortrait(cogSorted) && (
               <div className="block-intro">{buildCognitivePortrait(cogSorted)}</div>
             )}
@@ -447,7 +448,7 @@ export default function DiagResults() {
 
         {(profile.values_archetype || profile.values_top3) && (
           <div className="r-card" style={{ marginTop: 18 }}>
-            <BlockHead icon="💎" color="#4a82db" title="Что для тебя важно в работе"
+            <BlockHead icon="💎" color="#4a82db" title="Что для тебя важно в работе" hint="values"
               sub="Все 8 ценностей — от самой важной к наименее важной (по тому, что ты выбирал(а) чаще при сравнении друг с другом)." />
             {profile.motivation_type && MOTIV[profile.motivation_type] && (
               <div className="block-intro">В целом {MOTIV[profile.motivation_type]}.</div>
@@ -470,7 +471,7 @@ export default function DiagResults() {
 
         {profile.readiness_scores && (
           <div className="r-card" style={{ marginTop: 18 }}>
-            <BlockHead icon="🎯" color="#e8a0c4" title="Насколько ты готов(а) к разным видам работы"
+            <BlockHead icon="🎯" color="#e8a0c4" hint="readiness" title="Насколько ты готов(а) к разным видам работы"
               sub="Верхняя полоса — как ты сам(а) себя оцениваешь, нижняя — что показал реальный опыт (кружки, проекты, подработки)." />
             {Object.entries(profile.readiness_scores).sort((a, b) => (b[1].combined || 0) - (a[1].combined || 0)).map(([code, d]) => {
               const c = READY_COLORS[code] || 'var(--accent)'
@@ -489,7 +490,7 @@ export default function DiagResults() {
 
         {profile.se_confidence && (
           <div className="r-card" style={{ marginTop: 18 }}>
-            <BlockHead icon="⭐" color="#1a9d5c" title="В чём ты увереннее всего" />
+            <BlockHead icon="⭐" color="#1a9d5c" title="В чём ты увереннее всего" hint="selfefficacy" />
             <MetricGrid items={Object.entries(profile.se_confidence).sort((a, b) => b[1] - a[1]).map(([d, v], i) => ({ key: d, name: SE_NAMES[d] || d, v: Math.round(v), color: COG_COLORS[i % 7] }))} />
           </div>
         )}

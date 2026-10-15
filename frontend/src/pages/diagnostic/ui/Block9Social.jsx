@@ -4,7 +4,7 @@ import DiagShell, { ResultNav } from './DiagShell'
 import QuestionNav from './QuestionNav'
 import useDiagBlock from '../model/useDiagBlock'
 import useBlockDraft from '../model/useBlockDraft'
-import { blockSummary } from '../model/blockSummary'
+import { blockSummary } from '../../../shared/lib/blockSummary'
 import { MiniRings } from './charts'
 
 const QS = [
@@ -155,7 +155,7 @@ export default function Block9Social() {
         <div className="q-text">Какое достижение? Расскажи кратко.</div>
         <textarea className="q-textarea" placeholder="1–3 предложения..." maxLength={300} value={achieveText} onChange={e => setAchieveText(e.target.value)} />
         <div className="char-count">{achieveText.length} / 300</div>
-        <div className="nav-row"><button className="btn btn-accent" onClick={() => { ans.E1a = achieveText; setPhase('open'); setIdx(0) }}>Далее →</button></div>
+        <div className="nav-row"><button className="btn btn-accent" disabled={!achieveText.trim()} onClick={() => { ans.E1a = achieveText; setPhase('open'); setIdx(0) }}>Далее →</button></div>
       </>
     )
   } else {
@@ -167,7 +167,7 @@ export default function Block9Social() {
         <div className="q-text" style={{ fontSize: 13, color: 'var(--ghost)', marginTop: -12, fontWeight: 400 }}>{o.text}</div>
         <textarea className="q-textarea" placeholder="Минимум 2–3 предложения..." maxLength={500} value={openTexts[idx]} onChange={e => { const c = [...openTexts]; c[idx] = e.target.value; setOpenTexts(c) }} />
         <div className="char-count">{openTexts[idx].length} / 500</div>
-        <div className="nav-row"><button className="btn btn-accent" onClick={() => { const ni = idx + 1; if (ni >= OPEN.length) submit(); else setIdx(ni) }}>{idx < OPEN.length - 1 ? 'Далее →' : 'Завершить блок ✓'}</button></div>
+        <div className="nav-row"><button className="btn btn-accent" disabled={!(openTexts[idx] || '').trim()} onClick={() => { const ni = idx + 1; if (ni >= OPEN.length) submit(); else setIdx(ni) }}>{idx < OPEN.length - 1 ? 'Далее →' : 'Завершить блок ✓'}</button></div>
       </>
     )
   }

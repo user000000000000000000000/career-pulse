@@ -22,6 +22,8 @@ const Atlas         = lazy(() => import('../pages/atlas').then(m => ({ default: 
 const ChildResults  = lazy(() => import('../pages/child-results').then(m => ({ default: m.ChildResults })))
 const AdminPanel    = lazy(() => import('../pages/admin').then(m => ({ default: m.AdminPanel })))
 const SharedResults = lazy(() => import('../pages/shared-results').then(m => ({ default: m.SharedResults })))
+const ProfessionsCatalog = lazy(() => import('../pages/catalog').then(m => ({ default: m.ProfessionsCatalog })))
+const VuzCatalog         = lazy(() => import('../pages/catalog').then(m => ({ default: m.VuzCatalog })))
 const LegalHub  = lazy(() => import('../pages/legal').then(m => ({ default: m.LegalHub })))
 const Privacy   = lazy(() => import('../pages/legal').then(m => ({ default: m.Privacy })))
 const Terms     = lazy(() => import('../pages/legal').then(m => ({ default: m.Terms })))
@@ -59,6 +61,10 @@ export default function App() {
       <Route path="/login" element={<Login />} />
       <Route path="/reset-password" element={<ResetPassword />} />
       <Route path="/r/:token" element={<SharedResults />} />
+
+      {/* Публичные каталоги для индексации (без авторизации) */}
+      <Route path="/professions" element={<ProfessionsCatalog />} />
+      <Route path="/vuzy" element={<VuzCatalog />} />
 
       {/* Бесплатный мини-тест без регистрации (блоки 2/4/5) + шаринг результата */}
       <Route path="/proba" element={<Navigate to="/proba/2" replace />} />
