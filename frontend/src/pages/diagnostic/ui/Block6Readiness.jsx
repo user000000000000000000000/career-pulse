@@ -4,7 +4,7 @@ import DiagShell, { ResultNav } from './DiagShell'
 import QuestionNav from './QuestionNav'
 import useDiagBlock from '../model/useDiagBlock'
 import useBlockDraft from '../model/useBlockDraft'
-import { blockSummary } from '../model/blockSummary'
+import { blockSummary } from '../../../shared/lib/blockSummary'
 import { SegmentScale } from './charts'
 import { scoreReadiness } from '../model/scoring/readiness'
 
@@ -151,7 +151,7 @@ export default function Block6Readiness() {
         <textarea className="q-textarea" placeholder="Минимум 3–5 предложений..." maxLength={500}
           value={openTexts[num]} onChange={e => { const c = [...openTexts]; c[num] = e.target.value; setOpenTexts(c) }} />
         <div className="char-count">{openTexts[num].length} / 500</div>
-        <div className="nav-row"><button className="btn btn-accent" onClick={() => saveOpen(num)}>{num === 0 ? 'Далее →' : 'Завершить блок ✓'}</button></div>
+        <div className="nav-row"><button className="btn btn-accent" disabled={!(openTexts[num] || '').trim()} onClick={() => saveOpen(num)}>{num === 0 ? 'Далее →' : 'Завершить блок ✓'}</button></div>
       </>
     )
   }

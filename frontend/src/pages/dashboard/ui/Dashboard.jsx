@@ -8,6 +8,7 @@ import { DEV_PROFILES, applyDevProfile } from '../devProfiles'
 import { submitConsultRequest } from '../../../shared/api'
 import ContactLinks from '../../../shared/ui/ContactLinks.jsx'
 import SocialIcon from '../../../shared/ui/SocialIcon.jsx'
+import BlockResultModal from './BlockResultModal.jsx'
 import { confirmDialog, alertDialog } from '../../../shared/ui/Dialog.jsx'
 import FamilyCard from './FamilyCard.jsx'
 import RolePlaceholder from './RolePlaceholder.jsx'
@@ -31,6 +32,7 @@ export default function Dashboard() {
   const [completed, setCompleted] = useState([])
   const [profile, setProfile] = useState({})
   const [results, setResults] = useState({})
+  const [blockModal, setBlockModal] = useState(null)
   const [pct, setPct] = useState(0)
   const [me, setMe] = useState({ name: '', phone: '', role: '', avatar_url: '' })
   const [userLoaded, setUserLoaded] = useState(false)
@@ -238,7 +240,9 @@ export default function Dashboard() {
               <p>Твоя профориентационная диагностика — <strong>10 блоков</strong>, {totalQ} вопросов, ~{totalTime} минут. Можно проходить частями. Каждый блок сразу добавляет слой в твой профиль.</p>
             </div>
             <div className="wb-actions">
-              <Link to="/test/1" className="btn btn-accent">🧠 Начать диагностику</Link>
+              {pct >= 100
+                ? <Link to="/diagnostic" className="btn btn-accent">📊 Результаты диагностики</Link>
+                : <Link to="/test/1" className="btn btn-accent">🧠 {completed.length ? 'Продолжить диагностику' : 'Начать диагностику'}</Link>}
               <button className="btn btn-outline btn-tour" onClick={() => setTourOpen(true)}>🗺️ Как это работает</button>
             </div>
           </div>
@@ -329,9 +333,14 @@ export default function Dashboard() {
                       <span>⏱ ~{blk.time} мин</span>
                       <span style={{marginLeft:'auto',color:'var(--ghost)'}}>+{blk.weight}% профиля</span>
                     </div>
-                    <Link to={'/test/' + blk.n} className={'btn bc-btn ' + (done ? 'bc-btn--redo' : 'bc-btn--start')}>
-                      {done ? '↻ Пройти заново' : 'Начать →'}
-                    </Link>
+                    {done ? (
+                      <div className="bc-actions">
+                        <button className="btn bc-btn bc-btn--result" onClick={() => setBlockModal(blk.n)}>📊 Результаты</button>
+                        <Link to={'/test/' + blk.n} className="btn bc-btn bc-btn--redo">↻ Заново</Link>
+                      </div>
+                    ) : (
+                      <Link to={'/test/' + blk.n} className="btn bc-btn bc-btn--start">Начать →</Link>
+                    )}
                   </div>
                 )
               })}
@@ -585,6 +594,15 @@ export default function Dashboard() {
           </div>
         </div>
       </div>
+
+      {blockModal != null && (
+        <BlockResultModal
+          blockNum={blockModal}
+          title={(BLOCKS.find(b => b.n === blockModal) || {}).title || `Блок ${blockModal}`}
+          scores={results[blockModal]?.scores}
+          onClose={() => setBlockModal(null)}
+        />
+      )}
 
     </div>
   )

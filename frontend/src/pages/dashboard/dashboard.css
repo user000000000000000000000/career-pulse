@@ -338,3 +338,18 @@
   background: var(--ok); color: #fff; font-size: 10px; font-weight: 800;
   display: flex; align-items: center; justify-content: center;
 }
+
+/* ── кнопки действий на карточке блока + модалка результата ── */
+.cp-dashboard .bc-actions { display: flex; gap: 8px; }
+.cp-dashboard .bc-actions .bc-btn { flex: 1; min-width: 0; }
+.cp-dashboard .bc-btn--result { background: var(--accent); color: var(--on-accent); border: none; cursor: pointer; font-family: var(--font-body); }
+.cp-dashboard .bc-btn--result:hover { opacity: .9; }
+.brm-overlay { position: fixed; inset: 0; z-index: 200; background: rgba(37,32,92,.45); backdrop-filter: blur(3px); display: flex; align-items: center; justify-content: center; padding: 20px; }
+.brm-card { position: relative; background: var(--card, #fff); border: 1px solid var(--line); border-radius: 18px; padding: 28px; max-width: 440px; width: 100%; box-shadow: var(--shadow-lg); }
+.brm-close { position: absolute; top: 14px; right: 16px; background: none; border: none; font-size: 18px; color: var(--ghost); cursor: pointer; line-height: 1; }
+.brm-close:hover { color: var(--text); }
+.brm-eyebrow { font-size: 11px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--accent); margin-bottom: 6px; }
+.brm-title { font-family: var(--font-display); font-size: 20px; color: var(--text); margin: 0 0 12px; }
+.brm-text { font-size: 14px; line-height: 1.55; color: var(--sub); margin: 0 0 16px; }
+.brm-rings { margin-bottom: 16px; }
+.brm-full { width: 100%; }

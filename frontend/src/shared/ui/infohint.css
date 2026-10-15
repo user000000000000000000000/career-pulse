@@ -1,0 +1,24 @@
+.info-hint {
+  position: relative; display: inline-flex; align-items: center; justify-content: center;
+  color: var(--ghost); cursor: help; vertical-align: middle; margin-left: 6px; outline: none;
+  transition: color .15s;
+}
+.info-hint:hover, .info-hint:focus-visible { color: var(--accent); }
+.info-hint-pop {
+  position: absolute; bottom: calc(100% + 8px); left: 50%; transform: translateX(-50%);
+  width: 270px; max-width: 76vw;
+  background: var(--card, #fff); color: var(--text); border: 1px solid var(--line2);
+  border-radius: 12px; padding: 12px 14px;
+  font-size: 12.5px; line-height: 1.5; font-weight: 400; text-align: left; letter-spacing: 0;
+  box-shadow: var(--shadow-md); z-index: 60;
+  opacity: 0; visibility: hidden; transition: opacity .15s, visibility .15s; pointer-events: none;
+}
+.info-hint-pop::after {
+  content: ''; position: absolute; top: 100%; left: 50%; transform: translateX(-50%);
+  border: 6px solid transparent; border-top-color: var(--card, #fff);
+}
+.info-hint:hover .info-hint-pop, .info-hint:focus-visible .info-hint-pop { opacity: 1; visibility: visible; }
+@media (max-width: 560px) {
+  .info-hint-pop { left: auto; right: -8px; transform: none; }
+  .info-hint-pop::after { left: auto; right: 14px; transform: none; }
+}

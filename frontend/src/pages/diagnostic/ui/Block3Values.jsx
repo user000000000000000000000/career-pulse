@@ -4,7 +4,7 @@ import DiagShell, { ResultNav } from './DiagShell'
 import QuestionNav from './QuestionNav'
 import useDiagBlock from '../model/useDiagBlock'
 import useBlockDraft from '../model/useBlockDraft'
-import { blockSummary } from '../model/blockSummary'
+import { blockSummary } from '../../../shared/lib/blockSummary'
 import { RankCards } from './charts'
 import { scoreValues } from '../model/scoring/values'
 
@@ -162,7 +162,7 @@ export default function Block3Values() {
         <div className="q-text" style={{ fontSize: 13, color: 'var(--ghost)', marginTop: -12 }}>Напиши 2–3 предложения — как будто объясняешь другу</div>
         <textarea className="q-textarea" placeholder="Напиши здесь..." maxLength={500} value={openText} onChange={e => setOpenText(e.target.value)} />
         <div className="char-count">{openText.length} / 500</div>
-        <div className="nav-row"><button className="btn btn-accent" onClick={submit}>Завершить блок ✓</button></div>
+        <div className="nav-row"><button className="btn btn-accent" disabled={!openText.trim()} onClick={submit}>Завершить блок ✓</button></div>
       </>
     )
   }

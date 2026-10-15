@@ -3,7 +3,7 @@ import { CP } from '../../../shared/api'
 import DiagShell, { ResultNav } from './DiagShell'
 import useDiagBlock from '../model/useDiagBlock'
 import useBlockDraft from '../model/useBlockDraft'
-import { blockSummary } from '../model/blockSummary'
+import { blockSummary } from '../../../shared/lib/blockSummary'
 import { scoreAnketa } from '../model/scoring/anketa'
 
 const EGE = [

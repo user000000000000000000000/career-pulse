@@ -69,3 +69,11 @@
   .atlas-filter-row{gap:6px}
   .atlas-chip{padding:8px 13px;font-size:12px}
 }
+
+/* ── направления ОКСО в раскрытой карточке профессии ── */
+.atlas-card .ac-okso { margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--line); }
+.atlas-card .ac-okso-h { font-size: 11px; font-weight: 700; letter-spacing: .04em; text-transform: uppercase; color: var(--accent); margin-bottom: 8px; }
+.atlas-card .ac-okso-row { display: flex; gap: 10px; font-size: 13px; color: var(--text); padding: 5px 0; align-items: baseline; }
+.atlas-card .ac-okso-row + .ac-okso-row { border-top: 1px solid var(--line); }
+.atlas-card .ac-okso-code { font-family: var(--font-mono); font-size: 12px; color: var(--accent); flex-shrink: 0; min-width: 72px; }
+.atlas-card .ac-okso-note { margin-top: 10px; font-size: 12.5px; color: var(--ghost); }

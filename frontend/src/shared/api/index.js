@@ -1,7 +1,7 @@
 export { supabase, isSupabaseConfigured } from './supabase'
 export { callAiEdgeFunction } from './edgeFunction'
 export { default as CP } from './cpStorage'
-export { getCareerTrack, getCareerTracksForProfessions, EGE_SUBJECT_NAMES } from './careerTrackAPI'
+export { getCareerTrack, getCareerTracksForProfessions, listInstitutions, EGE_SUBJECT_NAMES } from './careerTrackAPI'
 export { generateRoadmap } from './roadmapAPI'
 export { submitConsultRequest } from './consult'
 export { generateLinkCode, redeemLinkCode, listFamily, unlinkFamily, getChildProfile } from './family'
