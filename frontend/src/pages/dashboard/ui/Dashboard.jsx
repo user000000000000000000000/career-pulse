@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
+import BoltIcon from '../../../shared/ui/BoltIcon.jsx'
 import { useNavigate, Link } from 'react-router-dom'
 import { getCurrentUser, logout as doLogout } from '../../../shared/auth'
 import { CP } from '../../../shared/api'
@@ -180,7 +181,7 @@ export default function Dashboard() {
       {/* ── SIDEBAR ── */}
       <aside className={'sidebar' + (sidebarOpen ? ' open' : '')} id="sidebar">
         <Link to="/" className="sb-logo" style={{textDecoration:'none'}}>
-          <div className="sb-logo-mark">⚡</div>
+          <div className="sb-logo-mark"><BoltIcon /></div>
           <div className="sb-logo-text">CAREER<span>PULSE</span></div>
         </Link>
 

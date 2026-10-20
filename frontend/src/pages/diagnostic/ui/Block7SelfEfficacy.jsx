@@ -5,7 +5,7 @@ import QuestionNav from './QuestionNav'
 import useDiagBlock from '../model/useDiagBlock'
 import useBlockDraft from '../model/useBlockDraft'
 import { blockSummary } from '../../../shared/lib/blockSummary'
-import { MiniRings } from './charts'
+import { MiniRings } from '../../../shared/ui/charts'
 import { scoreSelfEfficacy } from '../model/scoring/selfEfficacy'
 
 const GEN = [

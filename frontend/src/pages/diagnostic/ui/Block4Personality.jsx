@@ -5,7 +5,7 @@ import QuestionNav from './QuestionNav'
 import useDiagBlock from '../model/useDiagBlock'
 import useBlockDraft from '../model/useBlockDraft'
 import { blockSummary } from '../../../shared/lib/blockSummary'
-import { BarList } from './charts'
+import { BarList } from '../../../shared/ui/charts'
 import { scorePersonality, MAIN } from '../model/scoring/personality'
 
 const QS = [

@@ -5,7 +5,7 @@ import QuestionNav from './QuestionNav'
 import useDiagBlock from '../model/useDiagBlock'
 import useBlockDraft from '../model/useBlockDraft'
 import { blockSummary } from '../../../shared/lib/blockSummary'
-import { SegmentScale } from './charts'
+import { SegmentScale } from '../../../shared/ui/charts'
 import { scoreReadiness } from '../model/scoring/readiness'
 
 const TYPES = [

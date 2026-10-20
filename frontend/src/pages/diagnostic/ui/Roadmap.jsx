@@ -4,9 +4,10 @@ import { CP } from '../../../shared/api'
 import { matchProfessions } from '../../../entities/profession'
 import { generateRoadmap } from '../../../shared/api'
 import { confirmDialog } from '../../../shared/ui/Dialog.jsx'
+import { buildStages, gradeNum, INTRO, CLOSING } from '../model/roadmapContent'
+import { HOLLAND } from '../../../shared/lib/blockRings'
+import BoltIcon from '../../../shared/ui/BoltIcon.jsx'
 import '../diagnostic.css'
-
-const NODE_COLORS = ['#5f96e9', '#8b6fe8', '#e8a0c4', '#72a2eb', '#22d97a', '#72a2eb', '#8b6fe8', '#ff4d6d']
 
 export default function Roadmap() {
   const navigate = useNavigate()
@@ -38,17 +39,32 @@ export default function Roadmap() {
     setChosen(c => c.includes(name) ? c.filter(x => x !== name) : c.length < 2 ? [...c, name] : c)
   }
 
+  // Отметить/снять шаг чеклиста; состояние храним в roadmap.checked и сохраняем в профиль.
+  const toggleTask = (key) => {
+    setRoadmap(rm => {
+      // Снятие пишем как false (не delete): updateProfile делает deepMerge и
+      // удалённый ключ не затёрся бы, а false — примитив, он перезапишет true.
+      const nc = { ...(rm.checked || {}), [key]: !rm.checked?.[key] }
+      const next = { ...rm, checked: nc }
+      CP.updateProfile({ roadmap: next })
+      return next
+    })
+  }
+
   async function build() {
     setBuilding(true)
-    const r = await generateRoadmap(profile, chosen)
-    setRoadmap(r)
-    await CP.updateProfile({ roadmap: r, chosen_professions: chosen })
+    // От ИИ берём только одну персональную строку; остальной маршрут — курированный.
+    let aiLine = ''
+    try { const r = await generateRoadmap(profile, chosen); aiLine = (r?.intro || '').trim() } catch { /* ИИ недоступен — не критично */ }
+    const rm = { aiLine, chosen }
+    setRoadmap(rm)
+    await CP.updateProfile({ roadmap: rm, chosen_professions: chosen })
     setBuilding(false)
   }
   async function reset() {
     const ok = await confirmDialog({
       title: 'Выбрать другие профессии?',
-      message: 'Текущий маршрут будет сброшен. Чтобы построить новый, нейросеть сгенерирует его заново. Продолжить?',
+      message: 'Текущий маршрут будет сброшен, и мы построим новый под выбранные профессии. Продолжить?',
       confirmText: 'Да, выбрать заново',
       cancelText: 'Оставить маршрут',
       danger: true,
@@ -61,7 +77,7 @@ export default function Roadmap() {
   const Shell = ({ children }) => (
     <div className="cp-diag">
       <div className="topbar">
-        <div className="tb-left"><div className="tb-logo" onClick={() => navigate('/dashboard')}><div className="tb-logo-mark">⚡</div>CAREER<span>PULSE</span></div><div className="tb-divider"></div><div className="tb-block">Карьерный маршрут</div></div>
+        <div className="tb-left"><div className="tb-logo" onClick={() => navigate('/dashboard')}><div className="tb-logo-mark"><BoltIcon /></div>CAREER<span>PULSE</span></div><div className="tb-divider"></div><div className="tb-block">Карьерный маршрут</div></div>
         <button className="tb-btn" onClick={() => navigate('/diagnostic')}>← К результатам</button>
       </div>
       <div className="container" style={{ maxWidth: 980 }}>{children}</div>
@@ -78,46 +94,116 @@ export default function Roadmap() {
     </Shell>
   }
 
-  // ── Готовый маршрут ──
+  // ── Готовый маршрут (гибрид: мост «Ты → Профессия» + интерактивный чеклист) ──
   if (roadmap) {
+    const picked = roadmap.chosen || chosen
+    const ctx = profile?.context || {}
+    const stages = buildStages(ctx, picked)
+    const checked = roadmap.checked || {}
+
+    // Полюс «Ты сейчас» — из данных диагностики
+    const g = gradeNum(ctx)
+    const gradeLabel = g ? `${g} класс · твой профиль` : (ctx.grade ? `${ctx.grade} · твой профиль` : 'Твой профиль')
+    const topHolland = Object.entries(profile?.holland_scores || {})
+      .sort((a, b) => b[1] - a[1]).slice(0, 2).map(([k]) => HOLLAND[k]).filter(Boolean)
+    const nowBullets = [
+      profile?.career_archetype ? `Тип: «${profile.career_archetype}»` : null,
+      topHolland.length ? `Сильные стороны: ${topHolland.join(' + ')}` : null,
+      'Диагностика пройдена — склад ума уже понятен',
+    ].filter(Boolean)
+
+    // Прогресс по чеклисту
+    const allKeys = stages.flatMap(s => s.tasks.map((_, ti) => `${s.id}_${ti}`))
+    const total = allKeys.length
+    const done = allKeys.filter(k => checked[k]).length
+    const pct = total ? Math.round((done / total) * 100) : 0
+
     return <Shell>
-      <div className="block-num">КАРЬЕРНЫЙ МАРШРУТ</div>
-      <div className="block-title">ТВОЙ ПУТЬ</div>
-      {roadmap.goal && <div className="block-desc">🎯 {roadmap.goal}</div>}
-      <div style={{ textAlign: 'center', margin: '6px 0 18px', fontSize: 12, color: 'var(--ghost)' }}>
-        Профессии: <b style={{ color: 'var(--accent)' }}>{chosen.join(' · ')}</b> {roadmap._source && <span>· {roadmap._source === 'yandexgpt' ? 'YandexGPT' : 'локально'}</span>}
+      <div className="rm-head">
+        <div className="rm-eyebrow">🌉 Твой маршрут</div>
+        <div className="block-title" style={{ margin: '6px 0' }}>ОТ ТЕБЯ СЕЙЧАС — К ЦЕЛИ</div>
+        <p className="rm-intro">{INTRO}</p>
       </div>
 
-      {roadmap.intro && (
-        <div className="r-card" style={{ borderColor: 'rgba(139,111,232,.3)', background: 'linear-gradient(135deg, rgba(139,111,232,.08), rgba(95,150,233,.04))', marginBottom: 20 }}>
-          <div className="r-label" style={{ color: '#8b6fe8', marginBottom: 8 }}>🤖 От наставника</div>
-          <div style={{ fontSize: 14, lineHeight: 1.8 }}>{roadmap.intro}</div>
+      <div className="rm-poles">
+        <div className="rm-pole now">
+          <div className="rm-pole-cap">Ты сейчас</div>
+          <div className="rm-pole-h">{gradeLabel}</div>
+          <ul>{nowBullets.map((b, i) => <li key={i}>{b}</li>)}</ul>
+        </div>
+        <div className="rm-pole goal">
+          <div className="rm-pole-cap">Цель</div>
+          <div className="rm-pole-h">{picked.join(' · ')}</div>
+          <ul>
+            {picked.map((p, i) => <li key={i}>{p}</li>)}
+            <li>Путь ниже закрывает опыт и образование</li>
+          </ul>
+        </div>
+      </div>
+
+      {roadmap.aiLine && (
+        <div className="rm-personal">
+          <div className="rm-personal-h">✦ Персонально по твоему профилю</div>
+          <div className="rm-personal-t">{roadmap.aiLine}</div>
         </div>
       )}
 
-      <div className="rm-scroll">
-        <div className="rm-row">
-          {roadmap.steps.map((s, i) => (
-            <div className="rm-step" key={i}>
-              <div className="rm-horizon">{s.horizon}</div>
-              <div className="rm-node" style={{ background: NODE_COLORS[i % NODE_COLORS.length] }}>{s.n || i + 1}</div>
-              <div className="rm-card">
-                <div className="rm-title">{s.title}</div>
-                <div className="rm-desc">{s.desc}</div>
+      <div className="rm-prog">
+        <div className="rm-progcard">
+          <div className="rm-prog-big">{pct}%</div>
+          <div className="rm-prog-track"><div className="rm-prog-fill" style={{ width: pct + '%' }} /></div>
+          <div className="rm-prog-lbl">{done} / {total} шагов к цели</div>
+        </div>
+      </div>
+
+      <div className="rm-bridge">
+        {stages.map((s, i) => {
+          const doneHere = s.tasks.filter((_, ti) => checked[`${s.id}_${ti}`]).length
+          const complete = doneHere === s.tasks.length
+          return (
+            <div className={'rm-span' + (complete ? ' complete' : '')} key={s.id}>
+              <div className="rm-dot">{complete ? '✓' : i + 1}</div>
+              <div className="rm-c">
+                <div className="rm-c-top">
+                  <span className="rm-c-h">{s.horizon}</span>
+                  <span className="rm-c-cnt">{doneHere}/{s.tasks.length}</span>
+                </div>
+                <div className="rm-c-title">{s.title}</div>
+                <p className="rm-c-desc">{s.desc}</p>
+                {s.tasks.map((t, ti) => {
+                  const key = `${s.id}_${ti}`
+                  return (
+                    <label className={'rm-task' + (checked[key] ? ' on' : '')} key={ti}>
+                      <span className="rm-cb">✓</span>
+                      <input type="checkbox" checked={!!checked[key]} onChange={() => toggleTask(key)} style={{ display: 'none' }} />
+                      <span className="rm-tx">{t}</span>
+                    </label>
+                  )
+                })}
               </div>
             </div>
-          ))}
+          )
+        })}
+        <div className="rm-span goal-span">
+          <div className="rm-dot">🎯</div>
+          <div className="rm-c">
+            <div className="rm-goal-em">🎯</div>
+            <div className="rm-c-title">{picked.join(' · ')}</div>
+            <p className="rm-c-desc">Стажировка с первого курса и живое портфолио — и ты уже в профессии, а не «готовишься к ней».</p>
+          </div>
         </div>
       </div>
 
-      {roadmap.skills?.length > 0 && (
-        <div style={{ marginTop: 24 }}>
-          <div className="r-label" style={{ textAlign: 'center', marginBottom: 10 }}>Ключевые навыки прокачать</div>
-          <div className="rm-skills">{roadmap.skills.map((sk, i) => <span key={i} className="rm-skill">{sk}</span>)}</div>
+      {total > 0 && done === total && (
+        <div className="rm-banner">
+          <b>🎉 Мост построен!</b>
+          <span>Ты прошёл весь путь до цели. Самое время обсудить детали с живым наставником.</span>
         </div>
       )}
 
-      <div className="nav-row" style={{ marginTop: 28 }}>
+      <p className="rm-closing">{CLOSING}</p>
+
+      <div className="nav-row" style={{ marginTop: 20 }}>
         <button className="btn btn-ghost" onClick={reset}>← Выбрать другие профессии</button>
         <button className="btn btn-accent" onClick={() => navigate('/dashboard')}>В кабинет</button>
       </div>
@@ -128,7 +214,7 @@ export default function Roadmap() {
   return <Shell>
     <div className="block-num">КАРЬЕРНЫЙ МАРШРУТ</div>
     <div className="block-title">ВЫБЕРИ 2 ПРОФЕССИИ</div>
-    <div className="block-desc">Отметь две профессии из подобранных по твоему профилю — нейросеть построит к ним пошаговый маршрут с учётом твоего возраста.</div>
+    <div className="block-desc">Отметь две профессии из подобранных по твоему профилю — мы построим к ним пошаговый маршрут под твой возраст и класс.</div>
 
     <div className="prof-pick" style={{ marginTop: 24 }}>
       {profs.length === 0 && <div style={{ textAlign: 'center', color: 'var(--sub)' }}>Профессии появятся после анализа профиля.</div>}
@@ -147,7 +233,7 @@ export default function Roadmap() {
     <div style={{ textAlign: 'center', fontSize: 12, color: 'var(--ghost)', marginTop: 12 }}>Выбрано: {chosen.length} / 2</div>
     <div className="nav-row" style={{ marginTop: 16 }}>
       <button className="btn btn-accent" disabled={chosen.length !== 2 || building} onClick={build}>
-        {building ? 'Нейросеть строит маршрут… ⏳' : 'Построить маршрут →'}
+        {building ? 'Собираю маршрут… ⏳' : 'Построить маршрут →'}
       </button>
     </div>
   </Shell>
