@@ -5,7 +5,7 @@ import QuestionNav from './QuestionNav'
 import useDiagBlock from '../model/useDiagBlock'
 import useBlockDraft from '../model/useBlockDraft'
 import { blockSummary } from '../../../shared/lib/blockSummary'
-import { RadarChart } from './charts'
+import { RadarChart } from '../../../shared/ui/charts'
 import { scoreHolland } from '../model/scoring/holland'
 import { HOLLAND_FULL as TYPE_NAMES } from '../model/hollandTypes'
 

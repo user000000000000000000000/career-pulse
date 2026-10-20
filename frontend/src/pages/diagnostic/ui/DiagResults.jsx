@@ -10,7 +10,7 @@ import { defaultInstitutionType, filterPrograms } from '../model/careerTrackFilt
 import { HOLLAND_PLAIN, buildHollandPortrait } from '../model/hollandPlain.js'
 import { PERSONALITY_PLAIN, buildPersonalityPortrait, COGNITIVE_PLAIN, buildCognitivePortrait, VALUES_PLAIN, MOTIVATION_PLAIN, READINESS_PLAIN } from '../model/resultsPlain.js'
 import { MASCOT_RESULTS_LINE } from '../model/mascotLines'
-import { RadarChart, BarList, MiniRings } from './charts'
+import { RadarChart, BarList, MiniRings } from '../../../shared/ui/charts'
 import InfoHint from '../../../shared/ui/InfoHint.jsx'
 import '../diagnostic.css'
 
@@ -296,7 +296,13 @@ export default function DiagResults() {
                       </div>
                     ) : (
                       <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
-                        {track.specialties.map((sp, si) => {
+                        {track.specialties.filter(sp => {
+                          // при фильтре «Вузы» не показываем СПО-направления (колледж) и наоборот
+                          const isCollege = sp.level === 'college'
+                          if (typeFilter === 'university' && isCollege) return false
+                          if (typeFilter === 'college' && !isCollege) return false
+                          return true
+                        }).map((sp, si) => {
                           const { programs: progs, cityFallback, total } = filterPrograms(sp.programs, { typeFilter, relocationReady, userCity })
                           return (
                           <div key={sp.code} style={si > 0 ? { borderTop: '1px solid var(--line)', paddingTop: 14 } : undefined}>

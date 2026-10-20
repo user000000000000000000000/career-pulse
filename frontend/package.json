@@ -5,7 +5,7 @@
   "type": "module",
   "description": "CareerPulse — платформа карьерной диагностики (фронтенд)",
   "scripts": {
-    "dev": "vite",
+    "dev": "vite --base=/",
     "build": "vite build",
     "build:prod": "vite build --base=/",
     "preview": "vite preview",

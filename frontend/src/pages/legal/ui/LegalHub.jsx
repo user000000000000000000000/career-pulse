@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import BoltIcon from '../../../shared/ui/BoltIcon.jsx'
 import LegalShell from './LegalShell.jsx'
 import SocialIcon from '../../../shared/ui/SocialIcon.jsx'
 
@@ -9,7 +10,7 @@ export default function LegalHub() {
       <>
 <nav className="legal-nav">
   <a href="/" className="nav-logo-link">
-    <div className="nav-logo-mark">⚡</div>
+    <div className="nav-logo-mark"><BoltIcon /></div>
     <div className="nav-logo-txt">CAREER<span>PULSE</span></div>
   </a>
   <a href="/dashboard" className="nav-back-link">← Личный кабинет</a>

@@ -5,7 +5,7 @@ import QuestionNav from './QuestionNav'
 import useDiagBlock from '../model/useDiagBlock'
 import useBlockDraft from '../model/useBlockDraft'
 import { blockSummary } from '../../../shared/lib/blockSummary'
-import { MiniRings } from './charts'
+import { MiniRings } from '../../../shared/ui/charts'
 
 const QS = [
   { id: 'A1', t: 'Знаешь ли ты, кем работают твои родители?', sec: '👨‍👩‍👧 Семья', opts: ['Хорошо знаю', 'В общих чертах', 'Почти не знаю'], enc: [5, 3, 1] },

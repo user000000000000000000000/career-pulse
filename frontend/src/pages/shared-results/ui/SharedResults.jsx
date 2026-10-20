@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import BoltIcon from '../../../shared/ui/BoltIcon.jsx'
 import { useParams, Link } from 'react-router-dom'
 import { getSharedResults } from '../../../shared/api'
 import { friendlyError } from '../../../shared/lib/errors'
@@ -26,7 +27,7 @@ export default function SharedResults() {
     <div className="cp-legal">
       <nav className="legal-nav">
         <Link to="/" className="nav-logo-link">
-          <div className="nav-logo-mark">⚡</div>
+          <div className="nav-logo-mark"><BoltIcon /></div>
           <div className="nav-logo-txt">CAREER<span>PULSE</span></div>
         </Link>
         <Link to="/" className="nav-back-link">Пройти свою диагностику →</Link>

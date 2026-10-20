@@ -5,7 +5,7 @@ import QuestionNav from './QuestionNav'
 import useDiagBlock from '../model/useDiagBlock'
 import useBlockDraft from '../model/useBlockDraft'
 import { blockSummary } from '../../../shared/lib/blockSummary'
-import { RankCards } from './charts'
+import { RankCards } from '../../../shared/ui/charts'
 import { scoreValues } from '../model/scoring/values'
 
 const VNAMES = { KR: 'Креативность', AK: 'Активные контакты', RZ: 'Развитие себя', DU: 'Духовное удовлетворение', PR: 'Собственный престиж', MB: 'Материальное благополучие', DO: 'Достижения', IN: 'Индивидуальность' }
