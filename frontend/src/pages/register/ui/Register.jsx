@@ -108,7 +108,7 @@ export default function Register() {
         <Card accent className="auth-card">
           <div className="auth-eyebrow">Регистрация</div>
           <h1 className="auth-title">НАЙДИ СВОЙ ПУТЬ</h1>
-          <p className="auth-sub">Создайте аккаунт и пройдите диагностику из 250 вопросов.</p>
+          <p className="auth-sub">Создайте аккаунт и пройдите диагностику из 293 вопросов.</p>
 
           {error && <div className="auth-error">{error}</div>}
 

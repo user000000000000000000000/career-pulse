@@ -56,7 +56,7 @@
 .cp-diag .container { max-width: 640px; margin: 0 auto; padding: 32px 20px 80px; flex: 1; width: 100%; }
 .cp-diag .container.wide { max-width: 680px; }
 .cp-diag .block-num { font-family: 'JetBrains Mono', monospace; font-size: 11px; font-weight: 700; letter-spacing: 2px; color: var(--violet); text-align: center; }
-.cp-diag .block-title { font-family: var(--font-display); font-size: 36px; letter-spacing: 3px; text-align: center; margin: 4px 0 8px; }
+.cp-diag .block-title { font-family: var(--font-display); font-size: clamp(24px, 7vw, 36px); letter-spacing: 3px; text-align: center; margin: 4px 0 8px; overflow-wrap: break-word; }
 .cp-diag .block-desc { font-size: 14px; color: var(--sub); text-align: center; max-width: 520px; margin: 0 auto 6px; line-height: 1.7; }
 .cp-diag .block-meta { display: flex; justify-content: center; gap: 18px; margin: 10px 0 28px; font-size: 12px; color: var(--ghost); flex-wrap: wrap; }
 .cp-diag .block-meta span { display: flex; align-items: center; gap: 5px; }
@@ -161,7 +161,7 @@
 /* result */
 .cp-diag .result { text-align: center; animation: cpFade .5s ease; }
 .cp-diag .result-icon { font-size: 56px; margin-bottom: 8px; }
-.cp-diag .result-title { font-family: var(--font-display); font-size: 34px; letter-spacing: 2px; margin-bottom: 6px; }
+.cp-diag .result-title { font-family: var(--font-display); font-size: clamp(22px, 6.5vw, 34px); letter-spacing: 2px; margin-bottom: 6px; overflow-wrap: break-word; line-height: 1.12; }
 .cp-diag .result-desc { font-size: 14px; color: var(--sub); max-width: 460px; margin: 0 auto 20px; line-height: 1.7; }
 .cp-diag .r-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 24px; text-align: left; }
 .cp-diag .r-card { background: var(--card); border: 1px solid var(--line); border-radius: 10px; padding: 14px; }
@@ -280,7 +280,6 @@
 @media (max-width: 1024px) {
   /* правый отступ резервирует место под фиксированный бургер (AppNav) */
   .cp-diag .topbar { padding: 14px 64px 14px 20px; }
-  .cp-diag .block-title { font-size: 32px; }
   .cp-diag .opt-grid.cols-3 { grid-template-columns: 1fr 1fr; }
 }
 
@@ -289,7 +288,8 @@
   .cp-diag .pair-row { grid-template-columns: 1fr; }
   .cp-diag .r-grid, .cp-diag .result-cards { grid-template-columns: 1fr; }
   .cp-diag .container { padding: 20px 16px 60px; }
-  .cp-diag .block-title { font-size: 28px; letter-spacing: 2px; }
+  .cp-diag .block-title { letter-spacing: 2px; }
+  .cp-diag .result-title { letter-spacing: 1px; }
   .cp-diag .scale-row { gap: 7px; }
   .cp-diag .scale-btn { width: 46px; height: 46px; font-size: 18px; }
   .cp-diag .bar-lbl { width: 90px; font-size: 10px; }
