@@ -43,7 +43,7 @@ export default function Atlas() {
       <div className="atlas-hero">
         <div className="atlas-eyebrow">CareerPulse</div>
         <h1 className="atlas-title">АТЛАС ПРОФЕССИЙ</h1>
-        <p className="atlas-sub">105 профессий с описаниями, типами по Holland и категориями. Найди своё направление.</p>
+        <p className="atlas-sub">200 профессий с описаниями, типами по Holland и категориями. Найди своё направление.</p>
       </div>
 
       <div className="atlas-controls">

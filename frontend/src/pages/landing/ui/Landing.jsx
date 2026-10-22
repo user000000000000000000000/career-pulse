@@ -142,7 +142,7 @@ export default function Landing() {
           <div className="lv-vsteps reveal">
             <div className="lv-vstep">
               <div className="lv-vstep-rail"><div className="lv-vstep-node"><svg viewBox="0 0 24 24"><rect x="5" y="4" width="14" height="17" rx="2"/><path d="M9 4V3h6v1"/><path d="M8.5 10h7M8.5 14h5"/></svg></div></div>
-              <div className="lv-vstep-card"><div className="lv-vstep-tag">ШАГ 01</div><b>Пройди диагностику</b><p>10 блоков и около 250 вопросов о характере, ценностях, способностях и интересах. Это основа, на которой строится весь дальнейший разбор.</p></div>
+              <div className="lv-vstep-card"><div className="lv-vstep-tag">ШАГ 01</div><b>Пройди диагностику</b><p>10 блоков и 293 вопроса о характере, ценностях, способностях и интересах. Это основа, на которой строится весь дальнейший разбор.</p></div>
             </div>
             <div className="lv-vstep">
               <div className="lv-vstep-rail"><div className="lv-vstep-node"><svg viewBox="0 0 24 24"><path d="M12 3l1.7 4.6L18.3 9.3 13.7 11 12 15.6 10.3 11 5.7 9.3 10.3 7.6z"/><path d="M18 14.5l.7 1.8 1.8.7-1.8.7-.7 1.8-.7-1.8-1.8-.7 1.8-.7z"/></svg></div></div>
