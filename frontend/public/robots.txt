@@ -9,5 +9,9 @@ Disallow: /test
 Disallow: /diagnostic
 Disallow: /result
 Disallow: /child
+Disallow: /roadmap
+Disallow: /atlas
+Disallow: /reset-password
+Disallow: /vk-consent
 
 Sitemap: https://careerpulse.ru/sitemap.xml
