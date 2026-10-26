@@ -2,6 +2,14 @@
 # Задачи: 1) сжатие текстовых ответов, 2) вечный кэш хешированных ассетов, 3) без кэша для index.html
 # (чтобы новый релиз подхватывался сразу), 4) фолбэк на index.html.
 
+# ── Кодировка ──
+# Без этого reg.ru отдаёт текстовые файлы без charset → кириллица (robots.txt и т.п.)
+# превращается в кракозябры. Файлы в UTF-8, помечаем это в заголовке Content-Type.
+AddDefaultCharset utf-8
+<IfModule mod_mime.c>
+  AddCharset utf-8 .html .css .js .mjs .json .txt .xml .svg .webmanifest
+</IfModule>
+
 # ── Сжатие ──
 <IfModule mod_deflate.c>
   AddOutputFilterByType DEFLATE text/html text/css text/plain text/xml \
