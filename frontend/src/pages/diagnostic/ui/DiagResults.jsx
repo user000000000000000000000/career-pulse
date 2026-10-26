@@ -74,6 +74,7 @@ export default function DiagResults() {
   const [tracks, setTracks] = useState({}) // professionId → { status, specialties }
   const [typeSel, setTypeSel] = useState(null) // null = авто-дефолт по анкете; иначе выбор в тумблере
   const [sharing, setSharing] = useState(false)
+  const [openSpecs, setOpenSpecs] = useState({}) // `${profId}:${code}` → раскрыт ли полный список вузов
 
   async function shareResults() {
     try {
@@ -203,8 +204,22 @@ export default function DiagResults() {
           <button className="btn btn-ghost" onClick={shareResults} disabled={sharing}>🔗 {sharing ? 'Создаю ссылку…' : 'Поделиться результатами'}</button>
         </div>
 
+        {/* ── Оглавление: липкие якоря по секциям разбора ── */}
+        <div className="print-hide" style={{ position: 'sticky', top: 0, zIndex: 5, background: 'var(--deep)', padding: '10px 0', marginTop: 16, display: 'flex', gap: 8, flexWrap: 'wrap', borderBottom: '1px solid var(--line)' }}>
+          {[
+            ['s-razbor', 'Разбор', true],
+            ['s-prof', 'Профессии', atlasProfs.length > 0],
+            ['s-edu', 'Образование', atlasProfs.slice(0, 5).length > 0],
+            ['s-typ', 'Типология', arche.length > 0],
+            ['s-viz', 'Диаграммы', !!(vizRadar || vizRings.length > 0 || vizBars.length > 0)],
+          ].filter(([, , show]) => show).map(([id, label]) => (
+            <button key={id} onClick={() => document.getElementById(id)?.scrollIntoView({ behavior: 'smooth', block: 'start' })}
+              className="chip" style={{ cursor: 'pointer', font: 'inherit' }}>{label}</button>
+          ))}
+        </div>
+
         {/* ── Разбор от нейросети (представляет маскот) ── */}
-        <div className="r-card" style={{ marginTop: 24, borderColor: 'rgba(139,111,232,.3)', background: 'linear-gradient(135deg, rgba(139,111,232,.08), rgba(95,150,233,.04))' }}>
+        <div id="s-razbor" className="r-card" style={{ marginTop: 16, scrollMarginTop: 56, borderColor: 'rgba(139,111,232,.3)', background: 'linear-gradient(135deg, rgba(139,111,232,.08), rgba(95,150,233,.04))' }}>
           <div style={{ display: 'flex', gap: 16, alignItems: 'flex-start' }}>
             <div style={{ flex: 1, minWidth: 0 }}>
               <div className="r-label" style={{ marginBottom: 10, color: 'var(--violet)' }}>
@@ -247,7 +262,7 @@ export default function DiagResults() {
             </div>
           )}
           {atlasProfs.length > 0 && (
-            <div style={{ marginTop: 16 }}>
+            <div id="s-prof" style={{ marginTop: 16, scrollMarginTop: 56 }}>
               <div className="r-label" style={{ color: 'var(--accent)', marginBottom: 8 }}>Подходящие профессии <span style={{ color: 'var(--ghost)', fontWeight: 400 }}>· из атласа</span></div>
               <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
                 {atlasProfs.map((p) => (
@@ -267,7 +282,7 @@ export default function DiagResults() {
 
         {/* ── Образовательный путь: ЕГЭ + вузы/колледжи под топ-5 рекомендованных профессий ── */}
         {atlasProfs.slice(0, 5).length > 0 && (
-          <div style={{ marginTop: 18 }}>
+          <div id="s-edu" style={{ marginTop: 18, scrollMarginTop: 56 }}>
             <div className="r-label" style={{ color: 'var(--accent)', marginBottom: 10 }}>Образовательный путь</div>
             {typeOptions.length > 1 && (
               <div style={{ display: 'flex', gap: 6, marginBottom: 8, flexWrap: 'wrap' }}>
@@ -304,6 +319,9 @@ export default function DiagResults() {
                           return true
                         }).map((sp, si) => {
                           const { programs: progs, cityFallback, total } = filterPrograms(sp.programs, { typeFilter, relocationReady, userCity })
+                          const specKey = `${p.id}:${sp.code}`
+                          const open = openSpecs[specKey]
+                          const shown = open ? progs.slice(0, 7) : progs.slice(0, 3) // по умолчанию 3, чтобы не было простыни
                           return (
                           <div key={sp.code} style={si > 0 ? { borderTop: '1px solid var(--line)', paddingTop: 14 } : undefined}>
                             <div style={{ fontSize: 13.5, fontWeight: 700, marginBottom: 4, color: 'var(--accent)', display: 'flex', alignItems: 'center', gap: 7 }}>
@@ -319,17 +337,23 @@ export default function DiagResults() {
                               // Показываем топ-7 (город первым). Без «показать все 252» — из такого
                               // списка никто не выбирает; точный выбор — на консультации.
                               <div style={{ display: 'flex', flexDirection: 'column' }}>
-                                {progs.slice(0, 7).map((prog, i) => (
+                                {shown.map((prog, i) => (
                                   <div key={i} style={{ fontSize: 12.5, color: 'var(--text)', display: 'flex', gap: 10, alignItems: 'baseline', padding: '8px 0', borderTop: i > 0 ? '1px solid var(--line)' : 'none' }}>
                                     <span style={{ color: 'var(--ghost)', fontFamily: "'JetBrains Mono',monospace", fontSize: 11, minWidth: 16, flexShrink: 0 }}>{i + 1}</span>
                                     <span style={{ flex: 1, lineHeight: 1.4 }}>{prog.institution_name}{prog.city ? ` · ${prog.city}` : ''}{prog.institution_type === 'college' && <span style={{ color: 'var(--ghost)' }}> · колледж</span>}</span>
                                     {prog.min_score_last_year && <span style={{ color: 'var(--ghost)', whiteSpace: 'nowrap', flexShrink: 0 }}>от {prog.min_score_last_year} баллов ({prog.admission_year})</span>}
                                   </div>
                                 ))}
+                                {!open && progs.length > 3 && (
+                                  <button onClick={() => setOpenSpecs(s => ({ ...s, [specKey]: true }))}
+                                    style={{ alignSelf: 'flex-start', marginTop: 6, background: 'none', border: 'none', padding: 0, cursor: 'pointer', color: 'var(--accent)', fontWeight: 700, fontSize: 12 }}>
+                                    Показать ещё {Math.min(progs.length, 7) - 3} →
+                                  </button>
+                                )}
                                 {cityFallback && (
                                   <div style={{ fontSize: 11.5, color: 'var(--ghost)', marginTop: 2 }}>В городе «{userCity}» по этому направлению не нашли — показываем другие города.</div>
                                 )}
-                                {total > 7 && (
+                                {open && total > 7 && (
                                   <div style={{ fontSize: 11.5, color: 'var(--ghost)', marginTop: 2 }}>…и другие вузы по этому направлению — подберём точный список на консультации</div>
                                 )}
                               </div>
@@ -349,7 +373,7 @@ export default function DiagResults() {
         )}
 
         {arche.length > 0 && (
-          <div style={{ marginTop: 24 }}>
+          <div id="s-typ" style={{ marginTop: 24, scrollMarginTop: 56 }}>
             <BlockHead icon="🧩" color="#4079d3" title="Типология личности"
               sub="Один и тот же человек можно описать с четырёх разных сторон — ниже эти четыре взгляда на тебя." />
             <div className="r-grid" style={{ gridTemplateColumns: 'repeat(2,1fr)' }}>
@@ -365,7 +389,7 @@ export default function DiagResults() {
         )}
 
         {(vizRadar || vizRings.length > 0 || vizBars.length > 0) && (
-          <div className="r-card" style={{ marginTop: 18 }}>
+          <div id="s-viz" className="r-card" style={{ marginTop: 18, scrollMarginTop: 56 }}>
             <BlockHead icon="📊" color="#4079d3" title="Профиль в диаграммах"
               sub="Коротко и наглядно — твои главные показатели по блокам." />
             {vizRadar && (

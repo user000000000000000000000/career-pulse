@@ -321,24 +321,32 @@ function readinessPct(readiness, dim) {
  * @param {object} profile  агрегированный профиль (нужны holland_scores; readiness_scores — опционально)
  * @param {number} limit    сколько вернуть
  */
+const RIASEC = ['R', 'I', 'A', 'S', 'E', 'C']
+
 export function matchProfessions(profile = {}, limit = 8) {
   const scores = profile.holland_scores || {}
   if (!Object.keys(scores).length) return []
-  const W = [1, 0.7, 0.45] // веса по позиции кода в профессии
-  const maxH = Math.max(...Object.values(scores)) || 1 // топ-балл человека — для масштаба
+  const W = [1, 0.7, 0.45] // «идеальная» интенсивность кода по его позиции в профессии
   const readiness = profile.readiness_scores || null
 
+  // Вектор человека по всем шести типам RIASEC.
+  const v = RIASEC.map(c => scores[c] || 0)
+  const vNorm = Math.hypot(...v) || 1
+
   const ranked = PROFESSIONS.map(p => {
-    let sum = 0, wsum = 0
-    p.holland.forEach((code, i) => {
-      const w = W[i] ?? 0.3
-      sum += (scores[code] || 0) * w
-      wsum += w
+    // Вектор профессии: позиционный вес там, где её Holland-код, иначе 0.
+    const u = RIASEC.map(c => {
+      const i = p.holland.indexOf(c)
+      return i === -1 ? 0 : (W[i] ?? 0.3)
     })
-    const hFit = wsum ? (sum / wsum) / maxH : 0 // 0..1, ~1 когда коды совпали с топ-типами
+    const uNorm = Math.hypot(...u) || 1
+    const dot = v.reduce((s, x, i) => s + x * u[i], 0)
+    // Косинус: совпадение ФОРМЫ профиля и профессии (0..1). Не награждает «узкие»
+    // профессии с одним кодом и учитывает все типы человека, а не только топ.
+    const cos = dot / (vNorm * uNorm)
 
     const rPct = readinessPct(readiness, CATEGORY_READINESS[p.category])
-    const combined = rPct != null ? 0.7 * hFit + 0.3 * (rPct / 100) : hFit
+    const combined = rPct != null ? 0.7 * cos + 0.3 * (rPct / 100) : cos
 
     return { ...p, match: Math.max(0, Math.min(100, Math.round(combined * 100))) }
   }).sort((a, b) => b.match - a.match)

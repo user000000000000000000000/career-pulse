@@ -10,7 +10,7 @@
     "build:prod": "vite build --base=/",
     "preview": "vite preview",
     "check:arch": "steiger ./src",
-    "test": "node src/pages/diagnostic/model/scoring/scoring.test.mjs"
+    "test": "node src/pages/diagnostic/model/scoring/scoring.test.mjs && node src/entities/profession/model.test.mjs"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.45.0",
