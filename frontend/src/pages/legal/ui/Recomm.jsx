@@ -1,18 +1,12 @@
 import LegalShell from './LegalShell.jsx'
 import ContactLinks from '../../../shared/ui/ContactLinks.jsx'
-import BoltIcon from '../../../shared/ui/BoltIcon.jsx'
+import LegalNav from './LegalNav.jsx'
 
 export default function Recomm() {
   return (
     <LegalShell title="Рекомендательные технологии" description="Правила применения рекомендательных технологий на платформе CareerPulse.">
       <>
-<nav className="legal-nav">
-  <a href="/" className="nav-logo-link">
-    <div className="nav-logo-mark"><BoltIcon /></div>
-    <div className="nav-logo-txt">CAREER<span>PULSE</span></div>
-  </a>
-  <a data-back="1" href="/" className="nav-back-link">← Назад</a>
-</nav>
+<LegalNav />
 
 <main className="legal-page">
   <div className="container">
