@@ -17,6 +17,11 @@ export function usePageMeta(title, description) {
       if (!tag) { tag = document.createElement('meta'); tag.name = 'description'; document.head.appendChild(tag) }
       tag.setAttribute('content', description)
     }
+    // Canonical на прод-домен (срезаем base /career-pulse у стейджа), без query/hash.
+    const path = location.pathname.replace(/^\/career-pulse/, '') || '/'
+    let link = document.querySelector('link[rel="canonical"]')
+    if (!link) { link = document.createElement('link'); link.rel = 'canonical'; document.head.appendChild(link) }
+    link.setAttribute('href', 'https://careerpulse.ru' + path)
     return () => {
       document.title = `${BASE} — профориентация и карьерная диагностика`
       const tag = document.querySelector('meta[name="description"]')

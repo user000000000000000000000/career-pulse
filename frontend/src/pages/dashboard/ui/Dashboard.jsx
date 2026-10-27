@@ -353,7 +353,7 @@ export default function Dashboard() {
             <div className="panel">
               <div className="panel-title">Мой наставник и эксперт</div>
               <div className="mentor-card">
-                <div className="m-av" style={{background:'linear-gradient(135deg,var(--violet),var(--accent))'}}>НС<img src={mentorPhoto} alt="Никита Соколов" className="m-av-img" onError={(e) => { e.currentTarget.style.display = 'none' }} /></div>
+                <div className="m-av" style={{background:'linear-gradient(135deg,var(--violet),var(--accent))'}}>НС<img src={mentorPhoto} alt="Никита Соколов" className="m-av-img" loading="lazy" decoding="async" onError={(e) => { e.currentTarget.style.display = 'none' }} /></div>
                 <div style={{flex:'1'}}>
                   <div className="m-name">Никита Соколов</div>
                   <div className="m-spec">Профориентолог-наставник</div>
@@ -481,7 +481,7 @@ export default function Dashboard() {
             </div>
             <div className="modal-body">
               <div className="mentor-card" style={{ marginBottom: 16 }}>
-                <div className="m-av" style={{ background: 'linear-gradient(135deg,var(--violet),var(--accent))' }}>НС<img src={mentorPhoto} alt="Никита Соколов" className="m-av-img" onError={(e) => { e.currentTarget.style.display = 'none' }} /></div>
+                <div className="m-av" style={{ background: 'linear-gradient(135deg,var(--violet),var(--accent))' }}>НС<img src={mentorPhoto} alt="Никита Соколов" className="m-av-img" loading="lazy" decoding="async" onError={(e) => { e.currentTarget.style.display = 'none' }} /></div>
                 <div style={{ flex: 1 }}>
                   <div className="m-name">Никита Соколов</div>
                   <div className="m-spec">Профориентолог-наставник</div>
