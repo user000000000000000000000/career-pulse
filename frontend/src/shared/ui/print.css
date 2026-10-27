@@ -13,6 +13,12 @@
   html, body { background: #ffffff !important; }
   .cp-diag, .container { background: #ffffff !important; }
 
+  /* Печатать фоновые цвета: без этого браузеры «съедают» заливки полос,
+     бэйджей, колец и диаграмм — отчёт выходил бы белёсым. */
+  * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
+  /* SVG-диаграммы не должны рваться между страницами */
+  svg, .r-card, .rc-bars, .pb-ring { break-inside: avoid; page-break-inside: avoid; }
+
   /* читаемый тёмный текст на белом (цветные ЗАЛИВКИ полос/бэйджей остаются — это background) */
   .cp-diag, .cp-diag *:not(.hs-fill):not(.rc-bar-fill):not(.dtrack-fill):not(.pb-ring-fg) {
     color: #1a1636 !important;

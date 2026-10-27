@@ -75,6 +75,14 @@ export default function DiagResults() {
   const [typeSel, setTypeSel] = useState(null) // null = авто-дефолт по анкете; иначе выбор в тумблере
   const [sharing, setSharing] = useState(false)
   const [openSpecs, setOpenSpecs] = useState({}) // `${profId}:${code}` → раскрыт ли полный список вузов
+  const [forceAll, setForceAll] = useState(false) // печать: раскрыть все списки вузов перед PDF
+
+  // Печать: сначала форсируем полные списки (чтобы в PDF попали все вузы), печатаем после рендера.
+  useEffect(() => {
+    if (!forceAll) return
+    window.print()
+    setForceAll(false)
+  }, [forceAll])
 
   async function shareResults() {
     try {
@@ -200,7 +208,7 @@ export default function DiagResults() {
         <div className="block-desc">Пройдено блоков: {progress.completed.length} / {CP.TOTAL_BLOCKS}. Каждый блок добавляет слой.</div>
 
         <div className="print-hide" style={{ marginTop: 14, display: 'flex', gap: 10, flexWrap: 'wrap' }}>
-          <button className="btn btn-accent" onClick={() => window.print()}>📄 Скачать отчёт (PDF)</button>
+          <button className="btn btn-accent" onClick={() => setForceAll(true)}>📄 Скачать отчёт (PDF)</button>
           <button className="btn btn-ghost" onClick={shareResults} disabled={sharing}>🔗 {sharing ? 'Создаю ссылку…' : 'Поделиться результатами'}</button>
         </div>
 
@@ -320,7 +328,7 @@ export default function DiagResults() {
                         }).map((sp, si) => {
                           const { programs: progs, cityFallback, total } = filterPrograms(sp.programs, { typeFilter, relocationReady, userCity })
                           const specKey = `${p.id}:${sp.code}`
-                          const open = openSpecs[specKey]
+                          const open = openSpecs[specKey] || forceAll // forceAll — для печати PDF
                           const shown = open ? progs.slice(0, 7) : progs.slice(0, 3) // по умолчанию 3, чтобы не было простыни
                           return (
                           <div key={sp.code} style={si > 0 ? { borderTop: '1px solid var(--line)', paddingTop: 14 } : undefined}>

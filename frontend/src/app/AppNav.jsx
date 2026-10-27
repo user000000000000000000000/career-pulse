@@ -67,6 +67,7 @@ export default function AppNav() {
       <button
         className={'appnav-burger' + (open ? ' is-open' : '')}
         aria-label="Меню навигации"
+        aria-expanded={open}
         onClick={() => setOpen(o => !o)}
       >
         <span></span><span></span><span></span>
