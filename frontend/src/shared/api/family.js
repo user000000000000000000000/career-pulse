@@ -1,4 +1,6 @@
 import { supabase, isSupabaseConfigured } from './supabase'
+import { config } from '../config'
+import { demoProfileRow, demoUsers } from './demoData'
 
 // Семейная связка родитель↔ребёнок. Backend: supabase/migrations/002_family_links.sql
 // (таблица family_links + RLS + RPC link_child_by_code).
@@ -15,6 +17,7 @@ function randomCode(len = 4) {
 
 /** Ребёнок: сгенерировать код привязки, записать себе в профиль. Возвращает код. */
 export async function generateLinkCode() {
+  if (config.demoMode) { localStorage.setItem('demo_family_code', '2026'); return { code: '2026', ttlMin: 30 } }
   if (!isSupabaseConfigured) throw new Error('Supabase не настроен')
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) throw new Error('Нужно войти')
@@ -28,6 +31,11 @@ export async function generateLinkCode() {
 
 /** Родитель: обменять код на связь. Возвращает { ok, child_name } | { ok:false, error }. */
 export async function redeemLinkCode(code) {
+  if (config.demoMode) {
+    if (code !== '2026') return { ok: false, error: 'Для демонстрации используй код 2026' }
+    localStorage.setItem('demo_family_link', 'on')
+    return { ok: true, child_name: demoProfileRow().full_name }
+  }
   if (!isSupabaseConfigured) throw new Error('Supabase не настроен')
   const { data, error } = await supabase.rpc('link_child_by_code', { p_code: code })
   if (error) throw new Error(error.message)
@@ -36,6 +44,7 @@ export async function redeemLinkCode(code) {
 
 /** Мои связи: { parents: [...profiles], children: [...profiles] }. */
 export async function listFamily() {
+  if (config.demoMode) return { parents: [], children: localStorage.getItem('demo_family_link') === 'off' ? [] : [{ id: 'demo', full_name: demoProfileRow().full_name, has_passed_test: true }] }
   if (!isSupabaseConfigured) return { parents: [], children: [] }
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) return { parents: [], children: [] }
@@ -56,6 +65,7 @@ export async function listFamily() {
 
 /** Отвязать (любую сторону). */
 export async function unlinkFamily(otherId) {
+  if (config.demoMode) { localStorage.setItem('demo_family_link', 'off'); return }
   if (!isSupabaseConfigured) throw new Error('Supabase не настроен')
   const { data: { user } } = await supabase.auth.getUser()
   const { error } = await supabase.from('family_links').delete()
@@ -65,6 +75,11 @@ export async function unlinkFamily(otherId) {
 
 /** Полный профиль ребёнка (для просмотра результатов родителем). */
 export async function getChildProfile(childId) {
+  if (config.demoMode) {
+    const user = demoUsers.find(u => u.id === childId)
+    if (!user) return null
+    return { ...demoProfileRow(), id: user.id, full_name: user.full_name }
+  }
   if (!isSupabaseConfigured) return null
   const { data, error } = await supabase.from('profiles').select('*').eq('id', childId).maybeSingle()
   if (error) throw new Error(error.message)

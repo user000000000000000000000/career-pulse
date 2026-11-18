@@ -15,6 +15,7 @@ import { config } from '../config/config'
  * @returns {Promise<object>} результат с полем _source: 'yandexgpt'|'local-fallback'|'local'
  */
 export async function callAiEdgeFunction({ explicitUrl, path, body, fallback, validate }) {
+  if (config.demoMode) return { ...fallback(), _source: 'local' }
   const baseUrl = config.supabaseUrl
   const useRemote = isSupabaseConfigured || (explicitUrl && baseUrl)
 

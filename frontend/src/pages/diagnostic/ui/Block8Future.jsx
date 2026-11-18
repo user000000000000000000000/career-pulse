@@ -1,3 +1,4 @@
+import IconText from '../../../shared/ui/IconText.jsx'
 import { useState } from 'react'
 import { CP } from '../../../shared/api'
 import DiagShell, { ResultNav } from './DiagShell'
@@ -85,7 +86,7 @@ export default function Block8Future() {
     return (
       <DiagShell num={8} title="ОБРАЗ БУДУЩЕГО" pct={100}>
         <div className="result">
-          <div className="result-icon">🔮</div>
+          <div className="result-icon"><IconText text={"🔮"} /></div>
           <div className="result-title">ОБРАЗ БУДУЩЕГО</div>
           <div className="result-desc">Параметры будущей работы и готовность к пути сохранены в твой профиль.</div>
           <div className="result-summary">{blockSummary(8, result)}</div>
@@ -125,11 +126,11 @@ export default function Block8Future() {
     body = (
       <>
         <div className="q-counter" style={{ color: 'var(--gold)' }}>Открытый {idx + 1} / {OPEN.length}</div>
-        <div className="q-text">{o.title}</div>
+        <div className="q-text"><IconText text={o.title} /></div>
         <div className="q-text" style={{ fontSize: 13, color: 'var(--ghost)', marginTop: -12, fontWeight: 400 }}>{o.text}</div>
         <textarea className="q-textarea" placeholder="Минимум 2–3 предложения..." maxLength={500} value={openTexts[idx]} onChange={e => { const c = [...openTexts]; c[idx] = e.target.value; setOpenTexts(c) }} />
         <div className="char-count">{openTexts[idx].length} / 500</div>
-        <div className="nav-row"><button className="btn btn-accent" disabled={!openTexts[idx].trim()} onClick={saveOpen}>{idx < OPEN.length - 1 ? 'Далее →' : 'Завершить блок ✓'}</button></div>
+        <div className="nav-row"><button className="btn btn-accent" disabled={!openTexts[idx].trim()} onClick={saveOpen}><IconText text={idx < OPEN.length - 1 ? 'Далее →' : 'Завершить блок ✓'} /></button></div>
       </>
     )
   }

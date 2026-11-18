@@ -1,0 +1,59 @@
+/* Compact phone presentation only. Desktop/tablet styles and data stay intact. */
+@media screen and (max-width: 620px) {
+  #root :is(.app-landing, .app-interior) { font-size: 14px; }
+
+  #root .site-header .lv-nav-inner { min-height: 50px; }
+  #root .site-header .lv-logo { font-size: 12.5px; }
+  #root .site-header .lv-logo .brand-mark { width: 24px; height: 24px; }
+  #root .site-header .lv-nav-avatar { width: 30px; height: 30px; font-size: 11px; }
+  #root .site-header .lv-cta-pill { padding: 9px 12px; font-size: 11px; min-height: 38px; }
+
+  #root .cp-lv2 .lv-hero-left { gap: 12px; }
+  #root .cp-lv2 .lv-badge { font-size: 10px; padding: 6px 9px; }
+  #root .cp-lv2 .lv-badge > span { font-size: 18px; }
+  #root .cp-lv2 .lv-hero-title { font-size: clamp(30px, 8.3vw, 43px); letter-spacing: -1.8px; }
+  #root .cp-lv2 :is(.lv-hero-sub, .lv-lead, .lv-ctaband p) { font-size: 14px; line-height: 1.5; }
+  #root .cp-lv2 :is(.lv-h2, .lv-ctaband h2) { font-size: 23px; }
+  #root .cp-lv2 .lv-eyebrow { font-size: 12px; }
+  #root .cp-lv2 :is(.lv-vstep-card, .lv-prof-card, .lv-mcard, .lv-infocard) { padding: 16px; border-radius: 16px; gap: 6px; }
+  #root .cp-lv2 :is(.lv-vstep-card, .lv-prof-card, .lv-mcard, .lv-diff, .lv-infocard) b { font-size: 14px; }
+  #root .cp-lv2 :is(.lv-vstep-card, .lv-mcard, .lv-diff, .lv-infocard) p { font-size: 13px; line-height: 1.5; }
+  #root .cp-lv2 :is(.lv-btn-primary, .lv-ctaband-btn) { font-size: 14px; padding: 12px 20px; min-height: 44px; }
+
+  #root .app-interior :is(.auth-title, .cat-title, .atlas-title, .res-title, .block-title, .p-title, .page-title) { font-size: 24px; line-height: 1.3; }
+  #root .app-interior .profile-heading .auth-title { font-size: 24px; }
+  #root .app-interior .wb-text :is(h1, h2) { font-size: 22px; }
+  #root .app-interior :is(.section-title, .block-head h3, .legal-body h2, .profile-links h2) { font-size: 18px; }
+  #root .app-interior :is(.auth-sub, .cat-sub, .atlas-sub, .block-desc, .p-sub, .legal-lead, .wb-text p, .result-desc, .result-summary) { font-size: 13px; line-height: 1.6; }
+  #root .app-interior .materials-page .cat-sub { font-size: 13px; }
+  #root .app-interior :is(.cat-card-h, .ac-name, .bc-title, .rm-title, .q-label) { font-size: 14px; }
+  #root .app-interior :is(.cat-card-p, .ac-desc, .metric__mean, .result-reading-note, .result-next-steps, .block-intro, .brm-text) { font-size: 12px; line-height: 1.6; }
+  #root .app-interior :is(.r-card, .shared-result-card, .res-report) p { font-size: 13px; line-height: 1.65; }
+  #root .app-interior :is(.r-label, .metric__name, .cat-chip, .atlas-chip, .auth-role, .input-hint) { font-size: 11px; }
+  #root .app-interior .r-val { font-size: 21px; }
+  #root .app-interior :is(.cat-card, .atlas-card, .r-card, .p-card, .p-cta, .block-card, .axis-card, .shared-result-card, .profile-links, .auth-card) { padding: 16px; border-radius: 18px; }
+  #root .app-interior :is(.metric, .rm-card) { padding: 12px; border-radius: 14px; }
+  #root .app-interior :is(.welcome-banner, .progress-block) { padding: 18px 16px; }
+  #root .app-interior .profile-card { padding: 20px; }
+  #root .app-interior .profile-heading { margin: -20px -20px 20px; padding: 20px; }
+  #root .app-interior :is(.cat-grid, .atlas-grid, .r-grid, .metrics, .blocks-grid, .axes-grid) { gap: 12px; }
+
+  #root .app-interior :is(.btn, .cp-btn, .p-btn, .bc-btn, .rm-btn, .materials-button) { font-size: 12px; padding: 11px 16px; min-height: 44px; }
+  #root .app-interior :is(.cat-chip, .atlas-chip, .auth-role) { padding: 7px 11px; min-height: 40px; }
+  /* Keep the full-width save action at its explicitly requested size. */
+  #root .app-interior .profile-card .profile-save-button { min-height: 52px; padding: 14px 20px; font-size: 14px; }
+  /* 16px inputs avoid automatic viewport zoom when focused on iOS. */
+  #root .app-interior :is(.cp-input, .cat-input, .atlas-search, .cat-select) { font-size: 16px; min-height: 44px; padding: 10px 12px; }
+
+  #root .app-interior .cp-diag .diagnostic-overview__hero { padding: 20px 18px; border-radius: 20px; gap: 14px; }
+  #root .app-interior .cp-diag .diagnostic-overview .block-title { font-size: 24px; }
+  #root .app-interior .cp-diag .diagnostic-overview .block-desc { font-size: 13px; margin-top: 12px; }
+  #root .app-interior .diagnostic-info-card { padding: 12px; border-radius: 14px; gap: 8px; }
+  #root .app-interior .diagnostic-info-card__value { font-size: 12px; }
+  #root .app-interior .cp-diag .question-stage { padding: 16px 14px; border-radius: 20px; }
+  #root .app-interior .cp-diag .question-stage :is(.q-text, .q-prompt, .q-context) { font-size: 15px; line-height: 1.65; }
+  #root .app-interior .cp-diag .question-stage :is(.opt-card, .mat-card) { font-size: 13px; padding: 12px; min-height: 48px; }
+  #root .app-interior .cp-diag .question-stage .pair-card { min-height: 120px; padding: 14px; }
+  #root .app-interior .cp-diag .question-stage .scale-btn { font-size: 16px; height: 46px; }
+  #root .app-interior .cp-diag .question-stage .step-title { font-size: 19px; }
+}

@@ -1,0 +1,4 @@
+/* Full-screen overlays share one stack even when their cards live in a route.
+   Keep the existing DOM/style scope; release only the decorative route isolation
+   while a modal is open, so a nested route dialog can appear above global dialogs. */
+html[data-full-modal-open] .app-interior { isolation: auto; }

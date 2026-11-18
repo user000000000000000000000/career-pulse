@@ -1,3 +1,4 @@
+import IconText from '../../../shared/ui/IconText.jsx'
 import { useState } from 'react'
 import { useNavigate, Link } from 'react-router-dom'
 import Header from '../../../shared/ui/Header.jsx'
@@ -5,7 +6,7 @@ import Card from '../../../shared/ui/Card.jsx'
 import Input from '../../../shared/ui/Input.jsx'
 import Button from '../../../shared/ui/Button.jsx'
 import { friendlyError } from '../../../shared/lib/errors'
-import { supabase } from '../../../shared/api'
+import { supabase, isSupabaseConfigured, CP } from '../../../shared/api'
 import '../../../shared/ui/legal.css'
 import '../../../shared/ui/auth.css'
 
@@ -35,8 +36,12 @@ export default function VkConsent() {
         parent_name: adult ? '' : parent.name.trim(),
         parent_email: adult ? '' : parent.email.trim(),
       }
-      const { error: err } = await supabase.auth.updateUser({ data: consent })
-      if (err) throw err
+      if (isSupabaseConfigured) {
+        const { error: err } = await supabase.auth.updateUser({ data: consent })
+        if (err) throw err
+      } else {
+        await CP.saveUser(consent)
+      }
       navigate('/dashboard')
     } catch (err) {
       setError(friendlyError(err, 'Не удалось сохранить согласие'))
@@ -79,7 +84,7 @@ export default function VkConsent() {
           </label>
 
           <Button block onClick={onSubmit} disabled={busy}>
-            {busy ? 'Сохраняем…' : 'Продолжить →'}
+            <IconText text={busy ? 'Сохраняем…' : 'Продолжить →'} />
           </Button>
         </Card>
       </div>

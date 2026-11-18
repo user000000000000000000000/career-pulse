@@ -1,3 +1,4 @@
+import IconText from '../../../shared/ui/IconText.jsx'
 import { useState } from 'react'
 import { CP } from '../../../shared/api'
 import DiagShell, { ResultNav } from './DiagShell'
@@ -104,7 +105,7 @@ export default function Block3Values() {
     return (
       <DiagShell num={3} title="ЖИЗНЕННЫЕ ЦЕННОСТИ" pct={100}>
         <div className="result">
-          <div className="result-icon">💎</div>
+          <div className="result-icon"><IconText text={"💎"} /></div>
           <div className="result-title">{result.values_archetype.toUpperCase()}</div>
           <div className="result-desc">Твои ведущие ценности: <b>{result.values_top3.map(k => VNAMES[k]).join(', ')}</b></div>
           <div className="result-summary">{blockSummary(3, result)}</div>
@@ -151,7 +152,7 @@ export default function Block3Values() {
         <div className="q-text">Выбери <b>2 пункта</b>, которые для тебя <b>наименее важны</b> прямо сейчас</div>
         <div className="chip-grid">{ANTI_ITEMS.map(a => <div key={a.v} className={'chip' + (antiSel.includes(a.v) ? ' sel' : '')} onClick={() => togAnti(a.v)}>{a.t}</div>)}</div>
         <div className="chip-hint">Выбрано: {antiSel.length} / 2</div>
-        <div className="nav-row"><button className="btn btn-accent" disabled={antiSel.length !== 2} onClick={() => setPhase('open')}>Далее →</button></div>
+        <div className="nav-row"><button className="btn btn-accent" disabled={antiSel.length !== 2} onClick={() => setPhase('open')}><IconText text={"Далее →"} /></button></div>
       </>
     )
   } else {
@@ -162,7 +163,7 @@ export default function Block3Values() {
         <div className="q-text" style={{ fontSize: 13, color: 'var(--ghost)', marginTop: -12 }}>Напиши 2–3 предложения — как будто объясняешь другу</div>
         <textarea className="q-textarea" placeholder="Напиши здесь..." maxLength={500} value={openText} onChange={e => setOpenText(e.target.value)} />
         <div className="char-count">{openText.length} / 500</div>
-        <div className="nav-row"><button className="btn btn-accent" disabled={!openText.trim()} onClick={submit}>Завершить блок ✓</button></div>
+        <div className="nav-row"><button className="btn btn-accent" disabled={!openText.trim()} onClick={submit}><IconText text={"Завершить блок ✓"} /></button></div>
       </>
     )
   }

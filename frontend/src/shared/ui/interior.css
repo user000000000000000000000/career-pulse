@@ -1,0 +1,175 @@
+/* Interior compositions extend the landing tokens without changing its layout.
+   Chart labels and explicit state indicators preserve meaning in the blue palette. */
+/* Shared tokens: shared/ui/design-tokens.css */
+
+/* Shared typography and semantic states, including portal/modal content outside routes. */
+body { accent-color: var(--brand-blue); }
+:is(.site-dialog, .fw-overlay, .modal-overlay, .brm-overlay) { font-family: var(--font-body); }
+.app-interior[data-design='sky'] :is(.adm-eyebrow, .adm-tile__label, .adm-roles__head, .adm-date, .adm-user-contact, .res-label, .r-label, .rc-label, .panel-title, .auth-label) { font-family: var(--font-body); line-height: 1.6; }
+.app-interior[data-design='sky'] :is(.adm-title, .adm-tile__val) { font-family: var(--font-display); letter-spacing: -.035em; }
+.app-interior[data-design='sky'] :is(.auth-error, .cp-field__error) { color: var(--brand-danger); }
+.app-interior[data-design='sky'] .auth-error { border-inline-start: 4px solid var(--brand-danger); border-radius: var(--radius-sm); line-height: 1.6; }
+.app-interior[data-design='sky'] .auth-error::before { content: '!'; display: inline-grid; place-items: center; width: 18px; height: 18px; margin-inline-end: 8px; border: 1.5px solid currentColor; border-radius: 50%; font-weight: 800; }
+.app-interior[data-design='sky'] .auth-success { border-inline-start: 4px solid var(--brand-success); border-radius: var(--radius-sm); line-height: 1.6; }
+.app-interior[data-design='sky'] .auth-success::before { content: '\2713'; margin-inline-end: 8px; font-weight: 800; }
+.app-interior[data-design='sky'] :is(input,textarea,select)[aria-invalid='true'] { border: 2px solid var(--brand-danger); }
+.app-interior[data-design='sky'] .adm-open { min-height: 36px; border-radius: 999px; background: var(--brand-sky); color: var(--sea-text); transition: background .2s, border-color .2s; }
+.app-interior[data-design='sky'] .adm-open:hover { background: #dceeff; }
+.app-interior[data-design='sky'] :is(.adm-roles, .adm-tablewrap) { border-radius: var(--radius-md); border-color: var(--brand-border); }
+.app-interior[data-design='sky'] .adm-table thead th { font-family: var(--font-body); color: #42658c; background: #edf6ff; }
+.app-interior[data-design='sky'] {
+  background:
+    radial-gradient(ellipse 480px 390px at 100% 480px, var(--brand-sky-glow), transparent 75%),
+    radial-gradient(ellipse 900px 520px at 10% 0, #dcecffb3, transparent), var(--brand-page);
+}
+.app-interior[data-design='sky'] :is(.cp-diag, .cp-dashboard, .cp-legal) { font-family: var(--font-body); }
+.route-loader { min-height: 65vh; display: flex; align-items: center; justify-content: center; gap: 14px; color: var(--brand-copy); font: 600 13px var(--font-body); letter-spacing: .04em; }
+.route-loader__ring { width: 26px; height: 26px; border: 3px solid #d4e9ff; border-top-color: var(--brand-blue); border-radius: 50%; animation: route-spin .8s linear infinite; }
+@keyframes route-spin { to { transform: rotate(360deg); } }
+.app-interior[data-design='sky'] :is(.section-title, .bc-title, .ax-key, .res-card-h, .dc-title, .ac-name, .p-title, .rm-head, .modal-head h3) {
+  font-family: var(--font-display); letter-spacing: -.025em; line-height: 1.4;
+}
+.app-interior[data-design='sky'] :is(.section-title, .res-card-h) { font-size: 16px; text-transform: none; }
+.app-interior[data-design='sky'] :is(.auth-eyebrow, .block-num, .cat-eyebrow, .atlas-eyebrow, .legal-eyebrow) {
+  display: inline-flex; align-items: center; gap: 8px; padding: 7px 12px;
+  border: 1px solid #cfe5ff; border-radius: 999px; background: #edf6ff; line-height: 1.5;
+}
+.app-interior[data-design='sky'] :is(.doc-card, .contact-card, .res-card, .shared-result-card, .mentor-section, .family-card, .modal-box, .brm-card) {
+  border: 1px solid var(--brand-border); border-radius: var(--radius-lg);
+  background: white; box-shadow: var(--brand-shadow);
+}
+.app-interior[data-design='sky'] :is(.block-card, .axis-card, .cat-card, .atlas-card, .doc-card, .contact-card, .adm-tile) {
+  transition: transform 240ms var(--brand-ease), box-shadow 240ms ease, border-color 240ms ease;
+}
+@media (hover: hover) and (pointer: fine) {
+  .app-interior[data-design='sky'] :is(.block-card, .axis-card, .cat-card, .atlas-card, .doc-card, .contact-card):hover {
+    transform: translateY(-4px); box-shadow: var(--brand-card-hover); border-color: #afd4ff;
+  }
+}
+.app-interior[data-design='sky'] :is(button, a, input, select, textarea):focus-visible { outline: 3px solid var(--brand-blue); outline-offset: 3px; }
+.app-interior[data-design='sky'] :is(.btn, .cp-btn, .p-btn, .bc-btn, .rm-btn, .auth-role, .cat-chip, .atlas-chip) {
+  transition: background-color .2s, border-color .2s, color .2s, box-shadow .2s, transform .2s;
+}
+
+/* Profile: a clear editing surface plus existing account destinations. */
+.app-interior[data-design='sky'] .cp-legal .profile-layout {
+  display: grid; grid-template-columns: minmax(0, 660px) minmax(0, 340px);
+  align-items: start; justify-content: center; gap: 28px; max-width: 1120px; margin: auto;
+  padding: 32px 24px 80px;
+}
+.app-interior[data-design='sky'] .profile-card { max-width: none; padding: 36px; }
+.app-interior[data-design='sky'] .profile-heading { margin: -36px -36px 28px; padding: 32px 36px 26px; background: var(--gradient-hero); border-radius: 28px 28px 0 0; border-bottom: 1px solid var(--brand-border); }
+.app-interior[data-design='sky'] .profile-heading .auth-title { margin: 16px 0 0; font-size: clamp(28px, 3vw, 38px); }
+.app-interior[data-design='sky'] .profile-avatar { background: var(--brand-gradient); border: 5px solid white; box-shadow: 0 0 0 1px #cde3fb, 0 8px 28px #087cff24; }
+.app-interior[data-design='sky'] .profile-avatar-wrap { padding: 8px 0 20px; border-bottom: 1px solid var(--brand-border); }
+.app-interior[data-design='sky'] .profile-links { border: 1px solid #d3e6fb; border-radius: 28px; padding: 28px; background: linear-gradient(145deg, white, #edf6ff); box-shadow: var(--brand-shadow); }
+.app-interior[data-design='sky'] .profile-links h2 { font-size: 21px; margin: 20px 0; line-height: 1.5; }
+.app-interior[data-design='sky'] .profile-links > a { display: flex; align-items: center; gap: 12px; padding: 16px 0; border-top: 1px solid #dce9fa; text-decoration: none; color: var(--brand-ink); font-size: 14px; line-height: 1.5; }
+.app-interior[data-design='sky'] .profile-links > a > span:last-child { margin-left: auto; color: var(--brand-blue); }
+.app-interior[data-design='sky'] .profile-links > a:hover { color: var(--brand-blue); }
+
+/* Dashboard and the existing test catalogue. */
+.app-interior[data-design='sky'] .welcome-banner { background: linear-gradient(120deg, #dfedff, #eff8ff 72%, #e7f3ff); }
+.app-interior[data-design='sky'] .welcome-banner::before { background: radial-gradient(circle, #8bc9ff40, transparent 70%); }
+.app-interior[data-design='sky'] .cp-dashboard .sb-item { border-radius: 14px; padding-block: 12px; }
+.app-interior[data-design='sky'] .cp-dashboard .sb-item.active { background: #e7f2ff; border-color: #cde4ff; }
+.app-interior[data-design='sky'] .cp-dashboard .bc-num { color: #407bbd; background: #eaf4ff; border-radius: 12px; }
+.app-interior[data-design='sky'] .cp-dashboard .bc-title { font-size: 17px; font-weight: 800; }
+.app-interior[data-design='sky'] .cp-dashboard .bc-desc { line-height: 1.65; color: var(--brand-copy); }
+.app-interior[data-design='sky'] .cp-dashboard .bc-btn { border-radius: 999px; min-height: 42px; }
+.app-interior[data-design='sky'] .cp-dashboard .block-card { padding: 24px; }
+.app-interior[data-design='sky'] .cp-dashboard .block-card::before { background: var(--brand-gradient); }
+.app-interior[data-design='sky'] .cp-dashboard .axis-card { background: #ffffffed; box-shadow: var(--shadow-sm); }
+.app-interior[data-design='sky'] .cp-dashboard .axis-card:nth-child(1) { color: var(--brand-blue); border-top-color: var(--brand-blue); }
+.app-interior[data-design='sky'] .cp-dashboard .axis-card:nth-child(2) { color: var(--brand-blue); border-top-color: var(--brand-blue); }
+.app-interior[data-design='sky'] .cp-dashboard .axis-card:nth-child(3) { color: var(--brand-blue); border-top-color: #64b6ff; }
+.app-interior[data-design='sky'] .cp-dashboard .axis-card:nth-child(4) { color: #465d91; border-top-color: #728bb9; }
+.app-interior[data-design='sky'] .cp-dashboard .axis-card .ax-key { color: inherit; }
+.app-interior[data-design='sky'] .cp-dashboard .ax-key { font-size: 15px; }
+.app-interior[data-design='sky'] .cp-dashboard :is(.ts-icon, .bc-result-ico) { border-radius: 14px; background: #edf6ff; }
+.app-interior[data-design='sky'] .cp-dashboard .modal-head h3 { font-size: 24px; }
+
+/* Test surfaces: preserve every question and selected/disabled state. */
+.app-interior[data-design='sky'] .cp-diag .container { max-width: 760px; }
+.app-interior[data-design='sky'] .cp-diag .container.wide { max-width: 820px; }
+.app-interior[data-design='sky'] .cp-diag .block-num { display: table; margin: 0 auto 14px; }
+.app-interior[data-design='sky'] .cp-diag .block-title { font-size: clamp(27px, 3.4vw, 40px); line-height: 1.3; letter-spacing: -.035em; }
+.app-interior[data-design='sky'] .cp-diag .block-desc { max-width: 600px; margin-top: 16px; }
+.app-interior[data-design='sky'] .cp-diag .block-meta { gap: 8px; flex-wrap: wrap; margin: 20px 0 30px; }
+.app-interior[data-design='sky'] .cp-diag .block-meta > span { background: #eaf4ff; border-radius: 999px; padding: 6px 12px; }
+.app-interior[data-design='sky'] .cp-diag .progress-bar { height: 6px; background: #e2efff; }
+.app-interior[data-design='sky'] .cp-diag :is(.q-card, .task-block, .r-card, .hs-lead, .hs-card, .pair-card) { background: #fff; border: 1px solid var(--brand-border); box-shadow: var(--shadow-sm); border-radius: 24px; }
+.app-interior[data-design='sky'] .cp-diag :is(.opt-card, .mat-card, .int-btn, .scale-btn) { border-radius: 14px; border-color: #cfdef1; }
+.app-interior[data-design='sky'] .cp-diag :is(.opt-card, .mat-card) { padding: 16px 18px; line-height: 1.6; }
+.app-interior[data-design='sky'] .cp-diag :is(.opt-card, .mat-card, .pair-card, .scale-btn, .int-btn).sel { background: #e5f2ff; border-color: var(--brand-blue); box-shadow: 0 0 0 1px var(--brand-blue); }
+.app-interior[data-design='sky'] .cp-diag .btn { min-height: 46px; }
+.app-interior[data-design='sky'] .cp-diag .pair-label { letter-spacing: -.02em; }
+.app-interior[data-design='sky'] .cp-diag .tag-self { background: #eaf4ff; color: var(--brand-blue); }
+.app-interior[data-design='sky'] .cp-diag .ii-A.lvl1 { background: #e3efff; }
+.app-interior[data-design='sky'] .cp-diag .ii-A.lvl2 { background: #bbd8ff; }
+.app-interior[data-design='sky'] .cp-diag .ii-A.lvl3 { background: var(--brand-blue); color: white; }
+.app-interior[data-design='sky'] .cp-diag .ii-B.lvl1 { background: #e7f3ff; }
+.app-interior[data-design='sky'] .cp-diag .ii-B.lvl2 { background: #c9e3fc; }
+.app-interior[data-design='sky'] .cp-diag .ii-B.lvl3 { background: var(--brand-blue); color: white; }
+.app-interior[data-design='sky'] :is(.res-card, .res-block, .rm-card, .shared-result-card) { border-radius: 26px; }
+.app-interior[data-design='sky'] .cp-proba .p-title { font-size: clamp(27px, 4vw, 42px); line-height: 1.25; }
+.app-interior[data-design='sky'] .cp-proba .p-card-title { font-family: var(--font-display); letter-spacing: -.025em; }
+
+/* Profession discovery, expanded cards and recommendation surfaces. */
+.app-interior[data-design='sky'] :is(.cat-controls, .atlas-controls) { border-radius: 24px; }
+.app-interior[data-design='sky'] :is(.cat-card, .atlas-card) { background: linear-gradient(155deg, #fff 75%, #f1f8ff); }
+.app-interior[data-design='sky'] :is(.cat-input, .atlas-search) { border-radius: 999px; padding-inline: 20px; background: white; }
+.app-interior[data-design='sky'] :is(.cat-tag, .ac-tag) { border-radius: 999px; background: #eaf4ff; color: var(--brand-blue); }
+.app-interior[data-design='sky'] :is(.ac-detail, .ac-details) { border-top-color: #dce9fa; line-height: 1.7; }
+.app-interior[data-design='sky'] .atlas-chip.active { background: var(--brand-blue); border-color: var(--brand-blue); color: white; }
+
+/* Long documents: calm reading surface; the source wording stays untouched. */
+.app-interior[data-design='sky'] .cp-legal .legal-page { min-height: auto; }
+.app-interior[data-design='sky'] .legal-page .legal-header { padding: 30px; border: 1px solid #d3e7ff; border-radius: 28px; background: var(--gradient-hero); }
+.app-interior[data-design='sky'] .legal-header h1 { margin: 18px 0; font-size: clamp(26px, 3.6vw, 44px); line-height: 1.3; }
+.app-interior[data-design='sky'] .legal-meta { font-family: var(--font-body); line-height: 1.8; }
+.app-interior[data-design='sky'] .legal-highlight { border-radius: 20px; background: #eaf4ff; border-color: #cce2fc; padding: 22px 26px; }
+.app-interior[data-design='sky'] .legal-body { background: white; border: 1px solid var(--brand-border); border-radius: 28px; padding: 30px 36px; box-shadow: var(--brand-shadow); }
+.app-interior[data-design='sky'] .legal-body h2 { font-size: 21px; color: var(--brand-ink); letter-spacing: -.025em; line-height: 1.5; }
+.app-interior[data-design='sky'] .legal-body :is(p, li) { color: #4b5b7d; font-size: 15px; line-height: 1.85; }
+.app-interior[data-design='sky'] .legal-body a { text-decoration: underline; text-underline-offset: 3px; }
+.app-interior[data-design='sky'] .doc-card { padding: 26px; }
+.app-interior[data-design='sky'] .dc-icon { display: flex; align-items: center; justify-content: center; width: 48px; height: 48px; background: #eaf4ff; border-radius: 16px; }
+.app-interior[data-design='sky'] .legal-footer { margin-top: 48px; border-top: 1px solid #cee2fa; background: linear-gradient(170deg, #e4f1ff, #f4faff); border-radius: 36px 36px 0 0; }
+.app-interior[data-design='sky'] .lf-logo { font-size: 17px; letter-spacing: -.03em; }
+.app-interior[data-design='sky'] .lf-col h4 { font-family: var(--font-body); letter-spacing: .02em; font-size: 12px; color: var(--brand-blue); }
+.app-interior[data-design='sky'] .lf-bottom { border-color: #cee2fa; }
+.app-interior[data-design='sky'] .adm-tablewrap { border: 1px solid var(--brand-border); }
+.app-interior[data-design='sky'] .adm-toolbar { background: #edf5ff; padding: 16px; border-radius: 20px; }
+.app-interior[data-design='sky'] :is(.adm-input, .adm-select) { min-height: 44px; }
+
+/* Mint and star accents sit outside the reading surfaces. */
+.app-interior > .section-decor::after { content: ''; position: absolute; top: 40%; right: -90px; width: 280px; height: 340px; background: radial-gradient(ellipse, #a1ccf540, transparent 72%); }
+.app-interior > .section-decor .section-decor__line { top: 65%; right: 2%; left: auto; }
+
+@media (max-width: 960px) {
+  .app-interior[data-design='sky'] .cp-legal .profile-layout { grid-template-columns: minmax(0, 660px); }
+  .app-interior[data-design='sky'] .profile-links { padding: 24px; }
+}
+@media (max-width: 640px) {
+  .app-interior[data-design='sky'] .cp-legal .profile-layout { padding: 24px 16px 64px; gap: 20px; }
+  .app-interior[data-design='sky'] .profile-card { padding: 24px; }
+  .app-interior[data-design='sky'] .profile-heading { margin: -24px -24px 24px; padding: 24px; border-radius: 24px 24px 0 0; }
+  .app-interior[data-design='sky'] .cp-dashboard .block-card { padding: 20px; }
+  .app-interior[data-design='sky'] .cp-diag .block-meta { gap: 6px; }
+  .app-interior[data-design='sky'] .cp-diag :is(.opt-card, .mat-card) { padding: 14px; }
+  .app-interior[data-design='sky'] .legal-page .legal-header { padding: 24px 20px; }
+  .app-interior[data-design='sky'] .legal-body { padding: 24px 20px; border-radius: 24px; }
+  .app-interior[data-design='sky'] .legal-body h2 { font-size: 19px; }
+  .app-interior[data-design='sky'] .legal-highlight { padding: 20px; }
+  .app-interior[data-design='sky'] .legal-footer { border-radius: 28px 28px 0 0; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .route-loader__ring { animation: none; }
+  .site-dialog-overlay, .site-dialog { animation: none !important; }
+  .app-interior[data-design='sky'] :is(.block-card, .axis-card, .cat-card, .atlas-card, .doc-card, .contact-card, .adm-tile, .btn, .cp-btn, .p-btn, .bc-btn, .rm-btn, .auth-role, .cat-chip, .atlas-chip) { transition: none; }
+  .app-interior[data-design='sky'] :is(.block-card, .axis-card, .cat-card, .atlas-card, .doc-card, .contact-card):hover { transform: none; }
+}
+@media print {
+  .app-interior[data-design='sky'] .legal-body { border: 0; box-shadow: none; padding: 0; }
+}

@@ -1,6 +1,9 @@
+import IconText from '../../../shared/ui/IconText.jsx'
 import { blockSummary } from '../../../shared/lib/blockSummary'
 import { blockRings, BIG5, COG, HOLLAND } from '../../../shared/lib/blockRings'
 import { RadarChart, BarList, MiniRings } from '../../../shared/ui/charts'
+import { useRef } from 'react'
+import { useModal } from '../../../shared/ui/ModalProvider.jsx'
 
 // Диаграмма под конкретный блок (из сохранённых scores).
 function BlockChart({ blockNum, scores: r }) {
@@ -26,13 +29,17 @@ function BlockChart({ blockNum, scores: r }) {
 // Модалка с полным результатом одного пройденного блока.
 export default function BlockResultModal({ blockNum, title, scores, onClose }) {
   const summary = blockSummary(blockNum, scores)
+  const dialogRef = useRef(null)
+  useModal({ open: true, dialogRef, onClose })
+  const rings = blockRings(blockNum, scores)
   return (
-    <div className="brm-overlay" onClick={onClose} role="dialog" aria-modal="true">
-      <div className="brm-card" onClick={(e) => e.stopPropagation()}>
-        <button className="brm-close" onClick={onClose} aria-label="Закрыть">✕</button>
+    <div className="brm-overlay" onClick={onClose}>
+      <div ref={dialogRef} className="brm-card" role="dialog" aria-modal="true" aria-labelledby="block-result-title" onClick={(e) => e.stopPropagation()}>
+        <button className="brm-close" onClick={onClose} aria-label="Закрыть"><IconText text={"✕"} /></button>
         <div className="brm-eyebrow">Результат · блок {String(blockNum).padStart(2, '0')}</div>
-        <h3 className="brm-title">{title}</h3>
+        <h3 id="block-result-title" className="brm-title"><IconText text={title} /></h3>
         {summary && <p className="brm-text">{summary}</p>}
+        {rings.length > 0 && <p className="brm-text">Числа показывают результат по шкалам этого блока. Это не школьные оценки.</p>}
         <div className="brm-chart"><BlockChart blockNum={blockNum} scores={scores} /></div>
         <button className="btn btn-ghost brm-full" onClick={onClose}>Закрыть</button>
       </div>

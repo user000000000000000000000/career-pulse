@@ -1,3 +1,4 @@
+import IconText from '../../../shared/ui/IconText.jsx'
 import { useState } from 'react'
 import { CP } from '../../../shared/api'
 import DiagShell, { ResultNav } from './DiagShell'
@@ -109,7 +110,7 @@ export default function Block7SelfEfficacy() {
     return (
       <DiagShell num={7} title="САМОЭФФЕКТИВНОСТЬ" pct={100}>
         <div className="result">
-          <div className="result-icon">🎯</div>
+          <div className="result-icon"><IconText text={"🎯"} /></div>
           <div className="result-title">{(STYLE_NAMES[result.dominant_style] || 'СМЕШАННЫЙ').toUpperCase()} СТИЛЬ</div>
           <div className="result-desc">Общая уверенность в себе: <b>{result.se_general}/100</b>. Решительность: <b>{result.decisiveness}/100</b></div>
           <div className="result-summary">{blockSummary(7, result)}</div>
@@ -117,7 +118,7 @@ export default function Block7SelfEfficacy() {
             <MiniRings data={[
               { label: 'Общая уверенность', value: result.se_general },
               { label: 'Решительность', value: result.decisiveness },
-              { label: 'Индекс реализации', value: result.career_execution },
+              { label: 'Уверенность действовать', value: result.career_execution },
             ]} />
           </div>
           <div className="r-grid">
@@ -152,17 +153,19 @@ export default function Block7SelfEfficacy() {
         />
       </>
     )
-  } else {
+  } else if (caseAns.length < CASES.length) {
     const c = CASES[caseAns.length]
     body = (
       <>
         <div style={{ textAlign: 'center' }}><span className="section-badge badge-case">Кейс {caseAns.length + 1} / {CASES.length}</span></div>
-        <div className="q-text">{c.title}</div>
+        <div className="q-text"><IconText text={c.title} /></div>
         <div className="case-block">{c.desc}</div>
         {c.opts.map((o, i) => <div key={i} className={'opt-card' + (sel === i ? ' sel' : '')} onClick={() => pickCase(i)}><div className="opt-dot"></div><div>{o}</div></div>)}
       </>
     )
   }
+
+  if (!body) body = <div role="status" aria-live="polite">Сохраняем результаты…</div>
 
   return (
     <DiagShell num={7} title="САМОЭФФЕКТИВНОСТЬ"

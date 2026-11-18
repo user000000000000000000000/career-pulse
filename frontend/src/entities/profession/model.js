@@ -322,6 +322,16 @@ function readinessPct(readiness, dim) {
   return a ?? e ?? null
 }
 
+// Explain the existing matching inputs without changing the ranking or score.
+export function professionMatchSignals(profile, profession) {
+  return {
+    interests: (profession.holland || [])
+      .filter(code => profile.holland_scores?.[code] != null)
+      .map(code => ({ code, value: Math.round(profile.holland_scores[code]) })),
+    readiness: readinessPct(profile.readiness_scores, CATEGORY_READINESS[profession.category]),
+  }
+}
+
 /**
  * Подбор подходящих профессий ИЗ АТЛАСА.
  * Совпадение = 70% Holland-фит + 30% «готовность» по категории профессии.

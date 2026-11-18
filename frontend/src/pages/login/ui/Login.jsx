@@ -1,18 +1,20 @@
+import IconText from '../../../shared/ui/IconText.jsx'
 import { useState } from 'react'
 import { useNavigate, Link } from 'react-router-dom'
-import Header from '../../../shared/ui/Header.jsx'
+import AuthLayout from '../../../shared/ui/AuthLayout.jsx'
 import Card from '../../../shared/ui/Card.jsx'
 import Input from '../../../shared/ui/Input.jsx'
 import Button from '../../../shared/ui/Button.jsx'
 import { login as doLogin, requestPasswordReset } from '../../../shared/auth'
-import { startVkLogin } from '../../../shared/auth'
+import SocialSignIn from '../../../shared/ui/SocialSignIn.jsx'
 import { usePageMeta } from '../../../shared/lib/pageMeta'
 import '../../../shared/ui/legal.css'
 import { friendlyError } from '../../../shared/lib/errors'
 import '../../../shared/ui/auth.css'
+import { config } from '../../../shared/config'
 
 export default function Login() {
-  usePageMeta('Вход', 'Войдите в личный кабинет CareerPulse, чтобы продолжить карьерную диагностику.')
+  usePageMeta('Вход', 'Войдите в личный кабинет Пульс Карьеры, чтобы продолжить карьерную диагностику.')
   const navigate = useNavigate()
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
@@ -26,7 +28,7 @@ export default function Login() {
     try {
       setBusy(true)
       await requestPasswordReset(email)
-      setResetMsg('Письмо для сброса пароля отправлено на ' + email + '. Проверьте почту (и папку «Спам»).')
+      setResetMsg(config.demoMode ? 'Демонстрация: письмо не отправляется. Форму нового пароля можно открыть из панели «Демо · Все страницы».' : 'Письмо для сброса пароля отправлено на ' + email + '. Проверьте почту (и папку «Спам»).')
     } catch (err) {
       setError(friendlyError(err, 'Не удалось отправить письмо. Попробуйте позже.'))
     } finally {
@@ -49,16 +51,16 @@ export default function Login() {
   }
 
   return (
-    <div className="cp-legal">
-      <Header backTo="/" backLabel="← На главную" />
-      <div className="auth-wrap">
+    <AuthLayout>
         <Card accent className="auth-card">
           <div className="auth-eyebrow">Вход</div>
-          <h1 className="auth-title">С ВОЗВРАЩЕНИЕМ</h1>
+          <h1 className="auth-title">С возвращением</h1>
           <p className="auth-sub">Войдите, чтобы продолжить карьерную диагностику.</p>
 
           {error && <div className="auth-error">{error}</div>}
           {resetMsg && <div className="auth-success">{resetMsg}</div>}
+
+          <SocialSignIn />
 
           <Input
             id="login-email" label="Email" type="email" placeholder="ivan@email.com"
@@ -71,7 +73,7 @@ export default function Login() {
             onKeyDown={(e) => e.key === 'Enter' && onSubmit()}
           />
           <Button block onClick={onSubmit} disabled={busy}>
-            {busy ? 'Входим…' : 'Войти →'}
+            <IconText text={busy ? 'Входим…' : 'Войти →'} />
           </Button>
 
           <div style={{ textAlign: 'center', marginTop: 12 }}>
@@ -80,21 +82,10 @@ export default function Login() {
             </button>
           </div>
 
-          <div className="auth-divider"><span>или</span></div>
-
-          <button
-            type="button" onClick={() => startVkLogin()}
-            style={{ width: '100%', padding: '13px', fontSize: 14, fontWeight: 700, borderRadius: 8, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 10, color: '#fff', background: '#0077FF', border: 'none', cursor: 'pointer', fontFamily: "'Golos Text',sans-serif" }}
-          >
-            <svg width="20" height="20" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M12.9 16.4c-4.62 0-7.45-3.17-7.57-8.45h2.32c.08 3.87 1.8 5.5 3.16 5.84V7.95h2.18v3.34c1.34-.14 2.74-1.67 3.22-3.34h2.18c-.37 2.06-1.9 3.59-2.98 4.22 1.08.5 2.82 1.84 3.48 4.23h-2.4c-.52-1.6-1.8-2.85-3.5-3.02v3.02Z" fill="#fff"/></svg>
-            Войти через ВКонтакте
-          </button>
-
           <div className="auth-foot">
             Нет аккаунта? <Link to="/register">Зарегистрироваться</Link>
           </div>
         </Card>
-      </div>
-    </div>
+    </AuthLayout>
   )
 }

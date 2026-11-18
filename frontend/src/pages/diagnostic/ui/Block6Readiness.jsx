@@ -1,3 +1,4 @@
+import IconText from '../../../shared/ui/IconText.jsx'
 import { useState } from 'react'
 import { CP } from '../../../shared/api'
 import DiagShell, { ResultNav } from './DiagShell'
@@ -45,7 +46,7 @@ const QS = [
   { id: 'HP6', t: 'Мне приходилось помогать кому-то с вопросами здоровья или ухода за живым', type: 'HP', tag: 'behav' },
 ]
 const TYPE_NAMES = { HH: 'Человек–Человек', HT: 'Человек–Техника', HZ: 'Человек–Знак', HX: 'Человек–Образ', HP: 'Человек–Природа' }
-const TYPE_COLORS = { HH: '#5f96e9', HT: '#8b6fe8', HZ: '#e8a0c4', HX: '#72a2eb', HP: '#22d97a' }
+const TYPE_COLORS = { HH: '#087cff', HT: '#087cff', HZ: '#a1ccf5', HX: '#087cff', HP: '#087cff' }
 const OPEN_PROMPTS = [
   { title: 'Дело, которое получается', text: 'Расскажи о деле, которое у тебя хорошо получается — неважно, школьное это или нет. Что это? Почему думаешь, что получается хорошо? Как давно этим занимаешься?' },
   { title: 'Кейс признания', text: 'Вспомни ситуацию, когда кто-то попросил тебя помочь именно потому, что ты умеешь это лучше других. Что это было? Кто попросил? Какой результат?' },
@@ -101,7 +102,7 @@ export default function Block6Readiness() {
     return (
       <DiagShell num={6} title="ПРОФЕССИОНАЛЬНАЯ ГОТОВНОСТЬ" pct={100}>
         <div className="result">
-          <div className="result-icon">⚙️</div>
+          <div className="result-icon"><IconText text={"⚙️"} /></div>
           <div className="result-title">{TYPE_NAMES[result.top2[0]]} + {TYPE_NAMES[result.top2[1]]}</div>
           <div className="result-desc">Лучше всего у тебя получается: <b>{TYPE_NAMES[result.top2[0]]}</b> и <b>{TYPE_NAMES[result.top2[1]]}</b></div>
           <div className="result-summary">{blockSummary(6, result)}</div>
@@ -111,7 +112,7 @@ export default function Block6Readiness() {
               .map(([code, d]) => ({ label: TYPE_NAMES[code], value: d.combined }))} />
           </div>
           <div className="r-grid">
-            <div className="r-card"><div className="r-label">Проф. зрелость</div><div className="r-val" style={{ color: result.careerMaturity >= 60 ? 'var(--accent)' : result.careerMaturity >= 40 ? 'var(--violet)' : 'var(--ember)' }}>{result.careerMaturity}/100</div></div>
+            <div className="r-card"><div className="r-label">Готовность к выбору</div><div className="r-val" style={{ color: result.careerMaturity >= 60 ? 'var(--accent)' : result.careerMaturity >= 40 ? 'var(--violet)' : 'var(--ember)' }}>{result.careerMaturity}/100</div></div>
             <div className="r-card"><div className="r-label">Время</div><div className="r-val">{Math.ceil(result.durationSec / 60)} мин</div></div>
           </div>
           <ResultNav onNext={goNext} />
@@ -125,7 +126,7 @@ export default function Block6Readiness() {
     const q = QS[idx]; const ti = TYPES.find(t => t.code === q.type)
     body = (
       <>
-        <div className="type-badge">{ti.icon} {ti.name}</div>
+        <div className="type-badge"><IconText text={ti.icon} /> {ti.name}</div>
         <div className="q-counter">{idx + 1} / 30</div>
         <div style={{ textAlign: 'center' }}><span className={'q-tag ' + (q.tag === 'self' ? 'tag-self' : 'tag-behav')}>{q.tag === 'self' ? 'Самооценка' : 'Реальный опыт'}</span></div>
         <div className="q-text">{q.t}</div>
@@ -146,12 +147,12 @@ export default function Block6Readiness() {
     body = (
       <>
         <div className="q-counter" style={{ color: 'var(--gold)' }}>Открытый вопрос {num + 1} / 2</div>
-        <div className="q-text">{p.title}</div>
+        <div className="q-text"><IconText text={p.title} /></div>
         <div className="q-text" style={{ fontSize: 13, color: 'var(--ghost)', marginTop: -12, fontWeight: 400 }}>{p.text}</div>
         <textarea className="q-textarea" placeholder="Минимум 3–5 предложений..." maxLength={500}
           value={openTexts[num]} onChange={e => { const c = [...openTexts]; c[num] = e.target.value; setOpenTexts(c) }} />
         <div className="char-count">{openTexts[num].length} / 500</div>
-        <div className="nav-row"><button className="btn btn-accent" disabled={!(openTexts[num] || '').trim()} onClick={() => saveOpen(num)}>{num === 0 ? 'Далее →' : 'Завершить блок ✓'}</button></div>
+        <div className="nav-row"><button className="btn btn-accent" disabled={!(openTexts[num] || '').trim()} onClick={() => saveOpen(num)}><IconText text={num === 0 ? 'Далее →' : 'Завершить блок ✓'} /></button></div>
       </>
     )
   }

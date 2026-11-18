@@ -1,0 +1,2 @@
+/* Backward-compatible entry point; shared mascot styles have one owner. */
+@import '../../shared/ui/journey-mascot.css';

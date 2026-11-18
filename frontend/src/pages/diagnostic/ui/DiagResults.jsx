@@ -1,3 +1,7 @@
+import IconText from '../../../shared/ui/IconText.jsx'
+import Icon from '../../../shared/ui/Icon.jsx'
+import JourneyMascot from '../../../shared/ui/JourneyMascot.jsx'
+import { BLOCKS } from '../../../shared/config'
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { CP } from '../../../shared/api'
@@ -5,7 +9,8 @@ import { analyzeDiagnostic } from '../api/diagnosticAPI'
 import { getCareerTracksForProfessions, enableResultSharing } from '../../../shared/api'
 import { friendlyError } from '../../../shared/lib/errors'
 import { alertDialog } from '../../../shared/ui/Dialog.jsx'
-import { matchProfessions } from '../../../entities/profession'
+import { matchProfessions, professionMatchSignals } from '../../../entities/profession'
+import { INTEREST_LABELS, MATCH_EXPLANATION } from '../../../shared/lib/resultExplanation.js'
 import { defaultInstitutionType, filterPrograms } from '../model/careerTrackFilter'
 import { HOLLAND_PLAIN, buildHollandPortrait } from '../model/hollandPlain.js'
 import { PERSONALITY_PLAIN, buildPersonalityPortrait, COGNITIVE_PLAIN, buildCognitivePortrait, VALUES_PLAIN, MOTIVATION_PLAIN, READINESS_PLAIN } from '../model/resultsPlain.js'
@@ -13,32 +18,34 @@ import { MASCOT_RESULTS_LINE } from '../model/mascotLines'
 import { RadarChart, BarList, MiniRings } from '../../../shared/ui/charts'
 import InfoHint from '../../../shared/ui/InfoHint.jsx'
 import '../diagnostic.css'
+import '../results-page.css'
+import ResultsHeaderStatus from './ResultsHeaderStatus.jsx'
 
 const SCALE_NAMES = Object.fromEntries(Object.entries(PERSONALITY_PLAIN).map(([k, v]) => [k, v.title]))
-const SCALE_COLORS = { agreeableness: 'var(--accent)', conscientiousness: 'var(--violet)', extraversion: 'var(--ember)', openness: 'var(--gold)', stress_resilience: 'var(--ok)', anxiety: 'var(--danger)', impulse_control: '#72a2eb', ambiguity_tolerance: '#8b6fe8' }
+const SCALE_COLORS = { agreeableness: 'var(--accent)', conscientiousness: 'var(--violet)', extraversion: 'var(--ember)', openness: 'var(--gold)', stress_resilience: 'var(--ok)', anxiety: 'var(--danger)', impulse_control: '#087cff', ambiguity_tolerance: '#087cff' }
 const COG_NAMES = Object.fromEntries(Object.entries(COGNITIVE_PLAIN).map(([k, v]) => [k, v.title]))
-const COG_COLORS = ['var(--accent)', 'var(--violet)', 'var(--ember)', 'var(--gold)', 'var(--ok)', '#72a2eb', '#8b6fe8']
-const VARK_NAMES = { V: 'Визуальный', A: 'Аудиальный', R: 'Чтение/Письмо', K: 'Кинестетический', multimodal: 'Мультимодальный' }
+const COG_COLORS = ['var(--accent)', 'var(--violet)', 'var(--ember)', 'var(--gold)', 'var(--ok)', '#087cff', '#087cff']
+const VARK_NAMES = { V: 'схемы и изображения', A: 'объяснения вслух', R: 'чтение и записи', K: 'практика и действие', multimodal: 'сочетание разных способов' }
 const VALUE_NAMES = Object.fromEntries(Object.entries(VALUES_PLAIN).map(([k, v]) => [k, v.title]))
 const MOTIV = MOTIVATION_PLAIN
 const READY_NAMES = Object.fromEntries(Object.entries(READINESS_PLAIN).map(([k, v]) => [k, v.title]))
 const READY_COLORS = { HH: 'var(--accent)', HT: 'var(--violet)', HZ: 'var(--ember)', HX: 'var(--gold)', HP: 'var(--ok)' }
 const SE_NAMES = { S: 'Люди', I: 'Аналитика', A: 'Творчество', E: 'Лидерство', C: 'Системность' }
 // Цвета типов Holland — согласованы с плашками на странице результата (result.css).
-const HOLLAND_COLOR = { R: '#c25686', I: '#3f77cf', A: '#7a5bd6', S: '#2b8f6b', E: '#b57e1f', C: '#d63456' }
+const HOLLAND_COLOR = { R: '#087cff', I: '#087cff', A: '#087cff', S: '#087cff', E: '#087cff', C: '#087cff' }
 
 // Уровень словами по баллу (нейтрально, без оценки «хорошо/плохо» — годится и для тревожности).
 function levelInfo(v) {
-  if (v >= 75) return { label: 'Ярко выражено', color: '#1a9d5c' }
-  if (v >= 55) return { label: 'Заметно', color: '#4079d3' }
-  if (v >= 35) return { label: 'Умеренно', color: '#b57e1f' }
-  return { label: 'Слабо', color: '#82819b' }
+  if (v >= 75) return { label: 'Ярко выражено', color: '#087cff' }
+  if (v >= 55) return { label: 'Заметно', color: '#087cff' }
+  if (v >= 35) return { label: 'Умеренно', color: '#087cff' }
+  return { label: 'Пока выражено меньше', color: '#42658c' }
 }
 
 function BlockHead({ icon, color, title, sub, hint }) {
   return (
     <>
-      <div className="block-head"><span className="bh-ic" style={{ background: color + '18', color }}>{icon}</span><h3>{title}{hint && <InfoHint term={hint} />}</h3></div>
+      <div className="block-head"><span className="bh-ic" style={{ background: color + '18', color }}><IconText text={icon} /></span><h2><IconText text={title} />{hint && <InfoHint term={hint} />}</h2></div>
       {sub && <div className="block-head-sub">{sub}</div>}
     </>
   )
@@ -54,10 +61,10 @@ function MetricGrid({ items }) {
           <div key={it.key} className="metric">
             <div className="metric__top">
               <span className="metric__name">{it.name}</span>
-              <span className="metric__num" style={{ color: it.color }}>{it.v}</span>
+              <span className="metric__num" style={{ color: it.color }}>{it.v}<small> / 100</small></span>
             </div>
-            <span className="metric__lvl" style={{ background: lv.color + '1f', color: lv.color }}>{lv.label}</span>
-            {it.mean && <div className="metric__mean">{it.mean}</div>}
+            <span className="metric__lvl" style={{ background: lv.color + '1f', color: lv.color }}><IconText text={lv.label} /></span>
+            {it.mean && <div className="metric__mean">О чём шкала: {it.mean}.</div>}
           </div>
         )
       })}
@@ -100,7 +107,13 @@ export default function DiagResults() {
 
   useEffect(() => {
     let alive = true
-    Promise.all([CP.getProfile(), CP.getProgress()]).then(([p, pr]) => { if (alive) { setProfile(p); setProgress(pr) } })
+    Promise.all([CP.getProfile(), CP.getProgress()]).then(([p, pr]) => {
+      if (!alive) return
+      const saved = new Set((pr.completed || []).map(Number))
+      const completed = BLOCKS.filter(block => saved.has(block.n)).map(block => block.n)
+      setProfile(p)
+      setProgress({ ...pr, completed, pct: Math.round(completed.length / BLOCKS.length * 100) })
+    })
     return () => { alive = false }
   }, [])
 
@@ -140,6 +153,7 @@ export default function DiagResults() {
 
   if (!profile) return null
   const has = progress.completed.length > 0
+  const nextBlock = BLOCKS.find(block => !progress.completed.includes(block.n))
   // Подходящие профессии берём ИЗ АТЛАСА по Holland-профилю (всё на русском, с привязкой к атласу)
   const atlasProfs = matchProfessions(profile, 7)
 
@@ -157,12 +171,16 @@ export default function DiagResults() {
 
   if (!has) {
     return (
-      <div className="cp-diag">
-        <div className="topbar"><div className="tb-left"><div className="tb-logo" onClick={() => navigate('/dashboard')}><div className="tb-logo-mark"><svg viewBox="0 0 32 32" width="13" height="13" aria-hidden="true"><path d="M17.8 4.5 8.5 18.2h6.1L13 27.5 23.5 13.4h-6.1z" fill="#fff"/></svg></div>CAREER<span>PULSE</span></div></div><div style={{ display: 'flex', alignItems: 'center', gap: 12 }}><ThemeToggle /><button className="tb-btn" onClick={() => navigate('/dashboard')}>← В кабинет</button></div></div>
-        <div className="container">
-          <div className="block-title" style={{ marginTop: 40 }}>РЕЗУЛЬТАТОВ ПОКА НЕТ</div>
-          <div className="block-desc">Пройди хотя бы один блок диагностики — и здесь появится твой профиль.</div>
-          <div className="nav-row"><button className="btn btn-accent" onClick={() => navigate('/test/1')}>Начать диагностику →</button></div>
+      <div className="cp-diag cp-diag--results">
+        <ResultsHeaderStatus />
+        <div className="container results-container">
+          <section className="results-empty">
+            <JourneyMascot num={2} still />
+            <span className="results-eyebrow">Результаты диагностики</span>
+            <h1>Результаты <span className="heading-accent">диагностики</span></h1>
+            <p>Пройди первый блок — здесь начнёт собираться твой профиль интересов, сильных сторон и подходящих профессий.</p>
+            <button className="btn btn-accent" onClick={() => navigate('/test/1')}>Начать диагностику<Icon name="arrow-right" size={18}/></button>
+          </section>
         </div>
       </div>
     )
@@ -191,35 +209,38 @@ export default function DiagResults() {
   const vizBars = persOrder.filter(s => pers[s] != null).map(s => ({ label: SCALE_NAMES[s], value: Math.round(pers[s]) }))
 
   return (
-    <div className="cp-diag">
-      <div className="topbar">
-        <div className="tb-left"><div className="tb-logo" onClick={() => navigate('/dashboard')}><div className="tb-logo-mark"><svg viewBox="0 0 32 32" width="13" height="13" aria-hidden="true"><path d="M17.8 4.5 8.5 18.2h6.1L13 27.5 23.5 13.4h-6.1z" fill="#fff"/></svg></div>CAREER<span>PULSE</span></div><div className="tb-divider"></div><div className="tb-block">Готовность профиля: <b>{progress.pct}%</b></div></div>
-        <button className="tb-btn" onClick={() => navigate('/dashboard')}>← В кабинет</button>
-      </div>
-      <div className="container" style={{ maxWidth: 820 }}>
+    <div className="cp-diag cp-diag--results">
+      <ResultsHeaderStatus percent={progress.pct} completed={progress.completed.length} total={BLOCKS.length}/>
+      <div className="container results-container">
         {/* Шапка только для печатной версии (PDF) */}
-        <div className="print-only" style={{ marginBottom: 16, borderBottom: '2px solid #25205c', paddingBottom: 10 }}>
-          <div style={{ fontSize: 22, fontWeight: 800, letterSpacing: 2, color: '#25205c' }}>CAREERPULSE</div>
+        <div className="print-only" style={{ marginBottom: 16, borderBottom: '2px solid #087cff', paddingBottom: 10 }}>
+          <div style={{ fontSize: 22, fontWeight: 800, letterSpacing: 2, color: '#087cff' }}>Пульс Карьеры</div>
           <div style={{ fontSize: 13 }}>Отчёт по диагностике{profile.context?.name ? ` · ${profile.context.name}` : ''} · {new Date().toLocaleDateString('ru-RU')}</div>
         </div>
 
-        <div className="block-num">РЕЗУЛЬТАТ ДИАГНОСТИКИ</div>
-        <div className="block-title">ТВОЙ ПРОФИЛЬ</div>
-        <div className="block-desc">Пройдено блоков: {progress.completed.length} / {CP.TOTAL_BLOCKS}. Каждый блок добавляет слой.</div>
-
-        <div className="print-hide" style={{ marginTop: 14, display: 'flex', gap: 10, flexWrap: 'wrap' }}>
-          <button className="btn btn-accent" onClick={() => setForceAll(true)}>📄 Скачать отчёт (PDF)</button>
-          <button className="btn btn-ghost" onClick={shareResults} disabled={sharing}>🔗 {sharing ? 'Создаю ссылку…' : 'Поделиться результатами'}</button>
-        </div>
+        <section className="results-hero" aria-labelledby="results-title">
+          <div>
+            <span className="results-eyebrow"><Icon name="sparkles" size={16}/>Результаты диагностики</span>
+            <h1 id="results-title">Результаты <span className="heading-accent">диагностики</span></h1>
+            <p>Твои интересы, сильные стороны и возможности — в одной картине. Это твои ответы сейчас: они могут меняться вместе с опытом.</p>
+            <div className="results-actions print-hide">
+          <button className="btn btn-accent" onClick={() => setForceAll(true)}><IconText text={"📄 Скачать отчёт (PDF)"} /></button>
+          <button className="btn btn-ghost" onClick={shareResults} disabled={sharing}><IconText text={"🔗 "} />{sharing ? 'Создаю ссылку…' : 'Поделиться результатами'}</button>
+            </div>
+          </div>
+          <div className="results-hero__art" aria-hidden="true"><JourneyMascot num={2} still/></div>
+        </section>
+        {nextBlock && <div className="results-partial print-hide"><Icon name="clipboard" size={22}/><p><strong>Профиль ещё собирается.</strong> Пройди оставшиеся блоки, чтобы дополнить разбор.</p><button onClick={() => navigate(`/test/${nextBlock.n}`)}>Продолжить<Icon name="arrow-right" size={16}/></button></div>}
+        <nav className="results-sections print-hide" aria-label="Разделы результатов"><a href="#results-report">Твой разбор</a>{(vizRadar || vizRings.length > 0 || vizBars.length > 0) && <a href="#results-charts">Диаграммы</a>}<a href="#results-next">Что делать дальше</a></nav>
 
         {/* ── Оглавление: липкие якоря по секциям разбора ── */}
         <div className="print-hide" style={{ position: 'sticky', top: 0, zIndex: 5, background: 'var(--deep)', padding: '10px 0', marginTop: 16, display: 'flex', gap: 8, flexWrap: 'wrap', borderBottom: '1px solid var(--line)' }}>
           {[
-            ['s-razbor', 'Разбор', true],
+            ['results-report', 'Разбор', true],
             ['s-prof', 'Профессии', atlasProfs.length > 0],
             ['s-edu', 'Образование', atlasProfs.slice(0, 5).length > 0],
             ['s-typ', 'Типология', arche.length > 0],
-            ['s-viz', 'Диаграммы', !!(vizRadar || vizRings.length > 0 || vizBars.length > 0)],
+            ['results-charts', 'Диаграммы', !!(vizRadar || vizRings.length > 0 || vizBars.length > 0)],
           ].filter(([, , show]) => show).map(([id, label]) => (
             <button key={id} onClick={() => document.getElementById(id)?.scrollIntoView({ behavior: 'smooth', block: 'start' })}
               className="chip" style={{ cursor: 'pointer', font: 'inherit' }}>{label}</button>
@@ -227,14 +248,13 @@ export default function DiagResults() {
         </div>
 
         {/* ── Разбор от нейросети (представляет маскот) ── */}
-        <div id="s-razbor" className="r-card" style={{ marginTop: 16, scrollMarginTop: 56, borderColor: 'rgba(139,111,232,.3)', background: 'linear-gradient(135deg, rgba(139,111,232,.08), rgba(95,150,233,.04))' }}>
+        <section id="results-report" className="r-card results-report">
           <div style={{ display: 'flex', gap: 16, alignItems: 'flex-start' }}>
             <div style={{ flex: 1, minWidth: 0 }}>
-              <div className="r-label" style={{ marginBottom: 10, color: 'var(--violet)' }}>
-                {!repLoading && report?.full_report ? MASCOT_RESULTS_LINE : 'Твой разбор'}
-                {report?._source && <span style={{ fontSize: 9, color: 'var(--ghost)', marginLeft: 8 }}>{report._source === 'yandexgpt' ? '· YandexGPT' : '· локально'}</span>}
-              </div>
-              {repLoading && <div style={{ color: 'var(--sub)', fontSize: 14 }}>Пока думаю над твоим разбором… ⏳</div>}
+              <h2 className="results-section-title">
+                {!repLoading && report?.full_report ? 'Что говорят твои ответы' : 'Твой разбор'}
+              </h2>
+              {repLoading && <div style={{ color: 'var(--sub)', fontSize: 14 }}><IconText text={"Пока думаю над твоим разбором… ⏳"} /></div>}
               {!repLoading && report?.full_report && (
                 <div style={{ fontSize: 16, lineHeight: 1.75, color: 'var(--text)', maxWidth: '65ch' }}>
                   {String(report.full_report).split(/\n+/).map(s => s.trim()).filter(Boolean).map((para, i) => (
@@ -247,8 +267,8 @@ export default function DiagResults() {
           </div>
 
           {!repLoading && report?.key_insights?.length > 0 && (
-            <div style={{ marginTop: 18, background: 'rgba(139,111,232,.07)', border: '1px solid rgba(139,111,232,.22)', borderRadius: 14, padding: '16px 18px' }}>
-              <div className="r-label" style={{ color: 'var(--violet)', marginBottom: 10 }}>💡 Неочевидное о тебе</div>
+            <div style={{ marginTop: 18, background: 'rgba(161,204,245,.07)', border: '1px solid rgba(161,204,245,.22)', borderRadius: 14, padding: '16px 18px' }}>
+              <div className="r-label" style={{ color: 'var(--violet)', marginBottom: 10 }}><IconText text={"💡 Неочевидное о тебе"} /></div>
               <ul style={{ margin: 0, paddingLeft: 18, display: 'flex', flexDirection: 'column', gap: 8 }}>
                 {report.key_insights.map((x, i) => (
                   <li key={i} style={{ fontSize: 15, lineHeight: 1.6, color: 'var(--text)' }}>{x}</li>
@@ -270,27 +290,28 @@ export default function DiagResults() {
             </div>
           )}
           {atlasProfs.length > 0 && (
-            <div id="s-prof" style={{ marginTop: 16, scrollMarginTop: 56 }}>
+            <div id="s-prof" className="results-professions" style={{ marginTop: 16 }}>
               <div className="r-label" style={{ color: 'var(--accent)', marginBottom: 8 }}>Подходящие профессии <span style={{ color: 'var(--ghost)', fontWeight: 400 }}>· из атласа</span></div>
+              <p className="result-reading-note">{MATCH_EXPLANATION} Открой профессию, чтобы узнать о ней подробнее.</p>
               <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
                 {atlasProfs.map((p) => (
-                  <div key={p.id}
+                  <button type="button" className="result-profession" key={p.id}
                     onClick={() => navigate('/atlas', { state: { q: p.name } })}
-                    style={{ display: 'flex', alignItems: 'center', gap: 10, fontSize: 13, cursor: 'pointer', padding: '6px 8px', borderRadius: 8, transition: 'background .15s' }}
-                    onMouseEnter={e => e.currentTarget.style.background = 'rgba(var(--overlay-rgb),.04)'}
-                    onMouseLeave={e => e.currentTarget.style.background = 'transparent'}>
-                    <span style={{ flex: 1 }}>{p.name} <span style={{ color: 'var(--ghost)', fontSize: 11 }}>→ в атласе</span></span>
-                    <span style={{ fontFamily: "'JetBrains Mono',monospace", fontWeight: 700, color: 'var(--accent)' }}>{p.match}%</span>
-                  </div>
+                    >
+                    <span style={{ flex: 1 }}><strong>{p.name}</strong> <span style={{ color: 'var(--sub)', fontSize: 11 }}><IconText text={"→ в атласе"} /></span>
+                      <span className="result-profession__why">В подборе учтены: {professionMatchSignals(profile, p).interests.map(({ code, value }) => `${INTEREST_LABELS[code]} — ${value}/100`).join('; ')}{professionMatchSignals(profile, p).readiness != null ? `; готовность к этой сфере — ${Math.round(professionMatchSignals(profile, p).readiness)}/100` : ''}.</span>
+                    </span>
+                    <span className="result-profession__match">{p.match}%<small>совпадение</small></span>
+                  </button>
                 ))}
               </div>
             </div>
           )}
-        </div>
+        </section>
 
         {/* ── Образовательный путь: ЕГЭ + вузы/колледжи под топ-5 рекомендованных профессий ── */}
         {atlasProfs.slice(0, 5).length > 0 && (
-          <div id="s-edu" style={{ marginTop: 18, scrollMarginTop: 56 }}>
+          <div id="s-edu" className="results-education" style={{ marginTop: 18 }}>
             <div className="r-label" style={{ color: 'var(--accent)', marginBottom: 10 }}>Образовательный путь</div>
             {typeOptions.length > 1 && (
               <div style={{ display: 'flex', gap: 6, marginBottom: 8, flexWrap: 'wrap' }}>
@@ -314,7 +335,7 @@ export default function DiagResults() {
                     {!track || track.status !== 'ready' ? (
                       <div style={{ fontSize: 12.5, color: 'var(--ghost)' }}>
                         {track?.status === 'unavailable'
-                          ? 'Доступно только с подключённой базой данных.'
+                          ? 'Подбор образовательных программ для этой профессии пока недоступен. Изучи её задачи в атласе.'
                           : 'Вузы и ЕГЭ для этой профессии пока заполняются — скоро появятся здесь.'}
                       </div>
                     ) : (
@@ -382,12 +403,12 @@ export default function DiagResults() {
 
         {arche.length > 0 && (
           <div id="s-typ" style={{ marginTop: 24, scrollMarginTop: 56 }}>
-            <BlockHead icon="🧩" color="#4079d3" title="Типология личности"
-              sub="Один и тот же человек можно описать с четырёх разных сторон — ниже эти четыре взгляда на тебя." />
-            <div className="r-grid" style={{ gridTemplateColumns: 'repeat(2,1fr)' }}>
+            <BlockHead icon="🧩" color="#087cff" title="Твой профиль с четырёх сторон"
+              sub="Короткие названия объединяют твои ответы об интересах, ценностях, характере и мышлении. Они не ограничивают выбор профессии." />
+            <div className="r-grid">
               {arche.map(([label, val, hint]) => (
                 <div key={label} className="r-card">
-                  <div className="r-label">{label}</div>
+                  <div className="r-label"><IconText text={label} /></div>
                   <div className="r-val r-accent" style={{ fontSize: 15 }}>{val}</div>
                   {hint && <div style={{ fontSize: 11, color: 'var(--ghost)', marginTop: 4 }}>{hint}</div>}
                 </div>
@@ -397,33 +418,35 @@ export default function DiagResults() {
         )}
 
         {(vizRadar || vizRings.length > 0 || vizBars.length > 0) && (
-          <div id="s-viz" className="r-card" style={{ marginTop: 18, scrollMarginTop: 56 }}>
-            <BlockHead icon="📊" color="#4079d3" title="Профиль в диаграммах"
-              sub="Коротко и наглядно — твои главные показатели по блокам." />
+          <div className="r-card results-visuals" id="results-charts" style={{ marginTop: 18 }}>
+            <BlockHead icon="📊" color="#087cff" title="Профиль в диаграммах"
+              sub="Шкалы от 0 до 100 показывают выраженность по твоим ответам. Это не школьные оценки: больше не всегда значит лучше. Смысл каждой шкалы объяснён ниже." />
+            <div className="results-chart-grid">
             {vizRadar && (
-              <div style={{ marginTop: 10 }}>
-                <div className="r-label" style={{ marginBottom: 8 }}>Склонности · Holland</div>
+              <div className="results-chart" style={{ marginTop: 10 }}>
+                <div className="r-label" style={{ marginBottom: 8 }}>Интересы к разным занятиям</div>
                 <RadarChart data={vizRadar} />
               </div>
             )}
             {vizRings.length > 0 && (
-              <div style={{ marginTop: 18 }}>
-                <div className="r-label" style={{ marginBottom: 10 }}>Ключевые индексы</div>
+              <div className="results-chart" style={{ marginTop: 18 }}>
+                <div className="r-label" style={{ marginBottom: 10 }}>Готовность, уверенность и представление о будущем</div>
                 <MiniRings data={vizRings} />
               </div>
             )}
             {vizBars.length > 0 && (
-              <div style={{ marginTop: 18 }}>
+              <div className="results-chart results-chart--wide" style={{ marginTop: 18 }}>
                 <div className="r-label" style={{ marginBottom: 10 }}>Личностные качества</div>
                 <BarList data={vizBars} />
               </div>
             )}
+            </div>
           </div>
         )}
 
         {profile.holland_scores && (
           <div className="r-card" style={{ marginTop: 18 }}>
-            <BlockHead icon="🧭" color="#3f77cf" title="Что тебе интересно" hint="holland" />
+            <BlockHead icon="🧭" color="#087cff" title="Что тебе интересно" hint="holland" />
             {profile.holland_top2?.length === 2 && (
               <div className="block-intro">
                 {buildHollandPortrait(profile.holland_top2, profile.career_archetype)}
@@ -437,8 +460,8 @@ export default function DiagResults() {
               return (
                 <div className="holland-soty">
                   <div className="hs-lead" style={{ borderLeftColor: lead.c }}>
-                    <span className="hs-lead-badge" style={{ color: lead.c, background: lead.c + '1f' }}>★ Твой ведущий тип</span>
-                    <div className="hs-lead-name" style={{ color: lead.c }}>{lead.p.emoji} {lead.p.title}</div>
+                    <span className="hs-lead-badge" style={{ color: lead.c, background: lead.c + '1f' }}><Icon name="star" size={14}/> Твой ведущий тип</span>
+                    <div className="hs-lead-name" style={{ color: lead.c }}><IconText text={lead.p.emoji} /> <IconText text={lead.p.title} /></div>
                     <div className="hs-lead-mean">{lead.p.hook}</div>
                     <div className="hs-metric">
                       <span className="hs-metric-cap">Насколько это про тебя</span>
@@ -450,7 +473,7 @@ export default function DiagResults() {
                     {rest.map(({ t, v, p, c }) => (
                       <div key={t} className="hs-card">
                         <div className="hs-card-top">
-                          <span className="hs-card-name" style={{ color: c }}>{p.emoji} {p.title}</span>
+                          <span className="hs-card-name" style={{ color: c }}><IconText text={p.emoji} /> <IconText text={p.title} /></span>
                           <span className="hs-val">{v}%</span>
                         </div>
                         <div className="hs-card-mean">{p.tags.join(' · ')}</div>
@@ -466,7 +489,7 @@ export default function DiagResults() {
 
         {persOrder.some(s => pers[s] != null) && (
           <div className="r-card" style={{ marginTop: 18 }}>
-            <BlockHead icon="🎭" color="#8b6fe8" title="Твой характер" hint="bigfive" />
+            <BlockHead icon="🎭" color="#087cff" title="Твой характер" hint="bigfive" sub="Как ты описываешь свои привычные реакции. Высокий балл означает, что качество выражено сильнее, а не что оно лучше других." />
             {buildPersonalityPortrait(pers, persOrder) && (
               <div className="block-intro">{buildPersonalityPortrait(pers, persOrder)}</div>
             )}
@@ -476,7 +499,8 @@ export default function DiagResults() {
 
         {cogSorted.length > 0 && (
           <div className="r-card" style={{ marginTop: 18 }}>
-            <BlockHead icon="🧠" color="#4079d3" hint="vark" title={`Как тебе легче думать и учиться${profile.vark_style ? ` · ${VARK_NAMES[profile.vark_style] || profile.vark_style}` : ''}`} />
+            <BlockHead icon="🧠" color="#087cff" hint="vark" title="Как ты оцениваешь своё мышление" sub="Эти баллы — твоя самооценка из блока 5. Они не измеряют интеллект. Пробуй разные способы учиться и сравнивай, что помогает тебе на практике." />
+            {profile.vark_style && <p className="result-reading-note">В ответах об учёбе ты чаще выбирал(а): {VARK_NAMES[profile.vark_style] || profile.vark_style}. Можно сочетать разные способы.</p>}
             {buildCognitivePortrait(cogSorted) && (
               <div className="block-intro">{buildCognitivePortrait(cogSorted)}</div>
             )}
@@ -486,7 +510,7 @@ export default function DiagResults() {
 
         {(profile.values_archetype || profile.values_top3) && (
           <div className="r-card" style={{ marginTop: 18 }}>
-            <BlockHead icon="💎" color="#4a82db" title="Что для тебя важно в работе" hint="values"
+            <BlockHead icon="💎" color="#087cff" title="Что для тебя важно в работе" hint="values"
               sub="Все 8 ценностей — от самой важной к наименее важной (по тому, что ты выбирал(а) чаще при сравнении друг с другом)." />
             {profile.motivation_type && MOTIV[profile.motivation_type] && (
               <div className="block-intro">В целом {MOTIV[profile.motivation_type]}.</div>
@@ -509,8 +533,8 @@ export default function DiagResults() {
 
         {profile.readiness_scores && (
           <div className="r-card" style={{ marginTop: 18 }}>
-            <BlockHead icon="🎯" color="#e8a0c4" hint="readiness" title="Насколько ты готов(а) к разным видам работы"
-              sub="Верхняя полоса — как ты сам(а) себя оцениваешь, нижняя — что показал реальный опыт (кружки, проекты, подработки)." />
+            <BlockHead icon="🎯" color="#a1ccf5" hint="readiness" title="Насколько ты готов(а) к разным видам работы"
+              sub="Верхняя полоса — как ты сам(а) себя оцениваешь, нижняя — твои ответы об опыте (кружки, проекты, подработки). Если опыта мало, попробуй небольшую задачу в интересной сфере." />
             {Object.entries(profile.readiness_scores).sort((a, b) => (b[1].combined || 0) - (a[1].combined || 0)).map(([code, d]) => {
               const c = READY_COLORS[code] || 'var(--accent)'
               return (
@@ -528,22 +552,30 @@ export default function DiagResults() {
 
         {profile.se_confidence && (
           <div className="r-card" style={{ marginTop: 18 }}>
-            <BlockHead icon="⭐" color="#1a9d5c" title="В чём ты увереннее всего" hint="selfefficacy" />
+            <BlockHead icon="⭐" color="#087cff" title="В чём ты увереннее всего" hint="selfefficacy" />
             <MetricGrid items={Object.entries(profile.se_confidence).sort((a, b) => b[1] - a[1]).map(([d, v], i) => ({ key: d, name: SE_NAMES[d] || d, v: Math.round(v), color: COG_COLORS[i % 7] }))} />
           </div>
         )}
 
         <div className="r-grid" style={{ marginTop: 18 }}>
-          {profile.career_execution != null && <div className="r-card"><div className="r-label">Опыт на практике</div><div className="r-val r-violet">{profile.career_execution}/100</div></div>}
-          {profile.career_maturity != null && <div className="r-card"><div className="r-label">Ясность плана</div><div className="r-val r-accent">{profile.career_maturity}/100</div></div>}
-          {profile.se_general != null && <div className="r-card"><div className="r-label">Уверенность в себе</div><div className="r-val">{profile.se_general}/100</div></div>}
+          {profile.career_execution != null && <div className="r-card"><div className="r-label">Уверенность действовать</div><div className="r-val r-violet">{profile.career_execution}/100</div><p className="result-reading-note">Уверенность в своих силах и решительность по ответам блока 7. Можно начать с небольшой задачи в интересной сфере.</p></div>}
+          {profile.career_maturity != null && <div className="r-card"><div className="r-label">Готовность к выбору</div><div className="r-val r-accent">{profile.career_maturity}/100</div><p className="result-reading-note">Итог блока 6. Посмотри выше, какие занятия ты уже пробовал(а), а с какими ещё стоит познакомиться.</p></div>}
+          {profile.se_general != null && <div className="r-card"><div className="r-label">Уверенность в себе</div><div className="r-val">{profile.se_general}/100</div><p className="result-reading-note">Насколько ты веришь, что справишься с трудными задачами. Это самооценка, которая может меняться с опытом.</p></div>}
           {profile.readiness_top2 && <div className="r-card"><div className="r-label">Больше всего готов(а) к</div><div className="r-val">{profile.readiness_top2.map(c => READY_NAMES[c] || c).join(' · ')}</div></div>}
         </div>
 
+        <div className="r-card results-next" id="results-next" style={{ marginTop: 24 }}>
+          <BlockHead icon="🧭" color="#087cff" title="Что делать дальше" />
+          <ol className="result-next-steps">
+            <li>Открой интересные профессии в атласе. Сравни их задачи со своими интересами и ценностями выше.</li>
+            <li>Выбери две профессии в разделе «Карьерный маршрут» и получи план знакомства с ними.</li>
+            <li>Попробуй небольшую задачу из плана и обсуди впечатления с родителем или наставником. Тебе не нужно выбирать профессию раз и навсегда.</li>
+          </ol>
+        </div>
         <div className="nav-row" style={{ marginTop: 28 }}>
-          <button className="btn btn-ghost" onClick={() => navigate('/dashboard')}>← В кабинет</button>
+          <button className="btn btn-ghost" onClick={() => navigate('/dashboard')}><IconText text={"← В кабинет"} /></button>
           <button className="btn btn-violet" onClick={() => navigate('/atlas')}>Атлас профессий</button>
-          <button className="btn btn-accent" onClick={() => navigate('/roadmap')}>🗺️ Построить маршрут →</button>
+          <button className="btn btn-accent" onClick={() => navigate('/roadmap')}><IconText text={"🗺️ Построить маршрут →"} /></button>
         </div>
       </div>
     </div>

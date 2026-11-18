@@ -1,0 +1,222 @@
+/* Shared visual language, derived from the existing landing page.
+   Page rules are scoped to .app-interior[data-design='sky'] to preserve the landing composition. */
+/* Shared tokens: shared/ui/design-tokens.css */
+
+/* Blue title fragments share the landing's expressive italic. */
+.heading-accent {
+  font-family: var(--font-heading-accent);
+  font-style: italic;
+  font-weight: 700;
+  font-size: 1.18em;
+  line-height: 1.08;
+  letter-spacing: -.035em;
+}
+
+.app-interior[data-design='sky'] {
+  overflow-wrap: anywhere;
+  min-height: calc(100vh - var(--site-header-clearance));
+  background: radial-gradient(ellipse 80% 520px at 10% 0, #dcecffb3, transparent), var(--brand-page);
+  padding-bottom: 32px;
+  color: var(--brand-ink);
+}
+.app-interior[data-design='sky'] :is(.cp-legal, .cp-dashboard, .cp-diag, .atlas-page, .cp-catalog) { background: transparent; }
+.app-interior[data-design='sky'] :is(h1, h2, h3, .auth-title, .cat-title, .atlas-title, .res-title, .legal-header h1, .block-title, .hero-title, .rm-title, .page-title) {
+  font-family: var(--font-display);
+  color: var(--brand-ink);
+  font-weight: 800;
+  letter-spacing: -.045em;
+  line-height: 1.2;
+  text-wrap: balance;
+}
+.app-interior[data-design='sky'] :is(.auth-title, .cat-title, .atlas-title, .res-title, .legal-header h1, .block-title, .hero-title, .rm-title, .page-title) {
+  font-size: clamp(28px, 3.6vw, 48px);
+}
+.app-interior[data-design='sky'] :is(.auth-eyebrow, .cat-eyebrow, .atlas-eyebrow, .res-eyebrow, .legal-eyebrow, .block-num) {
+  font-family: var(--font-body); font-size: 12px; font-weight: 700;
+  color: var(--brand-blue); letter-spacing: .05em;
+}
+.app-interior[data-design='sky'] :is(.auth-sub, .cat-sub, .atlas-sub, .block-desc, .legal-lead) { color: var(--brand-copy); line-height: 1.7; }
+.app-interior[data-design='sky'] :is(.cp-card, .cat-card, .atlas-card, .p-card, .p-cta, .adm-tile, .adm-roles, .chart-block, .metric, .result-card, .res-block, .section-card, .family-card, .mentor-card, .progress-block, .block-card, .q-card, .question-card) {
+  background: #ffffffeb; border: 1px solid var(--brand-border); border-radius: var(--radius-lg);
+  box-shadow: var(--brand-shadow);
+}
+.app-interior[data-design='sky'] :is(.cat-card, .atlas-card, .block-card) { transition: border-color .2s, box-shadow .2s, transform .2s; }
+.app-interior[data-design='sky'] :is(.cat-card, .atlas-card, .block-card):hover { border-color: #96c8ff; box-shadow: 0 16px 36px -16px #087cff38; }
+.app-interior[data-design='sky'] :is(.btn, .cp-btn, .p-btn, .tb-btn, .topbar-btn, .nav-back-link, .auth-link-btn, .cat-chip, .atlas-chip) {
+  font-family: var(--font-body); border-radius: 999px; letter-spacing: 0; line-height: 1.4;
+}
+.app-interior[data-design='sky'] :is(.btn-accent, .btn-violet, .cp-btn--primary, .cp-btn--violet, .p-btn-primary, .topbar-btn.primary) {
+  color: white; background: var(--brand-gradient); box-shadow: 0 7px 20px #0781ff30;
+}
+.app-interior[data-design='sky'] :is(.btn-ghost, .btn-outline, .cp-btn--ghost, .p-btn-ghost, .tb-btn, .topbar-btn, .nav-back-link) {
+  color: var(--sea-text); border-color: var(--sea-border); background: var(--sea-bg);
+}
+.app-interior[data-design='sky'] :is(.btn, .cp-btn, .p-btn):not(:disabled):hover { filter: brightness(.98); }
+.app-interior[data-design='sky'] :is(input:not([type='checkbox']):not([type='radio']):not([type='range']):not([type='file']), textarea, select) {
+  font-family: var(--font-body); color: var(--brand-ink); border-radius: var(--radius-sm);
+  border-color: var(--brand-border); background-color: #f7fbff; max-width: 100%;
+}
+.app-interior[data-design='sky'] :is(input, textarea, select):focus-visible { outline: 2px solid var(--brand-blue); outline-offset: 2px; }
+.app-interior[data-design='sky'] input[type='checkbox'], .app-interior[data-design='sky'] input[type='radio'] { accent-color: var(--brand-blue); }
+.app-interior[data-design='sky'] :is(.cp-input, .cat-input, .atlas-search) { min-height: 48px; }
+.app-interior[data-design='sky'] :is(.auth-error, .cp-field__error) { color: var(--brand-blue); }
+.app-interior[data-design='sky'] .auth-error { background: #f6faff; border-color: #e7f3ff; }
+
+/* Secondary navigation retains existing actions, below the fixed site header. */
+#root .app-interior[data-design='sky'] .cp-legal nav.legal-nav {
+  position: relative; top: 0; max-width: 1200px; margin: 0 auto;
+  padding: 16px 32px; background: transparent; border: 0; box-shadow: none;
+  backdrop-filter: none; z-index: 10;
+}
+.app-interior[data-design='sky'] .nav-logo-txt { font-family: var(--font-display); font-size: 13px; letter-spacing: -.5px; }
+.app-interior[data-design='sky'] :is(.nav-logo-mark, .tb-logo-mark) { background: var(--brand-gradient); border-radius: 9px; }
+.app-interior[data-design='sky'] :is(.cp-diag, .cp-dashboard) .topbar {
+  background: #f7fbfff2; border-color: var(--brand-border); box-shadow: 0 8px 25px #2675ce08;
+}
+.app-interior[data-design='sky'] .tb-logo { font-size: 12px; letter-spacing: -.5px; }
+.app-interior[data-design='sky'] .cp-legal .legal-page { padding-top: 36px; }
+.app-interior[data-design='sky'] .cp-legal .auth-wrap { min-height: calc(100vh - 190px); padding: 32px 24px 80px; background: transparent; align-items: flex-start; }
+.app-interior[data-design='sky'] .auth-card { padding: 36px; max-width: 480px; }
+.app-interior[data-design='sky'] .profile-card { max-width: 580px; }
+.app-interior[data-design='sky'] .cp-legal .auth-title { font-size: 26px; overflow-wrap: anywhere; margin-bottom: 14px; }
+.app-interior[data-design='sky'] .auth-role { border-radius: 16px; background: #f4f9ff; padding: 13px 14px; }
+.app-interior[data-design='sky'] .auth-card .cp-btn { min-height: 48px; }
+.app-interior[data-design='sky'] .auth-card button[style] { border-radius: 999px; }
+.app-interior[data-design='sky'] .auth-role--active { background: #e5f1ff; border-color: var(--brand-blue); }
+.app-interior[data-design='sky'] .cp-field label { color: var(--brand-copy); font-size: 12px; letter-spacing: 0; text-transform: none; }
+.app-interior[data-design='sky'] .legal-page .container { max-width: 900px; }
+.app-interior[data-design='sky'] .legal-header { border-color: var(--brand-border); margin-bottom: 32px; }
+.app-interior[data-design='sky'] .legal-section { border-color: var(--brand-border); }
+.app-interior[data-design='sky'] .legal-card { border: 1px solid var(--brand-border); border-radius: var(--radius-lg); background: white; box-shadow: var(--brand-shadow); }
+
+/* Catalogs and expandable profession cards. */
+.app-interior[data-design='sky'] .cp-catalog { padding-top: 36px; }
+.app-interior[data-design='sky'] .cat-inner { max-width: 1200px; }
+.app-interior[data-design='sky'] .cat-title { max-width: 850px; }
+.app-interior[data-design='sky'] .cat-sub { max-width: 740px; margin-bottom: 32px; }
+.app-interior[data-design='sky'] .cat-grid { gap: 20px; }
+.app-interior[data-design='sky'] .cat-card { padding: 26px; }
+.app-interior[data-design='sky'] .cat-card-h, .app-interior[data-design='sky'] .ac-name { font-size: 17px; font-weight: 800; line-height: 1.4; }
+.app-interior[data-design='sky'] .cat-card-p, .app-interior[data-design='sky'] .ac-desc { font-size: 14px; color: var(--brand-copy); }
+.app-interior[data-design='sky'] .cat-chip { padding: 10px 17px; }
+.app-interior[data-design='sky'] .cat-chip.active { background: var(--brand-blue); color: #fff; border-color: var(--brand-blue); }
+.app-interior[data-design='sky'] .cat-cta a { border-radius: 999px; background: var(--brand-gradient); color: #fff; }
+.app-interior[data-design='sky'] .atlas-hero { padding-top: 36px; max-width: 800px; }
+.app-interior[data-design='sky'] .atlas-grid { gap: 20px; max-width: 1200px; }
+.app-interior[data-design='sky'] .atlas-card { padding: 24px; }
+.app-interior[data-design='sky'] .atlas-controls { max-width: 1200px; }
+
+/* Dashboard, diagnostic questions and results. */
+.app-interior[data-design='sky'] .cp-dashboard .content { max-width: 1200px; width: 100%; padding: 32px; }
+.app-interior[data-design='sky'] .welcome-banner { border: 1px solid #c6e2ff; background: var(--gradient-hero); border-radius: 28px; padding: 32px; }
+.app-interior[data-design='sky'] .wb-text h1, .app-interior[data-design='sky'] .wb-text h2 { font-size: clamp(24px, 2.8vw, 36px); }
+.app-interior[data-design='sky'] .progress-block { padding: 28px; }
+.app-interior[data-design='sky'] .block-card { border-radius: 24px; }
+.app-interior[data-design='sky'] .cp-diag .container { padding-top: 40px; padding-bottom: 60px; }
+.app-interior[data-design='sky'] .cp-diag .block-title { max-width: 900px; }
+.app-interior[data-design='sky'] .cp-diag :is(.q-card, .question, .question-card, .result-section, .rm-step) { border-radius: 24px; border-color: var(--brand-border); }
+.app-interior[data-design='sky'] .cp-diag :is(.option, .opt, .scale-btn) { border-radius: 14px; }
+.app-interior[data-design='sky'] .cp-diag .progress-fill { background: var(--brand-gradient); }
+.app-interior[data-design='sky'] .cp-diag :is(.r-card, .rm-card, .pair-card, .task-block) { border-radius: 24px; border-color: var(--brand-border); box-shadow: var(--shadow-sm); }
+.app-interior[data-design='sky'] .rm-card .rm-title { font-size: 18px; letter-spacing: -.02em; }
+.app-interior[data-design='sky'] .axis-card { border-radius: 20px; padding: 20px; }
+.app-interior[data-design='sky'] .adm-wrap { padding-top: 36px; max-width: 1200px; }
+.app-interior[data-design='sky'] .adm-tablewrap { border-radius: 24px; background: white; }
+.app-interior[data-design='sky'] .res-page { padding-top: 36px; max-width: 1100px; }
+.app-interior[data-design='sky'] .res-bg { display: none; }
+.app-interior[data-design='sky'] .res-prof { background: #f2f8ff; border-radius: 18px; }
+.app-interior[data-design='sky'] .cp-proba {
+  --p-blue: var(--brand-blue); --p-lilac: #a8d8ff; --p-ink: var(--brand-ink);
+  --p-body: var(--brand-copy); --p-muted: var(--brand-muted); --p-surface: var(--brand-sky);
+  background: transparent; padding-top: 40px;
+}
+.app-interior[data-design='sky'] .cp-proba .p-card, .app-interior[data-design='sky'] .cp-proba .p-cta { padding: 28px; border-radius: 28px; border-color: var(--brand-border); background: white; box-shadow: var(--brand-shadow); }
+.app-interior[data-design='sky'] .cp-proba .p-btn { border-radius: 999px; }
+.app-interior[data-design='sky'] .cp-proba .p-btn-primary { background: var(--brand-gradient); }
+.app-interior[data-design='sky'] .adm-page { max-width: 1200px; padding-top: 36px; }
+.app-interior[data-design='sky'] .adm-tile { padding: 24px; }
+.app-interior[data-design='sky'] .adm-table-wrap { border: 1px solid var(--brand-border); border-radius: 24px; background: white; overflow-x: auto; }
+.app-interior[data-design='sky'] .adm-title { font-family: var(--font-display); letter-spacing: -.04em; }
+.app-interior[data-design='sky'] :is(.modal-box, .dlg-box) { border-radius: 28px; }
+.app-interior[data-design='sky'] img { max-width: 100%; }
+.shared-result-card { background: var(--card); border: 1px solid var(--line); border-radius: var(--radius-lg); padding: 24px; margin-top: 18px; box-shadow: var(--shadow-sm); }
+.app-interior[data-design='sky'] :is(.cat-controls, .p-link-row, .auth-roles) > * { min-width: 0; }
+
+@media (max-width: 820px) {
+  .app-interior[data-design='sky'] .welcome-banner { padding: 24px; }
+  .app-interior[data-design='sky'] :is(.cat-grid, .atlas-grid) { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+@media (max-width: 640px) {
+  .app-interior[data-design='sky'] :is(.auth-title, .cat-title, .atlas-title, .res-title, .legal-header h1, .block-title, .hero-title, .rm-title) { font-size: 27px; }
+  #root .app-interior[data-design='sky'] .cp-legal nav.legal-nav { padding: 12px 20px; padding-right: 76px; gap: 10px; }
+  .app-interior[data-design='sky'] .nav-logo-txt { font-size: 11px; }
+  .app-interior[data-design='sky'] .cp-legal .auth-wrap { padding: 24px 16px 64px; }
+  .app-interior[data-design='sky'] .auth-card { padding: 26px 22px; border-radius: 24px; }
+  .app-interior[data-design='sky'] .cp-dashboard .content { padding: 24px 16px; }
+  .app-interior[data-design='sky'] .welcome-banner { padding: 24px 20px; }
+  .app-interior[data-design='sky'] .progress-block { padding: 22px 18px; }
+  .app-interior[data-design='sky'] :is(.cat-grid, .atlas-grid) { grid-template-columns: minmax(0, 1fr); }
+  .app-interior[data-design='sky'] :is(.cat-card, .atlas-card) { padding: 22px; }
+  .app-interior[data-design='sky'] .cp-catalog { padding-top: 24px; }
+  .app-interior[data-design='sky'] .cp-diag .container { padding-top: 28px; }
+  .app-interior[data-design='sky'] .cp-diag .tb-left { gap: 8px; flex-wrap: wrap; }
+  .app-interior[data-design='sky'] .cp-diag .tb-logo { font-size: 10px; }
+  .app-interior[data-design='sky'] .cp-diag .tb-block { font-size: 11px; }
+  .app-interior[data-design='sky'] .cp-diag .tb-btn { font-size: 11px; padding: 8px 10px; white-space: nowrap; }
+  .app-interior[data-design='sky'] .cp-proba { padding: 28px 16px 60px; }
+  .app-interior[data-design='sky'] .cp-proba .p-card, .app-interior[data-design='sky'] .cp-proba .p-cta { padding: 22px; }
+  .app-interior[data-design='sky'] .p-link-row { flex-wrap: wrap; }
+  .app-interior[data-design='sky'] .legal-page .legal-header h1 { font-size: clamp(20px, 5.2vw, 28px); letter-spacing: -.04em; }
+  .app-interior[data-design='sky'] .legal-body h2 { font-size: 22px; }
+}
+@media (max-width: 480px) { .app-interior[data-design='sky'] .auth-roles { grid-template-columns: 1fr; } }
+
+/* An offscreen drawer must not cast a shadow across every page. */
+.appnav-drawer:not(.open) { visibility: hidden; box-shadow: none; }
+
+/* The page background continues behind the floating site header. */
+#root:has(.app-interior) { background: radial-gradient(ellipse 900px 640px at 8% 0, #e3f1ff, transparent), var(--brand-page); }
+#root .app-interior[data-design='sky'] { background: transparent; padding-bottom: 0; }
+#root .app-interior :is(.cp-diag, .cp-legal, .cp-dashboard) { background: transparent; }
+#root .app-interior :is(.tb-logo, .tb-divider) { display: none; }
+#root .app-interior :is(.cp-diag, .cp-dashboard) > .topbar {
+  position: relative; top: auto; width: min(var(--content-wide), calc(100% - 2 * var(--page-gutter)));
+  margin: 12px auto 0; padding: 0 64px 0 0; min-height: 44px; border: 0;
+  background: transparent; box-shadow: none; backdrop-filter: none; justify-content: flex-start;
+}
+#root .app-interior .cp-legal nav.legal-nav {
+  position: relative; top: auto; width: min(var(--content-wide), calc(100% - 2 * var(--page-gutter)));
+  max-width: none; min-height: 44px; padding: 0; margin: 12px auto 0;
+  border: 0; background: transparent; box-shadow: none; backdrop-filter: none;
+}
+#root .app-interior .legal-nav .nav-logo-link { display: none; }
+#root .app-interior .legal-nav .nav-back-link { background: transparent; border: 0; padding: 10px 0; font-size: 14px; font-weight: 600; }
+
+/* Shared action contrast, hit areas and keyboard states. */
+#root :is(.site-header .lv-cta-pill, .app-interior .btn-accent, .app-interior .btn-violet, .app-interior .cp-btn--primary, .app-interior .cp-btn--violet, .app-interior .p-btn-primary, .app-interior .qnav-finish) {
+  background: var(--action-gradient); color: #fff; border-color: transparent; box-shadow: 0 6px 18px #0968d81f;
+}
+#root .app-interior :is(.btn, .cp-btn, .p-btn) { min-height: 48px; font-family: var(--font-body); font-weight: 700; letter-spacing: 0; }
+#root :is(button, a, input, select, textarea, [role='button']):focus-visible { outline: 3px solid var(--action-blue); outline-offset: 4px; }
+#root .app-interior button:disabled { cursor: not-allowed; box-shadow: none; transform: none; }
+#root .app-interior :is(.btn-accent, .cp-btn--primary, .qnav-finish):not(:disabled):hover { background: var(--action-hover); }
+
+/* Legal documents share the same outer width as the site navigation. */
+#root .app-interior .cp-legal .legal-page { padding: 24px 0 64px; }
+#root .app-interior .legal-page .container { width: min(var(--content-wide), calc(100% - 2 * var(--page-gutter))); max-width: none; padding: 0; }
+#root .app-interior .legal-header { padding: clamp(24px, 4vw, 48px); border-radius: var(--radius-lg); background: var(--gradient-hero); }
+#root .app-interior .legal-header h1 { max-width: 1100px; font-size: clamp(26px, 3.5vw, 50px); line-height: 1.25; margin-block: 24px; }
+#root .app-interior .legal-meta { font: 500 14px/1.7 var(--font-body); color: var(--brand-copy); }
+#root .app-interior .legal-body { padding: clamp(24px, 4vw, 48px); border-radius: var(--radius-lg); box-shadow: var(--shadow-sm); }
+#root .app-interior .legal-body :is(p, ul, ol) { max-width: 92ch; font-size: 16px; line-height: 1.85; }
+#root .app-interior .legal-body h2 { font-size: clamp(20px, 2vw, 27px); line-height: 1.4; letter-spacing: -.03em; }
+#root .app-interior .legal-highlight { padding: 24px 32px; border-radius: var(--radius-md); border: 1px solid var(--brand-border); }
+#root .cp-legal .product-footer { padding: 48px var(--page-gutter); }
+#root .cp-legal .product-footer__inner { max-width: var(--content-wide); margin: auto; }
+#root .cp-legal .product-footer__brand p { margin-top: 14px; }
+#root .cp-legal .product-footer__copy { padding-top: 24px; }
+@media (max-width: 640px) {
+  #root .app-interior .legal-header h1 { font-size: clamp(24px, 6.3vw, 32px); overflow-wrap: anywhere; }
+  #root .app-interior .legal-highlight { padding: 22px; }
+  #root .app-interior .legal-body :is(p, ul, ol) { font-size: 15px; line-height: 1.8; }
+}

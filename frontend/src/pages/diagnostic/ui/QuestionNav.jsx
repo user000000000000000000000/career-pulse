@@ -1,3 +1,4 @@
+import IconText from '../../../shared/ui/IconText.jsx'
 // Навигатор по вопросам блока с быстрыми ответами (личность, Holland, готовность…).
 // Кнопка «Назад», прокручиваемая лента номеров 1..N (ткнуть — перейти к любому вопросу
 // и поправить ответ) и «Готово», когда отвечены все. Отвеченные точки — залиты,
@@ -11,6 +12,15 @@ export default function QuestionNav({ total, current, isAnswered, onJump, onBack
 
   // Колесо мыши прокручивает ленту номеров по горизонтали (как в соцсетях).
   const ribbonRef = useRef(null)
+  useEffect(() => {
+    const ribbon = ribbonRef.current
+    const active = ribbon?.querySelector('.current')
+    if (!active) return
+    const left = active.offsetLeft - ribbon.offsetLeft
+    if (left < ribbon.scrollLeft || left + active.offsetWidth > ribbon.scrollLeft + ribbon.clientWidth) {
+      ribbon.scrollTo({ left: Math.max(0, left - ribbon.clientWidth / 2 + active.offsetWidth / 2), behavior: 'instant' })
+    }
+  }, [current])
   useEffect(() => {
     const el = ribbonRef.current
     if (!el) return
@@ -27,9 +37,9 @@ export default function QuestionNav({ total, current, isAnswered, onJump, onBack
   return (
     <div className="qnav print-hide">
       <div className="qnav-top">
-        <button className="qnav-back" onClick={onBack} disabled={current === 0}>← Назад</button>
+        <button className="qnav-back" onClick={onBack} disabled={current === 0}><IconText text={"← Назад"} /></button>
         <span className="qnav-progress">{answeredCount} / {total} отвечено</span>
-        {allAnswered && <button className="qnav-finish" onClick={onFinish}>Готово →</button>}
+        {allAnswered && <button className="qnav-finish" onClick={onFinish}><IconText text={"Готово →"} /></button>}
       </div>
       <div className="qnav-ribbon" ref={ribbonRef}>
         {Array.from({ length: total }, (_, i) => (

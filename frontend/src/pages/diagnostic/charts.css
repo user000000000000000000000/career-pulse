@@ -1,0 +1,17 @@
+.diag-radar { min-width: 0; }
+.diag-radar > svg { display: block; flex-shrink: 0; max-width: 100%; height: auto; }
+.diag-radar__legend { display: flex; flex-direction: column; flex: 1 1 180px; gap: 10px; min-width: 0; max-width: 380px; }
+.diag-radar__key { display: inline-grid; place-items: center; flex: 0 0 22px; width: 22px; height: 22px; border-radius: 50%; background: #e3f0ff; color: var(--brand-blue); font: 700 11px/1 var(--font-body); }
+.diag-bars { display: grid; gap: 16px; width: 100%; min-width: 0; }
+.diag-bars__row { display: grid; grid-template-columns: minmax(130px,170px) minmax(0,1fr) 40px; align-items: center; gap: 12px; }
+.diag-bars__label { color: var(--text); font: 500 13px/1.5 var(--font-body); }
+.diag-bars__track { height: 10px; border-radius: 100px; overflow: hidden; background: #e1ecfa; }
+.diag-bars__value { text-align: right; color: var(--sub); font: 700 13px/1.5 var(--font-body); font-variant-numeric: tabular-nums; }
+.diag-minirings { display: flex; justify-content: space-around; align-items: stretch; gap: 14px; flex-wrap: wrap; }
+.diag-minirings__item { display: flex; flex-direction: column; align-items: center; flex: 1 1 86px; max-width: 140px; min-width: 0; padding: 12px 8px; border: 1px solid #e0ecfc; border-radius: 18px; background: #fff; text-align: center; }
+.diag-minirings__item svg { max-width: 100%; height: auto; }
+.diag-minirings__label { margin-top: 8px; color: var(--sub); font: 500 12px/1.5 var(--font-body); }
+@media (max-width: 620px) {
+  .diag-bars__row { grid-template-columns: minmax(0,1fr) 40px; gap: 6px 10px; }
+  .diag-bars__label { grid-column: 1/-1; }
+}

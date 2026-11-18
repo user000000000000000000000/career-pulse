@@ -1,8 +1,8 @@
 /* ─── Страница результата ─── */
 .res-page{min-height:100vh;padding:100px 24px 80px;max-width:920px;margin:0 auto}
 .res-bg{position:fixed;inset:0;z-index:-1;background:
-  radial-gradient(ellipse 60% 50% at 50% 0%, rgba(139,111,232,.16) 0%, transparent 60%),
-  radial-gradient(ellipse 45% 40% at 85% 80%, rgba(95,150,233,.08) 0%, transparent 55%)}
+  radial-gradient(ellipse 60% 50% at 50% 0%, rgba(161,204,245,.16) 0%, transparent 60%),
+  radial-gradient(ellipse 45% 40% at 85% 80%, rgba(8,124,255,.08) 0%, transparent 55%)}
 .res-eyebrow{font-family:'JetBrains Mono',monospace;font-size:12px;letter-spacing:3px;
   text-transform:uppercase;color:var(--accent);margin-bottom:12px}
 .res-title{font-family:'Bebas Neue',sans-serif;font-size:clamp(40px,7vw,72px);letter-spacing:1px;
@@ -21,12 +21,12 @@
 .res-prof__tags{display:flex;gap:5px;flex-wrap:wrap;flex:1;margin:0 12px}
 .res-prof__htag{font-size:10px;font-weight:800;letter-spacing:.5px;border-radius:5px;
   padding:2px 7px;border:1px solid}
-.res-prof__htag[data-h="R"]{background:#c2568622;color:#c25686;border-color:#c2568644}
-.res-prof__htag[data-h="I"]{background:#3f77cf22;color:#3f77cf;border-color:#3f77cf44}
-.res-prof__htag[data-h="A"]{background:#7a5bd622;color:#7a5bd6;border-color:#7a5bd644}
-.res-prof__htag[data-h="S"]{background:#2b8f6b22;color:#2b8f6b;border-color:#2b8f6b44}
-.res-prof__htag[data-h="E"]{background:#b57e1f22;color:#b57e1f;border-color:#b57e1f44}
-.res-prof__htag[data-h="C"]{background:#d6345622;color:#d63456;border-color:#d6345644}
+.res-prof__htag[data-h="R"]{background:#418bdb22;color:var(--brand-blue);border-color:#418bdb44}
+.res-prof__htag[data-h="I"]{background:#3f77cf22;color:var(--brand-blue);border-color:#3f77cf44}
+.res-prof__htag[data-h="A"]{background:#70aceb22;color:var(--brand-blue);border-color:#70aceb44}
+.res-prof__htag[data-h="S"]{background:#3378be22;color:var(--brand-blue);border-color:#3378be44}
+.res-prof__htag[data-h="E"]{background:#3378be22;color:var(--brand-blue);border-color:#3378be44}
+.res-prof__htag[data-h="C"]{background:#418bdb22;color:var(--brand-blue);border-color:#418bdb44}
 .res-prof__cat{font-size:11px;color:var(--ghost)}
 .res-prof__pct{font-family:'JetBrains Mono',monospace;font-size:13px;color:var(--accent);min-width:42px;text-align:right}
 .res-report{font-size:16px;line-height:1.75;color:var(--text);white-space:pre-wrap;max-width:65ch}

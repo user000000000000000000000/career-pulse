@@ -1,0 +1,74 @@
+/* Paint once behind both the header clearance and the page: no horizontal seam. */
+#root:has(.auth-scene) { background: radial-gradient(ellipse 900px 750px at 5% 15%, #dfedff, transparent 85%), #f7fbff; }
+.app-interior[data-design='sky']:has(.auth-scene) { background: transparent; padding-bottom: 0; }
+.app-interior:has(.auth-scene) > .section-decor { display: none; }
+.auth-scene { position: relative; isolation: isolate; overflow: clip; }
+.auth-scene__waves { position: absolute; inset: 120px 0 auto; height: 950px; z-index: -1; pointer-events: none; }
+.auth-scene__waves svg { width: 100%; height: 100%; display: block; }
+.app-interior[data-design='sky'] .auth-scene .auth-scene__layout {
+  display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 500px); align-items: start;
+  gap: clamp(32px, 5vw, 84px); max-width: 1200px; width: 100%; box-sizing: border-box;
+  min-height: calc(100vh - var(--site-header-clearance)); margin: 0 auto;
+  padding: 38px 28px 90px; background: transparent;
+}
+.auth-scene__story { position: sticky; top: calc(var(--site-header-clearance) + 32px); padding-top: 24px; min-width: 0; }
+.auth-scene__eyebrow { display: inline-flex; align-items: center; gap: 8px; font-size: 10px; line-height: 1.6; letter-spacing: .09em; font-weight: 700; color: var(--brand-blue); }
+.app-interior[data-design='sky'] .auth-scene__story h2 { margin: 20px 0 18px; font: 800 clamp(30px, 3.1vw, 45px)/1.25 var(--font-display); letter-spacing: -.055em; color: #070529; }
+.auth-scene__story h2 em { font-family: var(--font-heading-accent); font-size: 1.25em; font-weight: 700; color: var(--brand-blue); white-space: nowrap; }
+.auth-scene__story > p { font: 400 15px/1.85 var(--font-body); color: #587699; margin: 0; max-width: 400px; }
+.auth-scene__illustration { position: relative; width: 100%; max-width: 490px; height: 350px; margin-top: 14px; }
+.auth-scene__halo { position: absolute; width: 290px; height: 290px; border-radius: 50%; left: 50%; top: 50%; transform: translate(-50%, -50%); background: radial-gradient(circle at 35% 30%, #ffffffc9, #b8ddff7a 65%, #d9edff33); border: 1px solid #ffffffa8; }
+.auth-scene__route { position: absolute; inset: 0; width: 100%; height: 100%; }
+.auth-scene__mascot { position: absolute; width: 290px; max-width: 72%; left: 50%; top: 52%; transform: translate(-50%, -50%); }
+.auth-scene__mascot .bird-helper__wing--greeting { animation: auth-scene-wave 3.2s ease-in-out infinite; }
+@keyframes auth-scene-wave { 0%,100% { transform: rotate(0); } 50% { transform: rotate(var(--wing-up)); } }
+.auth-scene__tag { display: flex; gap: 9px; align-items: center; position: absolute; z-index: 1; padding: 12px 15px; border: 1px solid #ffffffed; border-radius: 15px; background: #ffffffed; box-shadow: 0 10px 30px #377bb512; color: var(--brand-blue); font: 600 11px/1.4 var(--font-body); animation: auth-tag-float 7s ease-in-out infinite; }
+.auth-scene__tag .ui-icon { color: var(--brand-blue); }
+.auth-scene__tag--interests { top: 28px; left: 2px; }
+.auth-scene__tag--strengths { right: -4px; top: 155px; animation-delay: -2.5s; }
+.auth-scene__tag--route { left: 30px; bottom: 24px; animation-delay: -4.5s; }
+@keyframes auth-tag-float { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-5px); } }
+.auth-scene__star { position: absolute; color: var(--brand-blue); }
+.auth-scene__star--one { right: 28px; top: 35px; }.auth-scene__star--two { left: 12px; top: 190px; }
+.auth-scene__caption { display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 10px; font: 500 11px/1.6 var(--font-body); color: #6080a5; }
+.auth-scene__caption i { width: 3px; height: 3px; background: #8cb9e8; border-radius: 50%; }
+/* The legal-page universal reset may load after these component styles. */
+.auth-scene .auth-scene__tag { padding: 12px 15px; }
+.auth-scene .social-sign-in { margin: 26px 0 6px; }
+.auth-scene .social-sign-in__heading { margin-bottom: 12px; }
+.auth-scene .social-sign-in__provider { padding: 14px 12px; }
+.auth-scene .social-sign-in__note { margin-top: 12px; }
+.auth-scene .social-sign-in__message { padding: 12px 14px; margin-top: 10px; }
+.auth-scene .cp-input { padding: 13px 15px; }
+.auth-scene .cp-field { margin-bottom: 16px; }
+.app-interior[data-design='sky'] .auth-scene .auth-card { max-width: none; min-width: 0; padding: 30px; border-radius: 28px; background: #fffffffa; box-shadow: 0 18px 60px -30px #2565aa3b; }
+@media (max-width: 980px) {
+  .app-interior[data-design='sky'] .auth-scene .auth-scene__layout { grid-template-columns: minmax(0, 1fr) minmax(0, 450px); gap: 26px; padding-inline: 24px; }
+  .auth-scene__tag { padding: 10px; font-size: 10px; gap: 6px; }
+  .auth-scene .auth-scene__tag { padding: 10px; }
+  .auth-scene__tag--strengths { right: 0; top: 200px; }
+  .auth-scene__tag--route { left: 0; }
+  .auth-scene__story > p { font-size: 13px; }
+  .auth-scene__illustration { height: 310px; }
+  .auth-scene__halo { width: 240px; height: 240px; }
+}
+@media (max-width: 760px) {
+  .app-interior[data-design='sky'] .auth-scene .auth-scene__layout { display: flex; flex-direction: column; align-items: stretch; padding: 22px 18px 70px; gap: 26px; max-width: 540px; }
+  .auth-scene__story { position: relative; top: auto; padding: 10px 4px 0; text-align: center; }
+  .auth-scene__eyebrow { font-size: 9px; letter-spacing: .04em; }
+  .app-interior[data-design='sky'] .auth-scene__story h2 { font-size: 29px; margin: 14px 0 10px; }
+  .auth-scene__story > p { margin: 0 auto; max-width: 340px; font-size: 13px; line-height: 1.7; }
+  .auth-scene__illustration { height: 240px; max-width: 380px; margin: 8px auto 0; }
+  .auth-scene__halo { width: 205px; height: 205px; }
+  .auth-scene__mascot { width: 235px; max-width: 70%; }
+  .auth-scene__tag--interests { top: 10px; left: 0; }
+  .auth-scene__tag--strengths { top: 138px; right: 0; }
+  .auth-scene__tag--route { bottom: 4px; left: 10px; }
+  .auth-scene__star--one { top: 8px; right: 14px; }.auth-scene__star--two { top: 130px; left: 6px; }
+  .auth-scene__caption { font-size: 10px; gap: 8px; margin-top: 8px; }
+  .auth-scene__waves { top: 130px; height: 700px; }
+  .app-interior[data-design='sky'] .auth-scene .auth-card { padding: 25px 22px; border-radius: 24px; }
+  .auth-scene:not(.auth-scene--register) .auth-scene__illustration { height: 185px; }
+  .auth-scene:not(.auth-scene--register) .auth-scene__tag--strengths { top: 115px; }
+}
+@media (prefers-reduced-motion: reduce) { .auth-scene .bird-helper__flight, .auth-scene .bird-helper__wing--greeting, .auth-scene__tag { animation: none; transform: none; } }

@@ -1,10 +1,13 @@
+import Header from '../../../shared/ui/Header.jsx'
+import IconText from '../../../shared/ui/IconText.jsx'
+import DarkFooter from '../../../shared/ui/DarkFooter.jsx'
 import LegalShell from './LegalShell.jsx'
 import ContactLinks from '../../../shared/ui/ContactLinks.jsx'
 import LegalNav from './LegalNav.jsx'
 
 export default function Privacy() {
   return (
-    <LegalShell title="Политика конфиденциальности" description="Как CareerPulse обрабатывает и защищает персональные данные пользователей.">
+    <LegalShell title="Политика конфиденциальности" description="Как Пульс Карьеры обрабатывает и защищает персональные данные пользователей.">
       <>
 <LegalNav />
 
@@ -110,41 +113,7 @@ export default function Privacy() {
   </div>
 </main>
 
-<footer className="legal-footer">
-  <div className="lf-inner">
-    <div className="lf-grid">
-      <div className="lf-brand">
-        <div className="lf-logo">CAREER<span>PULSE</span></div>
-        <p>Персональная платформа карьерной диагностики. Психодиагностика, анализ рынка и живой наставник.</p>
-      </div>
-      <div className="lf-col">
-        <h4>Правовые документы</h4>
-        <ul>
-          <li><a href="/legal/privacy">Политика конфиденциальности</a></li>
-          <li><a href="/legal/terms">Пользовательское соглашение</a></li>
-          <li><a href="/legal">Все документы</a></li>
-          <li><a href="/legal/consent">Согласие на обработку ПД</a></li>
-          <li><a href="/legal/adconsent">Согласие на рекламу</a></li>
-          <li><a href="/legal/recomm">Рекомендательные технологии</a></li>
-        </ul>
-      </div>
-      <div className="lf-col">
-        <h4>Контакты</h4>
-        <ul>
-          <ContactLinks />
-        </ul>
-      </div>
-    </div>
-    <div className="lf-bottom">
-      <div className="lf-copy">© 2026 CareerPulse · careerpulse.ru · Никита Соколов</div>
-      <div className="lf-links">
-        <a href="/legal/privacy">Конфиденциальность</a>
-        <a href="/legal/terms">Соглашение</a>
-        <a href="/legal">Документы</a>
-      </div>
-    </div>
-  </div>
-</footer>
+<DarkFooter from="#f7fbff" />
       </>
     </LegalShell>
   )

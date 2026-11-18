@@ -1,3 +1,4 @@
+import IconText from '../../../shared/ui/IconText.jsx'
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { CP } from '../../../shared/api'
@@ -7,7 +8,7 @@ import ProbaResultView from './ProbaResultView'
 import '../proba.css'
 
 export default function ProbaResult() {
-  usePageMeta('Экспресс-профиль', 'Результат бесплатного мини-теста CareerPulse.')
+  usePageMeta('Экспресс-профиль', 'Результат бесплатного мини-теста Пульс Карьеры.')
   const navigate = useNavigate()
   const [results, setResults] = useState(null)
   const [shareUrl, setShareUrl] = useState('')
@@ -25,7 +26,7 @@ export default function ProbaResult() {
   }, [navigate])
 
   function onShare() {
-    const url = `${window.location.origin}/t/${encodeProba(results)}`
+    const url = `${window.location.origin}${import.meta.env.BASE_URL}t/${encodeProba(results)}`
     setShareUrl(url)
     navigator.clipboard?.writeText(url).then(() => { setCopied(true); setTimeout(() => setCopied(false), 2000) }).catch(() => {})
   }
@@ -38,7 +39,7 @@ export default function ProbaResult() {
         <div className="p-head">
           <div className="p-eyebrow">Экспресс-профиль</div>
           <h1 className="p-title">Вот что уже о тебе видно</h1>
-          <p className="p-sub">Ты прошёл 3 блока из 10: склонности к деятельности (по Голланду), тип личности (Большая пятёрка) и когнитивный профиль. Уже по ним видно, что тебе ближе. Полная диагностика добавляет ещё 7 блоков — ценности, мотивацию, готовность и образ будущего — и на их основе ИИ собирает цельный разбор и подбирает профессии с вузами. Зарегистрируйся — эти 3 блока сохранятся, останется пройти остальные.</p>
+          <p className="p-sub">Ты прошёл 3 блока из 10: об интересах, характере и мышлении. Ниже — первые наблюдения по твоим ответам. Сравни их со своими ощущениями и вспомни, в каких занятиях ты это замечал(а). В полной диагностике можно дополнить профиль ценностями, опытом и планами, изучить профессии и построить маршрут.</p>
         </div>
 
         <ProbaResultView results={results} />
@@ -47,7 +48,7 @@ export default function ProbaResult() {
           <b>Сохранить результат и пройти полностью</b>
           <p>Эти 3 блока уже готовы. После регистрации они появятся в кабинете — останется пройти оставшиеся 7.</p>
           <div className="p-actions">
-            <a href="/register" className="p-btn p-btn-primary" onClick={(e) => { e.preventDefault(); navigate('/register') }}>Зарегистрироваться →</a>
+            <a href="/register" className="p-btn p-btn-primary" onClick={(e) => { e.preventDefault(); navigate('/register') }}><IconText text={"Зарегистрироваться →"} /></a>
             <button className="p-btn p-btn-ghost" onClick={onShare}>{copied ? 'Ссылка скопирована' : 'Поделиться'}</button>
           </div>
           {shareUrl && (

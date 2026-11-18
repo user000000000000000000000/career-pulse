@@ -1,0 +1,40 @@
+const { chromium } = require(process.env.PLAYWRIGHT_MODULE || 'playwright')
+const assert = require('node:assert/strict')
+const base = 'http://127.0.0.1:5174/career-pulse/'
+;(async () => {
+  const browser = await chromium.launch({ channel: 'chrome', headless: true })
+  try {
+    const page = await browser.newPage({ viewport: { width: 320, height: 800 } })
+    await page.emulateMedia({ reducedMotion: 'reduce' })
+    const errors = []
+    page.on('pageerror', e => errors.push(e.message))
+    for (const route of ['profile', 'dashboard', 'professions', 'atlas', 'legal', 'legal/privacy', 'admin', ...Array.from({ length: 10 }, (_, i) => 'test/' + (i + 1))]) {
+      await page.goto(base + route)
+      await page.locator('.site-header nav').waitFor()
+      await page.waitForTimeout(250)
+      const edit = page.getByRole('button', { name: 'Изменить ответы', exact: true })
+      if (await edit.isVisible()) await edit.click()
+      await page.waitForTimeout(150)
+      assert.equal(await page.evaluate(() => document.documentElement.scrollWidth > innerWidth), false, '320px overflow: ' + route)
+    }
+    await page.goto(base + 'professions')
+    await page.locator('.cat-card').first().waitFor()
+    await page.waitForTimeout(400)
+    assert.equal(await page.locator('.bird-helper').isVisible(), false, 'Interior helper hidden initially')
+    await page.evaluate(() => scrollTo({ top: 380, behavior: 'instant' }))
+    await page.waitForTimeout(100)
+    assert.equal(await page.locator('.bird-helper').isVisible(), true)
+    await page.evaluate(() => scrollTo({ top: 0, behavior: 'instant' }))
+    await page.waitForTimeout(100)
+    assert.equal(await page.locator('.bird-helper').isVisible(), false)
+    const brand = page.locator('.site-header .brand-mark')
+    assert.ok(await brand.evaluate(img => img.complete && img.naturalWidth > 0 && img.src.endsWith('/brand-logo-blue.png')))
+    const icon = await page.locator('link[rel="icon"]').getAttribute('href')
+    const response = await page.request.get(new URL(icon, base).href)
+    assert.equal(response.status(), 200)
+    assert.ok(response.headers()['content-type'].includes('image/png'))
+    assert.equal(await page.locator('.cat-card').first().evaluate(el => el.getAnimations().length), 0, 'Reduced motion')
+    assert.deepEqual(errors, [])
+    console.log('PASS: 17 narrow-screen routes, all ten question screens, reduced motion, interior helper, approved logo/favicon; no page errors')
+  } finally { await browser.close() }
+})().catch(error => { console.error(error); process.exitCode = 1 })

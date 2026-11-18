@@ -1,0 +1,9 @@
+.diagnostic-overview__chapter { display: inline-flex; padding: 8px 12px; margin: 16px 0 0; color: var(--brand-blue); border: 1px solid #c4ddf8; border-radius: 12px; background: #ffffffb3; font: 600 12px/1.5 var(--font-body); }
+.letter-chapter { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding-bottom: 12px; margin-bottom: 16px; border-bottom: 1px solid #e0ebf7; color: var(--brand-blue); font: 700 13px/1.5 var(--font-body); }
+.letter-chapter > :last-child { font-size: 11px; font-weight: 500; white-space: nowrap; color: #637b9a; }
+.letter-chapter__desc { margin: 0 0 18px; font: 400 13px/1.7 var(--font-body); color: #637b9a; }
+.cp-diag label.q-prompt { display: block; }
+.letter-result__mascot { display: grid; place-items: center; margin: 0 auto 12px; width: 210px; height: 210px; border-radius: 50%; background: radial-gradient(circle,#e6f3ff,transparent 72%); }
+.letter-result__mascot .diagnostic-mascot { width: 210px; height: 210px; }
+.letter-storage-note { max-width: 540px; margin: 16px auto; padding: 12px 16px; border-radius: 14px; background: #f1f7ff; color: #516d91; font: 400 12px/1.7 var(--font-body); }
+@media (max-width: 620px) { .diagnostic-overview[data-block='10'] .diagnostic-overview__hero { position: relative; padding: 22px; gap: 14px; } .diagnostic-overview[data-block='10'] .diagnostic-overview__art { width: 140px; height: 140px; } .diagnostic-overview[data-block='10'] .diagnostic-mascot { width: 150px; height: 150px; } .diagnostic-overview[data-block='10'] .diagnostic-overview__orbit { width: 135px; height: 135px; } .letter-chapter { font-size: 12px; } }

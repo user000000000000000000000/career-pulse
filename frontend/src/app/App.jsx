@@ -1,5 +1,5 @@
-import { lazy, Suspense } from 'react'
-import { Routes, Route, Navigate } from 'react-router-dom'
+import { lazy, Suspense, useRef } from 'react'
+import { Routes, Route, Navigate, useLocation } from 'react-router-dom'
 
 // Eager — точки входа (первый экран), грузятся сразу.
 import { Landing } from '../pages/landing'
@@ -36,23 +36,41 @@ import VkAuthHandler from './VkAuthHandler.jsx'
 import AuthRecoveryHandler from './AuthRecoveryHandler.jsx'
 import AppNav from './AppNav.jsx'
 import { DialogHost } from '../shared/ui/Dialog.jsx'
+import { ModalProvider } from '../shared/ui/ModalProvider.jsx'
 import FeedbackWidget from '../shared/ui/FeedbackWidget.jsx'
+import SiteHeader from '../shared/ui/SiteHeader.jsx'
+import BirdHelper from '../shared/ui/BirdHelper.jsx'
+import SectionDecor from '../shared/ui/SectionDecor.jsx'
+import ScrollManager from './ScrollManager.jsx'
+import { useScrollReveal } from '../shared/lib/useScrollReveal'
+import { useInteriorSceneMotion } from '../shared/lib/useInteriorSceneMotion'
+import { config } from '../shared/config'
+const DemoControls = lazy(() => import('./demo/DemoControls.jsx'))
 
 const PageLoader = () => (
-  <div style={{
-    minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center',
-    color: 'var(--ghost)', fontFamily: "'JetBrains Mono', monospace", fontSize: 13, letterSpacing: 2,
-  }}>ЗАГРУЗКА…</div>
+  <div className="route-loader" role="status" aria-live="polite">
+    <span className="route-loader__ring" aria-hidden="true" />ЗАГРУЗКА…
+  </div>
 )
 
 export default function App() {
+  const { pathname } = useLocation()
+  const interiorRef = useRef(null)
+  useInteriorSceneMotion(interiorRef, pathname)
+  useScrollReveal(interiorRef, 'h1, h2, .section-title, .block-title, .welcome-banner, .dashboard-progress, .progress-block, .block-card, .axis-card, .family-card, .mentor-card, .cat-card, .atlas-card, .doc-card, .legal-header, .auth-card, .profile-links, .res-block, .res-prof, .rm-card, .p-card, .adm-tile, .shared-result-card, .diagnostic-overview__hero, .results-hero, .results-empty, .results-notice, .r-card, .chart-block, .roadmap-journey__hero, .roadmap-journey__step', pathname, 'interior')
   return (
-    <>
+    <ModalProvider>
+    <ScrollManager />
     <VkAuthHandler />
     <AuthRecoveryHandler />
+    <SiteHeader />
     <AppNav />
     <DialogHost />
     <FeedbackWidget />
+    <BirdHelper />
+    {config.demoMode && <Suspense fallback={null}><DemoControls /></Suspense>}
+    <div ref={pathname === '/' ? undefined : interiorRef} className={pathname === '/' ? 'app-landing' : 'app-interior'} data-design={pathname === '/' ? undefined : 'sky'}>
+    {pathname !== '/' && <SectionDecor />}
     <Suspense fallback={<PageLoader />}>
     <Routes>
       <Route path="/" element={<Landing />} />
@@ -93,6 +111,7 @@ export default function App() {
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
     </Suspense>
-    </>
+    </div>
+    </ModalProvider>
   )
 }

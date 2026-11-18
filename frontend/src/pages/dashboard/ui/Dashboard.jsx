@@ -1,9 +1,18 @@
+import BrandMark from '../../../shared/ui/BrandMark.jsx'
+import Icon from '../../../shared/ui/Icon.jsx'
+import DrawerJourney from '../../../shared/ui/DrawerJourney.jsx'
+import BirdFlight from '../../../shared/ui/BirdFlight.jsx'
+import DashboardProgress from './DashboardProgress.jsx'
+import '../../../shared/ui/feedback-widget.css'
+import '../consultation.css'
+import DashboardArtwork from './DashboardArtwork.jsx'
+import IconText from '../../../shared/ui/IconText.jsx'
 import { useEffect, useRef, useState } from 'react'
-import BoltIcon from '../../../shared/ui/BoltIcon.jsx'
+import { createPortal } from 'react-dom'
 import { useNavigate, Link } from 'react-router-dom'
 import { getCurrentUser, logout as doLogout } from '../../../shared/auth'
-import { CP } from '../../../shared/api'
-import { BLOCKS } from '../../../shared/config'
+import { CP, checkIsAdmin } from '../../../shared/api'
+import { BLOCKS, config } from '../../../shared/config'
 import { STORAGE_KEYS } from '../../../shared/lib/storageKeys'
 import { DEV_PROFILES, applyDevProfile } from '../devProfiles'
 import { submitConsultRequest } from '../../../shared/api'
@@ -11,40 +20,67 @@ import ContactLinks from '../../../shared/ui/ContactLinks.jsx'
 import SocialIcon from '../../../shared/ui/SocialIcon.jsx'
 import BlockResultModal from './BlockResultModal.jsx'
 import { confirmDialog, alertDialog } from '../../../shared/ui/Dialog.jsx'
+import { useModal } from '../../../shared/ui/ModalProvider.jsx'
 import FamilyCard from './FamilyCard.jsx'
 import RolePlaceholder from './RolePlaceholder.jsx'
 import { friendlyError } from '../../../shared/lib/errors'
+import { greetingName } from '../../../shared/lib/personName'
 import '../dashboard.css'
+import '../workspace.css'
+import '../dashboard-mobile.css'
+import '../dashboard-journey.css'
+import '../dashboard-landing.css'
+import '../dashboard-progress.css'
+import '../dashboard-drawer.css'
 
 // BLOCKS — единый реестр блоков из shared/config/blocks.js (импортируется выше).
 
 const AXIS_INFO = [
-  { key: 'ХОЧУ',     color: 'var(--accent)', icon: '💡', desc: 'Склонности, ценности, образ будущего',          blocks: [2, 3, 8] },
-  { key: 'МОГУ',     color: 'var(--ember)',  icon: '🚀', desc: 'Когнитивный профиль, проф. готовность',          blocks: [5, 6] },
-  { key: 'ВОЗМОЖНОСТИ',   color: 'var(--violet)', icon: '🧠', desc: 'Личность, самоэффективность, стиль решений',     blocks: [4, 7] },
-  { key: 'КТО Я', color: 'var(--sub)',    icon: '🌐', desc: 'Анкета, соц. контекст, письмо в будущее',        blocks: [1, 9, 10] },
+  { key: 'ХОЧУ',     color: 'var(--brand-blue)', icon: '💡', desc: 'Склонности, ценности, образ будущего',          blocks: [2, 3, 8] },
+  { key: 'МОГУ',     color: 'var(--brand-blue)',  icon: '⚡', desc: 'Как ты учишься и что уже умеешь',          blocks: [5, 6] },
+  { key: 'ВОЗМОЖНОСТИ',   color: 'var(--brand-blue)', icon: '🧠', desc: 'Твой характер, уверенность и выбор решений',     blocks: [4, 7] },
+  { key: 'КТО Я', color: 'var(--brand-blue)',    icon: '🌐', desc: 'Твои планы, окружение и письмо в будущее',        blocks: [1, 9, 10] },
 ]
 
 const ROLE_LABELS = { parent: 'Родитель школьника', student: 'Школьник / Студент', specialist: 'Специалист', entrepreneur: 'Предприниматель', hr: 'HR / Компания' }
+const AXIS_TITLES = { 'ХОЧУ': 'Хочу', 'МОГУ': 'Могу', 'ВОЗМОЖНОСТИ': 'Возможности', 'КТО Я': 'Кто я' }
+const BLOCK_ICONS = ['clipboard', 'compass', 'heart', 'user', 'brain', 'briefcase', 'zap', 'rocket', 'users', 'mail']
+const OUTCOMES = [
+  { icon: 'bulb', title: 'Твои интересы', desc: 'Что тебе интересно. Какие занятия и сферы тебе по душе.' },
+  { icon: 'user', title: 'Твой характер', desc: 'Какой ты человек. Твои сильные стороны и особенности характера.' },
+  { icon: 'book', title: 'Твоя учёба', desc: 'Как ты лучше учишься. Какие у тебя способности и как тебе проще усваивать новое.' },
+  { icon: 'heart', title: 'Твои ценности', desc: 'Что для тебя важно. Что тебя мотивирует и чего ты хочешь от работы.' },
+  { icon: 'briefcase', title: 'Подходящие профессии', desc: 'Твой профессиональный образ и подходящие профессии. Кто ты в работе и какие профессии тебе подойдут больше всего.' },
+  { icon: 'route', title: 'План действий', desc: 'План на 3–6 месяцев. Конкретные шаги: что изучить, что попробовать и куда двигаться.' },
+  { icon: 'document', title: 'Подробный отчёт', desc: 'Все результаты в одном отчёте. Его можно сохранить в PDF через печать браузера и вернуться к нему позже.' },
+]
 
 export default function Dashboard() {
   const navigate = useNavigate()
   const menuRef = useRef(null)
+  const sidebarRef = useRef(null)
+  const sidebarToggleRef = useRef(null)
   const [completed, setCompleted] = useState([])
   const [profile, setProfile] = useState({})
   const [results, setResults] = useState({})
   const [blockModal, setBlockModal] = useState(null)
-  const [pct, setPct] = useState(0)
+  const pct = Math.round(completed.length / BLOCKS.length * 100)
   const [me, setMe] = useState({ name: '', phone: '', role: '', avatar_url: '' })
   const [userLoaded, setUserLoaded] = useState(false)
   const [menuOpen, setMenuOpen] = useState(false)
+  const [menuHost, setMenuHost] = useState(null)
   const [sidebarOpen, setSidebarOpen] = useState(false)
+  const [isAdmin, setIsAdmin] = useState(false)
   const [tourOpen, setTourOpen] = useState(false)
   const [consultOpen, setConsultOpen] = useState(false)
   const [consultForm, setConsultForm] = useState({ name: '', contact: '', message: '' })
   const [consultBusy, setConsultBusy] = useState(false)
   const [consultErr, setConsultErr] = useState('')
   const [consultSent, setConsultSent] = useState(false)
+  const consultDialogRef = useRef(null)
+  const tourDialogRef = useRef(null)
+  useModal({ open: consultOpen, dialogRef: consultDialogRef, onClose: () => setConsultOpen(false) })
+  useModal({ open: tourOpen, dialogRef: tourDialogRef, onClose: () => setTourOpen(false) })
 
   function openConsult() {
     setConsultForm({ name: me.name || '', contact: me.phone || '', message: '' })
@@ -67,27 +103,27 @@ export default function Dashboard() {
 
   async function handleLogout(e) {
     e.preventDefault()
+    setSidebarOpen(false)
     const ok = await confirmDialog({ title: 'Выход', message: 'Выйти из личного кабинета?', confirmText: 'Выйти', danger: true })
     if (ok) doLogout().finally(() => navigate('/'))
   }
 
   function handleCookieSettings(e) {
     e.preventDefault()
-    alertDialog({ title: 'Cookie', message: 'CareerPulse использует только технические cookie для работы сайта и входа. Отключить их можно в настройках браузера (раздел «Конфиденциальность»), но тогда вход в кабинет работать не будет.' })
+    alertDialog({ title: 'Cookie', message: 'Пульс Карьеры использует только технические cookie для работы сайта и входа. Отключить их можно в настройках браузера (раздел «Конфиденциальность»), но тогда вход в кабинет работать не будет.' })
   }
 
   // Минимум для консультации: блоки 1, 2, 3, 4, 10
   const consultMissing = [1, 2, 3, 4, 10].filter(n => !completed.includes(n))
+  const nextBlock = BLOCKS.find(block => !completed.includes(block.n))?.n || 1
   const consultReady = consultMissing.length === 0
 
   // Фото наставника: положи файл в frontend/public/mentor-nikita.jpg.
   // Если файла нет — img не загрузится и останутся инициалы «НС».
   const mentorPhoto = import.meta.env.BASE_URL + 'mentor-nikita.jpg'
 
-  // ФИО хранится как «Фамилия Имя [Отчество]» → имя = 2-е слово
-  const parts = (me.name || '').trim().split(/\s+/).filter(Boolean)
-  const family = parts[0] || ''
-  const given = parts[1] || parts[0] || 'Пользователь'
+  const fallbackName = !me.name || me.name === 'Пользователь' ? profile.context?.name : ''
+  const { given, family } = greetingName(me, fallbackName)
   const initials = ((given[0] || '') + (family && family !== given ? family[0] : '')).toUpperCase() || 'ИИ'
   const sbUsername = given + (family && family !== given ? ' ' + family[0] + '.' : '')
   // Пока профиль грузится — нейтральное «…», а не захардкоженная роль (иначе родитель на миг видит «Специалист»)
@@ -99,21 +135,58 @@ export default function Dashboard() {
     CP.getAllResults().then((r) => { if (progAlive) setResults(r || {}) })
     CP.getProgress().then((p) => {
       if (!progAlive) return
-      setCompleted(p.completed || [])
-      setPct(p.pct || 0)
+      const saved = new Set((p.completed || []).map(Number))
+      setCompleted(BLOCKS.filter(block => saved.has(block.n)).map(block => block.n))
     })
     return () => { progAlive = false }
   }, [])
 
   useEffect(() => {
     let alive = true
+    checkIsAdmin().then(value => { if (alive) setIsAdmin(value) }).catch(() => {})
     getCurrentUser().then((u) => {
       if (!alive || !u) return
-      setMe({ name: u.name || '', phone: u.phone || '', role: u.role || '', avatar_url: u.avatar_url || '' })
+      setMe({ name: u.name || '', first_name: u.first_name || '', given_name: u.given_name || '', phone: u.phone || '', role: u.role || '', avatar_url: u.avatar_url || '' })
       setUserLoaded(true)
     })
     return () => { alive = false }
   }, [])
+
+  useEffect(() => {
+    setMenuHost(document.getElementById('site-menu-slot'))
+  }, [])
+
+  useEffect(() => { if (!sidebarOpen) setMenuOpen(false) }, [sidebarOpen])
+
+  useEffect(() => {
+    if (!sidebarOpen) return
+    const sidebar = sidebarRef.current
+    if (!sidebar) return
+    const previousOverflow = document.body.style.overflow
+    const previousHtmlOverflow = document.documentElement.style.overflow
+    const appRoot = document.getElementById('root')
+    const wasInert = appRoot?.inert
+    document.body.style.overflow = 'hidden'
+    document.documentElement.style.overflow = 'hidden'
+    if (appRoot) appRoot.inert = true
+    const focusables = () => [...sidebar.querySelectorAll('a[href], button:not(:disabled)')].filter(el => el.getClientRects().length)
+    sidebar.querySelector('.dashboard-nav-close')?.focus({ preventScroll: true })
+    const onKey = event => {
+      if (event.key === 'Escape') { event.preventDefault(); setSidebarOpen(false); return }
+      if (event.key !== 'Tab') return
+      const items = focusables(), first = items[0], last = items.at(-1)
+      if (event.shiftKey && document.activeElement === first) { event.preventDefault(); last?.focus() }
+      else if (!event.shiftKey && document.activeElement === last) { event.preventDefault(); first?.focus() }
+    }
+    window.addEventListener('keydown', onKey)
+    return () => {
+      document.body.style.overflow = previousOverflow
+      document.documentElement.style.overflow = previousHtmlOverflow
+      if (appRoot) appRoot.inert = wasInert
+      window.removeEventListener('keydown', onKey)
+      sidebarToggleRef.current?.focus({ preventScroll: true })
+    }
+  }, [sidebarOpen])
 
   // Закрыть выпадающее меню пользователя по клику вне его
   useEffect(() => {
@@ -151,14 +224,14 @@ export default function Dashboard() {
       case 2: return p.career_archetype || s.career_archetype || (s.profile_clarity != null ? `Ясность профиля ${s.profile_clarity}%` : 'Склонности определены')
       case 3: return p.values_archetype || s.values_archetype || 'Ценностный профиль собран'
       case 4: return p.personality_archetype || s.personality_archetype || s.archetype || 'Тип личности определён'
-      case 5: return p.cognitive_archetype || s.cognitive_archetype || s.archetype || 'Когнитивный профиль готов'
+      case 5: return p.cognitive_archetype || s.cognitive_archetype || s.archetype || 'Результат о мышлении готов'
       case 6: {
         const m = p.career_maturity ?? s.careerMaturity
-        return m != null ? `Зрелость ${m}%` : 'Готовность оценена'
+        return m != null ? `Готовность к выбору ${m}/100` : 'Готовность оценена'
       }
       case 7: {
         const se = p.se_general ?? s.se_general
-        return se != null ? `Уверенность ${se}/100` : 'Самоэффективность оценена'
+        return se != null ? `Уверенность ${se}/100` : 'Уверенность оценена'
       }
       case 8: {
         const c = p.career_clarity ?? s.career_clarity
@@ -176,28 +249,39 @@ export default function Dashboard() {
   }
 
   return (
-    <div className="cp-dashboard">
+    <div className="cp-dashboard dashboard-workspace dashboard-workspace--nav-closed">
 
       {/* ── SIDEBAR ── */}
-      <aside className={'sidebar' + (sidebarOpen ? ' open' : '')} id="sidebar">
+      {menuHost && createPortal(<button ref={sidebarToggleRef} className="dashboard-menu-toggle" aria-label="Меню кабинета" aria-controls={sidebarOpen ? 'dashboard-sidebar' : undefined} aria-expanded={sidebarOpen} onClick={() => setSidebarOpen(o => !o)}><Icon name="menu" size={20}/></button>, menuHost)}
+      {sidebarOpen && createPortal(<div className="cp-dashboard dashboard-drawer">
+      <div className="dashboard-drawer__backdrop" onClick={() => setSidebarOpen(false)} aria-hidden="true" />
+      <aside ref={sidebarRef} className="sidebar open navigation-panel" id="dashboard-sidebar" aria-label="Навигация личного кабинета" role="dialog" aria-modal="true" tabIndex={-1} onClick={event => { if (event.target.closest('a')) setSidebarOpen(false) }}>
+        <div className="dashboard-drawer__header">
         <Link to="/" className="sb-logo" style={{textDecoration:'none'}}>
-          <div className="sb-logo-mark"><BoltIcon /></div>
-          <div className="sb-logo-text">CAREER<span>PULSE</span></div>
+          <div className="sb-logo-mark"><BrandMark size={24} /></div>
+          <div className="sb-logo-text">Пульс<span> Карьеры</span></div>
         </Link>
 
+        <button className="dashboard-nav-close" aria-label="Закрыть меню кабинета" onClick={() => setSidebarOpen(false)}><Icon name="close" size={20} /></button>
+        </div>
+        <nav className="dashboard-drawer__links" aria-label="Разделы кабинета">
+        <DrawerJourney completed={completed} />
         <div className="sb-section">Главное</div>
-        <Link to="/dashboard" className="sb-item active"><span className="icon">📊</span> Дашборд</Link>
-        <Link to="/diagnostic" className="sb-item"><span className="icon">🧠</span> Результаты диагностики</Link>
-        <Link to="/roadmap" className="sb-item"><span className="icon">🗺️</span> Карьерный маршрут</Link>
-        <Link to="/atlas" className="sb-item"><span className="icon">📚</span> Атлас профессий</Link>
+        <Link to="/dashboard" className="sb-item active nav-panel-item" aria-current="page"><span className="icon nav-panel-icon"><IconText text={"📊"} /></span> Мой кабинет</Link>
+        <Link to="/test" className="sb-item nav-panel-item"><span className="icon nav-panel-icon"><Icon name="clipboard" size={20} /></span> Пройти диагностику</Link>
+        <Link to="/diagnostic" className="sb-item nav-panel-item"><span className="icon nav-panel-icon"><IconText text={"🧠"} /></span> Результаты диагностики</Link>
+        <Link to="/roadmap" className="sb-item nav-panel-item"><span className="icon nav-panel-icon"><IconText text={"🗺️"} /></span> Карьерный маршрут</Link>
+        <Link to="/atlas" className="sb-item nav-panel-item"><span className="icon nav-panel-icon"><IconText text={"📚"} /></span> Атлас профессий</Link>
 
         <div className="sb-section">Работа</div>
-        <Link to="/dashboard" className="sb-item"><span className="icon">📅</span> Мои встречи <span className="sb-badge">2</span></Link>
-        <Link to="/dashboard" className="sb-item"><span className="icon">🔔</span> Уведомления</Link>
-        <Link to="/profile" className="sb-item"><span className="icon">⚙️</span> Профиль</Link>
+        <Link to="/dashboard" className="sb-item nav-panel-item"><span className="icon nav-panel-icon"><IconText text={"📅"} /></span> Мои встречи</Link>
+        <Link to="/dashboard" className="sb-item nav-panel-item"><span className="icon nav-panel-icon"><IconText text={"🔔"} /></span> Уведомления</Link>
+        <Link to="/profile" className="sb-item nav-panel-item"><span className="icon nav-panel-icon"><IconText text={"⚙️"} /></span> Профиль</Link>
+        {isAdmin && <Link to="/admin" className="sb-item nav-panel-item"><span className="icon nav-panel-icon"><Icon name="shield" size={20} /></span> Админ-панель</Link>}
 
+        </nav>
         <div className="sb-user" style={{position:'relative'}} ref={menuRef}>
-          <div className="sb-user-btn" style={{display:'flex',alignItems:'center',gap:'10px',cursor:'pointer',flex:'1',padding:'4px',borderRadius:'8px',transition:'background .2s'}}
+          <button type="button" className="sb-user-btn" aria-label="Меню пользователя" aria-expanded={menuOpen}
             onClick={() => setMenuOpen(o => !o)}>
             <div className="sb-av" style={me.avatar_url ? { backgroundImage: `url(${me.avatar_url})`, backgroundSize: 'cover', backgroundPosition: 'center' } : undefined}>
               {me.avatar_url ? '' : initials}
@@ -206,104 +290,64 @@ export default function Dashboard() {
               <div className="sb-name">{sbUsername}</div>
               <div className="sb-role">{roleLabel}</div>
             </div>
-            <div style={{fontSize:'10px',color:'var(--ghost)',transition:'transform .2s', transform: menuOpen ? 'rotate(180deg)' : ''}}>▲</div>
-          </div>
+            <div style={{fontSize:'10px',color:'var(--ghost)',transition:'transform .2s', transform: menuOpen ? 'rotate(180deg)' : ''}}><IconText text={"▲"} /></div>
+          </button>
           <div className={'sb-user-menu' + (menuOpen ? ' show' : '')}>
-            <Link to="/profile" className="sum-item"><span>⚙️</span> Настройки профиля</Link>
-            <Link to="/legal/privacy" className="sum-item" target="_blank"><span>🔒</span> Конфиденциальность</Link>
-            <Link to="/legal" className="sum-item" target="_blank"><span>📋</span> Правовые документы</Link>
+            <Link to="/profile" className="sum-item"><span><IconText text={"⚙️"} /></span> Настройки профиля</Link>
+            <Link to="/legal/privacy" className="sum-item" target="_blank"><span><IconText text={"🔒"} /></span> Конфиденциальность</Link>
+            <Link to="/legal" className="sum-item" target="_blank"><span><IconText text={"📋"} /></span> Правовые документы</Link>
             <div className="sum-divider"></div>
-            <Link to="/" className="sum-item"><span>🏠</span> На главную сайта</Link>
+            <Link to="/" className="sum-item"><span><IconText text={"🏠"} /></span> На главную сайта</Link>
             <div className="sum-divider"></div>
-            <a href="#" className="sum-item sum-danger" onClick={handleLogout}><span>🚪</span> Выйти из кабинета</a>
+            <a href="#" className="sum-item sum-danger" onClick={handleLogout}><span><IconText text={"🚪"} /></span> Выйти из кабинета</a>
           </div>
         </div>
       </aside>
+      </div>, document.body)}
 
       {/* ── MAIN ── */}
       <div className="main">
-        <div className="topbar">
-          <div className="topbar-left">
-            <button className="mobile-menu-btn" aria-label="Меню" aria-expanded={sidebarOpen} onClick={() => setSidebarOpen(o => !o)}>☰</button>
-            <div className="page-crumb">CareerPulse / <span>Дашборд диагностики</span></div>
-          </div>
-          <div className="topbar-right">
-            <button className="topbar-btn sum-danger topbar-logout-mobile" onClick={handleLogout}>🚪 Выйти</button>
-          </div>
-        </div>
-
         <div className="content">
 
           {/* ── WELCOME ── */}
+          <div className="dashboard-welcome-row">
           <div className="welcome-banner">
+            <DashboardArtwork />
             <div className="wb-text">
-              <h2>Привет, <span>{given}</span>! 👋</h2>
-              <p>Твоя профориентационная диагностика — <strong>10 блоков</strong>, {totalQ} вопросов, ~{totalTime} минут. Можно проходить частями. Каждый блок сразу добавляет слой в твой профиль.</p>
+              <div className="dashboard-eyebrow"><Icon name="sparkles" size={16} />Твой личный маршрут</div>
+              <h1>Привет, <span className="heading-accent">{given}</span>!</h1>
+              <p>Здесь ты узнаешь свои интересы и сильные стороны, изучишь профессии и составишь план, как их попробовать. Начни с вопросов о себе: <strong>10 блоков</strong>, {totalQ} вопросов, ~{totalTime} минут. Можно проходить частями и возвращаться к сохранённым ответам.</p>
+              <p className="dashboard-mobile-summary">{pct >= 100
+                ? 'Диагностика пройдена. Посмотри результаты и выбери, что попробовать дальше.'
+                : completed.length
+                  ? `Продолжи с блока ${nextBlock}. Ответы в пройденных блоках сохранены.`
+                  : 'Начни с вопросов о себе. Можно проходить по одному блоку.'}</p>
             </div>
             <div className="wb-actions">
               {pct >= 100
-                ? <Link to="/diagnostic" className="btn btn-accent">📊 Результаты диагностики</Link>
-                : <Link to="/test/1" className="btn btn-accent">🧠 {completed.length ? 'Продолжить диагностику' : 'Начать диагностику'}</Link>}
-              <button className="btn btn-outline btn-tour" onClick={() => setTourOpen(true)}>🗺️ Как это работает</button>
+                ? <Link to="/diagnostic" className="btn btn-accent"><IconText text={"📊 Результаты диагностики"} /></Link>
+                : <Link to={`/test/${nextBlock}`} className="btn btn-accent"><IconText text={"🧠 "} />{completed.length ? 'Продолжить диагностику' : 'Начать диагностику'}</Link>}
+              <button className="btn btn-outline btn-tour" onClick={() => setTourOpen(true)}><IconText text={"🗺️ Как это работает"} /></button>
             </div>
+          </div>
           </div>
 
+          <nav className="dashboard-mobile-nav" aria-label="Быстрые переходы кабинета">
+            <a href="#dashboard-tests"><Icon name="clipboard" size={19} /><span>Мои тесты</span></a>
+            <Link to="/diagnostic"><Icon name="chart" size={19} /><span>Результаты</span></Link>
+            <Link to="/roadmap"><Icon name="compass" size={19} /><span>Маршрут</span></Link>
+            <Link to="/profile"><Icon name="user" size={19} /><span>Профиль</span></Link>
+          </nav>
+
           {/* ── PROGRESS ── */}
-          <div className="progress-block">
-            <div className="pb-ring-wrap">
-              <div className="pb-ring">
-                <svg className="pb-ring-svg" viewBox="0 0 100 100" aria-hidden="true">
-                  <defs>
-                    <linearGradient id="pb-grad" x1="0" y1="0" x2="1" y2="1">
-                      <stop offset="0" stopColor="var(--accent)" />
-                      <stop offset="1" stopColor="var(--violet)" />
-                    </linearGradient>
-                  </defs>
-                  <circle className="pb-ring-bg" cx="50" cy="50" r="42" />
-                  <circle
-                    className="pb-ring-fg" cx="50" cy="50" r="42"
-                    transform="rotate(-90 50 50)"
-                    style={{
-                      strokeDasharray: 263.9,
-                      strokeDashoffset: 263.9 * (1 - pct / 100),
-                      strokeLinecap: pct >= 100 ? 'butt' : 'round',
-                    }}
-                  />
-                </svg>
-                <div className="pb-ring-num">
-                  <span className="pb-ring-pct">{pct}%</span>
-                  <span className="pb-ring-sub">пройдено</span>
-                </div>
-              </div>
-              <div className="pb-steps">
-                <div className="pb-title">Прогресс профориентационной диагностики</div>
-                <ul className="pb-steplist">
-                  {[
-                    { pos: 10, label: 'Блок 1 — анкета и интересы' },
-                    { pos: 45, label: 'Блоки 2–4 — способности и ценности' },
-                    { pos: 65, label: 'Письмо в будущее — ключевой', key: true },
-                    { pos: 100, label: 'Все 10 блоков' },
-                  ].map(m => {
-                    const reached = pct >= m.pos
-                    return (
-                      <li key={m.pos} className={'pb-step' + (reached ? ' reached' : '') + (m.key ? ' key' : '')}>
-                        <span className="pb-step-tick">{reached ? '✓' : m.pos + '%'}</span>
-                        <span className="pb-step-label">{m.label}</span>
-                      </li>
-                    )
-                  })}
-                </ul>
-                <div className="pb-hint">Минимум для первой консультации — блоки 1, 2, 3, 4 + Письмо в будущее (блок 10)</div>
-              </div>
-            </div>
-          </div>
+          <DashboardProgress completed={completed} onConsult={openConsult} />
 
           {/* ── ОСИ ── */}
           <div className="axes-grid">
             {AXIS_INFO.map(ax => (
               <div key={ax.key} className="axis-card" style={{'--ax-color': ax.color}}>
-                <div className="ax-icon">{ax.icon}</div>
-                <div className="ax-key">{ax.key}</div>
+                <div className="ax-icon"><IconText text={ax.icon} /></div>
+                <h2 className="ax-key"><span className="heading-accent">{AXIS_TITLES[ax.key]}</span></h2>
                 <div className="ax-desc">{ax.desc}</div>
                 <div className="ax-blocks">блоки {ax.blocks.join(', ')}</div>
               </div>
@@ -311,9 +355,9 @@ export default function Dashboard() {
           </div>
 
           {/* ── 10 БЛОКОВ ── */}
-          <div className="blocks-section">
+          <div className="blocks-section" id="dashboard-tests">
             <div className="section-header">
-              <div className="section-title">10 блоков диагностики</div>
+              <h2 className="section-title">10 блоков диагностики</h2>
               <div className="section-sub">{totalQ} вопросов · ~{totalTime} минут · можно проходить частями</div>
             </div>
             <div className="blocks-grid">
@@ -322,25 +366,26 @@ export default function Dashboard() {
                 return (
                   <div key={blk.n} className={['block-card', done && 'block-card--done'].filter(Boolean).join(' ')}>
                     <div className="bc-top">
+                      <span className="dashboard-block-icon"><Icon name={BLOCK_ICONS[blk.n - 1]} size={24} /></span>
                       <div className="bc-num">{blk.num}</div>
-                      {blk.special && <div className="bc-star" title="Ключевой блок">★</div>}
+                      {blk.special && <div className="bc-star" title="Ключевой блок"><Icon name="star" size={17}/></div>}
                     </div>
-                    <div className="bc-title">{blk.title}</div>
+                    <h3 className="bc-title"><IconText text={blk.title} /></h3>
                     {done
-                      ? <div className="bc-result"><span className="bc-result-ico">✓</span>{blockResult(blk.n)}</div>
+                      ? <div className="bc-result"><span className="bc-result-ico"><IconText text={"✓"} /></span>{blockResult(blk.n)}</div>
                       : <div className="bc-desc">{blk.desc}</div>}
                     <div className="bc-meta">
-                      <span>📝 {blk.questions} вопросов</span>
-                      <span>⏱ ~{blk.time} мин</span>
+                      <span><IconText text={"📝 "} />{blk.questions} вопросов</span>
+                      <span><IconText text={"⏱ ~"} />{blk.time} мин</span>
                       <span style={{marginLeft:'auto',color:'var(--ghost)'}}>+{blk.weight}% профиля</span>
                     </div>
                     {done ? (
                       <div className="bc-actions">
-                        <button className="btn bc-btn bc-btn--result" onClick={() => setBlockModal(blk.n)}>📊 Результаты</button>
-                        <Link to={'/test/' + blk.n} className="btn bc-btn bc-btn--redo">↻ Заново</Link>
+                        <button className="btn bc-btn bc-btn--result" onClick={() => setBlockModal(blk.n)}><IconText text={"📊 Результаты"} /></button>
+                        <Link to={'/test/' + blk.n} className="btn bc-btn bc-btn--redo"><IconText text={"↻ Заново"} /></Link>
                       </div>
                     ) : (
-                      <Link to={'/test/' + blk.n} className="btn bc-btn bc-btn--start">Начать →</Link>
+                      <Link to={'/test/' + blk.n} className="btn bc-btn bc-btn--start"><IconText text={"Начать →"} /></Link>
                     )}
                   </div>
                 )
@@ -357,7 +402,7 @@ export default function Dashboard() {
                 <div style={{flex:'1'}}>
                   <div className="m-name">Никита Соколов</div>
                   <div className="m-spec">Профориентолог-наставник</div>
-                  <div className="m-stars">★★★★★ · 10+ лет · 2000+ консультаций</div>
+                  <div className="m-stars"><span className="ui-rating" aria-label="5 звёзд">{Array.from({length:5},(_,i)=><Icon key={i} name="star" size={11}/>)}</span> · 10+ лет · 2000+ консультаций</div>
                   <div style={{fontSize:'11px',color:'var(--ghost)',marginTop:'4px'}}>9 лет в вузах · Санкт-Петербург</div>
                 </div>
                 <button className="m-btn" onClick={openConsult}>Записаться</button>
@@ -367,20 +412,13 @@ export default function Dashboard() {
               </div>
             </div>
             <div style={{display:'flex',flexDirection:'column',gap:'14px'}}>
-              <div className="panel" style={{padding:'16px'}}>
-                <div className="panel-title">Что ты получишь по итогу</div>
-                <ul style={{listStyle:'none',display:'flex',flexDirection:'column',gap:'8px'}}>
-                  {[
-                    ['💡','Профиль Holland RIASEC (ось ХОЧУ)'],
-                    ['🧠','Личностный профиль Big Five (КТО Я)'],
-                    ['🚀','Тип интеллекта и стиль обучения (МОГУ)'],
-                    ['🎯','Карта ценностей и мотивации'],
-                    ['📍','Карьерный архетип и топ профессий'],
-                    ['🗺️','Персональный маршрут на 3–6 месяцев'],
-                    ['📄','PDF-отчёт на 20+ страниц'],
-                  ].map(([icon, text]) => (
-                    <li key={text} style={{display:'flex',gap:'8px',fontSize:'12px',color:'var(--sub)'}}>
-                      <span style={{fontSize:'14px'}}>{icon}</span><span>{text}</span>
+              <div className="panel dashboard-outcomes">
+                <h2 className="panel-title">Что ты получишь по итогу</h2>
+                <ul className="dashboard-outcomes__list">
+                  {OUTCOMES.map(({ icon, title, desc }) => (
+                    <li key={title} className="dashboard-outcomes__item">
+                      <span className="dashboard-outcomes__icon"><Icon name={icon} size={20} /></span>
+                      <div><h3>{title}</h3><p>{desc}</p></div>
                     </li>
                   ))}
                 </ul>
@@ -390,12 +428,12 @@ export default function Dashboard() {
               <div className="panel" style={{padding:'16px'}}>
                 <div className="panel-title">Активность</div>
                 <div className="activity-item" style={{padding:'8px 0',borderBottom:'none'}}>
-                  <div className="a-icon">🎉</div>
-                  <div><div className="a-text">Аккаунт создан</div><div className="a-sub">Добро пожаловать в CareerPulse</div></div>
+                  <div className="a-icon"><IconText text={"🎉"} /></div>
+                  <div><div className="a-text">Аккаунт создан</div><div className="a-sub">Добро пожаловать в Пульс Карьеры</div></div>
                   <div className="a-time">Сегодня</div>
                 </div>
                 <div className="activity-item" style={{padding:'8px 0',borderBottom:'none'}}>
-                  <div className="a-icon">📚</div>
+                  <div className="a-icon"><IconText text={"📚"} /></div>
                   <div><div className="a-text">Диагностика готова</div><div className="a-sub">10 блоков · {totalQ} вопросов доступны</div></div>
                   <div className="a-time">Сегодня</div>
                 </div>
@@ -411,10 +449,13 @@ export default function Dashboard() {
         </div>
 
         {/* ── FOOTER ── */}
+      </div>
+      <div className="dashboard-footer">
+        <svg className="dashboard-footer__wave" viewBox="0 0 1600 150" preserveAspectRatio="none" aria-hidden="true" focusable="false"><path d="M0 68C220 140 390 10 650 66S1040 135 1280 62 1480 22 1600 56V150H0Z" fill="#070529" /></svg>
         <footer className="site-footer">
           <div className="footer-grid">
             <div className="footer-brand">
-              <div className="fb-logo">CAREER<span>PULSE</span></div>
+              <div className="fb-logo"><BrandMark size={32} variant="white" />Пульс Карьеры</div>
               <p>Платформа профориентации и карьерного наставничества. Глубокая диагностика, профиль личности и живой эксперт — Никита Соколов — в одном маршруте.</p>
             </div>
             <div className="footer-col">
@@ -437,7 +478,7 @@ export default function Dashboard() {
             </div>
           </div>
           <div className="footer-bottom">
-            <div className="footer-copy">© 2026 CareerPulse · careerpulse.ru · Никита Соколов</div>
+            <div className="footer-copy">© 2026 Пульс Карьеры · careerpulse.ru · Никита Соколов</div>
             <div className="footer-legal-links">
               <Link to="/legal/privacy">Конфиденциальность</Link>
               <Link to="/legal/terms">Соглашение</Link>
@@ -448,14 +489,13 @@ export default function Dashboard() {
       </div>
 
       {/* ── DEV: быстрое заполнение тестов ── */}
-      {import.meta.env.DEV && (
+      {import.meta.env.DEV && !config.demoMode && (
         <div style={{ position: 'fixed', bottom: 16, right: 16, zIndex: 9999, display: 'flex', flexDirection: 'column', gap: 8, background: 'rgba(12,12,24,0.94)', border: '1px solid var(--violet)', borderRadius: 12, padding: 12, boxShadow: '0 8px 32px rgba(0,0,0,0.5)' }}>
           <div style={{ fontSize: 10, fontWeight: 700, letterSpacing: 1, color: 'var(--violet)', textTransform: 'uppercase', fontFamily: "'JetBrains Mono',monospace" }}>DEV · быстрый прогон</div>
           {Object.entries(DEV_PROFILES).map(([key, p]) => (
             <button key={key}
               onClick={async () => { await applyDevProfile(key); navigate('/diagnostic') }}
-              style={{ background: 'var(--violet)', color: '#fff', border: 'none', borderRadius: 8, padding: '8px 14px', fontSize: 12, fontWeight: 700, cursor: 'pointer', fontFamily: "'Golos Text',sans-serif", textAlign: 'left' }}>
-              ⚡ {p.label}
+              style={{ background: 'var(--violet)', color: '#fff', border: 'none', borderRadius: 8, padding: '8px 14px', fontSize: 12, fontWeight: 700, cursor: 'pointer', fontFamily: "'Golos Text',sans-serif", textAlign: 'left' }}><IconText text={"\n              ⚡ "} /><IconText text={p.label} />
             </button>
           ))}
           <button onClick={() => {
@@ -465,66 +505,64 @@ export default function Dashboard() {
             }
             window.location.reload()
           }}
-            style={{ background: 'transparent', color: 'var(--sub)', border: '1px solid var(--line2)', borderRadius: 8, padding: '6px 14px', fontSize: 11, fontWeight: 700, cursor: 'pointer', fontFamily: "'Golos Text',sans-serif" }}>
-            🗑 Сбросить диагностику
-          </button>
+            style={{ background: 'transparent', color: 'var(--sub)', border: '1px solid var(--line2)', borderRadius: 8, padding: '6px 14px', fontSize: 11, fontWeight: 700, cursor: 'pointer', fontFamily: "'Golos Text',sans-serif" }}><IconText text={"\n            🗑 Сбросить диагностику\n          "} /></button>
         </div>
       )}
 
       {/* ── МОДАЛ ЗАПИСИ НА КОНСУЛЬТАЦИЮ ── */}
       {consultOpen && (
-        <div className="modal-overlay show" onClick={(e) => { if (e.target === e.currentTarget) setConsultOpen(false) }}>
-          <div className="modal-box" style={{ maxWidth: 520 }}>
-            <div className="modal-head">
-              <h3>ЗАПИСЬ НА КОНСУЛЬТАЦИЮ</h3>
-              <button className="modal-close" aria-label="Закрыть" onClick={() => setConsultOpen(false)}>✕</button>
+        <div className="feedback-overlay consultation-overlay" onClick={(e) => { if (e.target === e.currentTarget) setConsultOpen(false) }}>
+          <div ref={consultDialogRef} className="feedback-chat consultation-chat" role="dialog" aria-modal="true" aria-labelledby="consult-dialog-title" tabIndex={-1}>
+            <div className="feedback-chat__header">
+              <div className="feedback-chat__mascot" aria-hidden="true"><BirdFlight greeting={1} /></div>
+              <div className="feedback-chat__eyebrow"><Icon name="message" size={15} />Личный разговор о будущем</div>
+              <h2 id="consult-dialog-title">Запись на <span>консультацию</span></h2>
+              <button className="feedback-chat__close" aria-label="Закрыть запись на консультацию" onClick={() => setConsultOpen(false)}><Icon name="close" size={20} /></button>
             </div>
-            <div className="modal-body">
-              <div className="mentor-card" style={{ marginBottom: 16 }}>
+            <div className="feedback-chat__body consultation-chat__body">
+              <div className="consultation-mentor">
                 <div className="m-av" style={{ background: 'linear-gradient(135deg,var(--violet),var(--accent))' }}>НС<img src={mentorPhoto} alt="Никита Соколов" className="m-av-img" loading="lazy" decoding="async" onError={(e) => { e.currentTarget.style.display = 'none' }} /></div>
                 <div style={{ flex: 1 }}>
                   <div className="m-name">Никита Соколов</div>
                   <div className="m-spec">Профориентолог-наставник</div>
-                  <div className="m-stars">★★★★★ · 10+ лет · 2000+ консультаций</div>
+                  <div className="m-stars"><span className="ui-rating" aria-label="5 звёзд">{Array.from({length:5},(_,i)=><Icon key={i} name="star" size={11}/>)}</span> · 10+ лет · 2000+ консультаций</div>
                 </div>
               </div>
-              <p style={{ fontSize: 14, color: 'var(--sub)', lineHeight: 1.6, marginBottom: 14 }}>
+              <p className="consultation-chat__intro">
                 Первая ознакомительная консультация — <strong style={{ color: 'var(--text)' }}>бесплатно, 30 минут</strong>. Никита разберёт твой профиль и поможет наметить карьерный маршрут.
               </p>
               <div className={'consult-status ' + (consultReady ? 'ok' : 'wait')}>
-                {consultReady
+                <IconText text={consultReady
                   ? '✅ Профиль готов к разбору — все ключевые блоки пройдены.'
-                  : `⏳ Для предварительных рекомендаций пройди ещё блоки: ${consultMissing.join(', ')} (нужны 1–4 и 10).`}
+                  : `⏳ Для предварительных рекомендаций пройди ещё блоки: ${consultMissing.join(', ')} (нужны 1–4 и 10).`} />
               </div>
 
               {consultSent ? (
-                <div className="consult-status ok" style={{ textAlign: 'center', padding: '18px 14px' }}>
-                  ✅ Заявка отправлена! Никита свяжется с тобой по указанному контакту. Если хочешь быстрее — напиши сам в Telegram ниже.
-                </div>
+                <div className="consult-status ok" style={{ textAlign: 'center', padding: '18px 14px' }}><IconText text={"\n                  ✅ Заявка отправлена! Никита свяжется с тобой по указанному контакту. Если хочешь быстрее — напиши сам в Telegram ниже.\n                "} /></div>
               ) : (
                 <>
                   <div className="consult-field">
-                    <label>Имя</label>
-                    <input className="consult-input" value={consultForm.name}
+                    <label htmlFor="consult-name">Имя</label>
+                    <input id="consult-name" autoComplete="name" className="consult-input" value={consultForm.name}
                       onChange={e => setConsultForm(f => ({ ...f, name: e.target.value }))}
                       placeholder="Как к тебе обращаться" />
                   </div>
                   <div className="consult-field">
-                    <label>Контакт для связи</label>
-                    <input className="consult-input" value={consultForm.contact}
+                    <label htmlFor="consult-contact">Контакт для связи</label>
+                    <input id="consult-contact" className="consult-input" value={consultForm.contact}
                       onChange={e => setConsultForm(f => ({ ...f, contact: e.target.value }))}
                       placeholder="Телефон, @telegram или email" />
                   </div>
                   <div className="consult-field">
-                    <label>Сообщение <span style={{ color: 'var(--ghost)' }}>(необязательно)</span></label>
-                    <textarea className="consult-textarea" rows={2} value={consultForm.message}
+                    <label htmlFor="consult-message">Сообщение <span style={{ color: 'var(--ghost)' }}>(необязательно)</span></label>
+                    <textarea id="consult-message" className="consult-textarea" rows={2} value={consultForm.message}
                       onChange={e => setConsultForm(f => ({ ...f, message: e.target.value }))}
                       placeholder="Удобное время, вопросы…" />
                   </div>
-                  {consultErr && <div className="consult-status wait" style={{ marginBottom: 12 }}>{consultErr}</div>}
-                  <button className="btn btn-accent" style={{ width: '100%', justifyContent: 'center' }}
+                  {consultErr && <div className="consult-status wait" role="alert" style={{ marginBottom: 12 }}>{consultErr}</div>}
+                  <button className="feedback-chat__submit"
                     onClick={sendConsult} disabled={consultBusy}>
-                    {consultBusy ? 'Отправляем…' : 'Отправить заявку'}
+                    <Icon name="send" size={18} />{consultBusy ? 'Отправляем…' : 'Отправить заявку'}
                   </button>
                 </>
               )}
@@ -533,7 +571,7 @@ export default function Dashboard() {
               <div className="consult-actions">
                 <a className="btn btn-outline" href="https://t.me/SokolovNYU" target="_blank" rel="noopener"><SocialIcon name="telegram" style={{ marginRight: 7, verticalAlign: '-4px' }} /> Telegram</a>
                 <a className="btn btn-outline" href="https://vk.com/sokolovnyu" target="_blank" rel="noopener"><SocialIcon name="vk" style={{ marginRight: 7, verticalAlign: '-4px' }} /> ВКонтакте</a>
-                <a className="btn btn-outline" href="mailto:SokolovNYU@mail.ru?subject=Запись%20на%20консультацию%20CareerPulse"><SocialIcon name="email" style={{ marginRight: 7, verticalAlign: '-4px' }} /> Email</a>
+                <a className="btn btn-outline" href="mailto:SokolovNYU@mail.ru?subject=Запись%20на%20консультацию%20Пульс%20Карьеры"><SocialIcon name="email" style={{ marginRight: 7, verticalAlign: '-4px' }} /> Email</a>
               </div>
             </div>
           </div>
@@ -541,11 +579,11 @@ export default function Dashboard() {
       )}
 
       {/* ── ТУР-МОДАЛ ── */}
-      <div className={'modal-overlay' + (tourOpen ? ' show' : '')} onClick={(e) => { if (e.target === e.currentTarget) setTourOpen(false) }}>
-        <div className="modal-box">
+      <div className={'modal-overlay' + (tourOpen ? ' show' : '')} aria-hidden={!tourOpen || undefined} onClick={(e) => { if (e.target === e.currentTarget) setTourOpen(false) }}>
+        <div ref={tourDialogRef} className="modal-box" role="dialog" aria-modal={tourOpen || undefined} aria-labelledby="tour-dialog-title">
           <div className="modal-head">
-            <h3>🗺️ КАК РАБОТАЕТ ДИАГНОСТИКА</h3>
-            <button className="modal-close" aria-label="Закрыть" onClick={() => setTourOpen(false)}>✕</button>
+            <h3 id="tour-dialog-title"><IconText text={"🗺️ КАК РАБОТАЕТ ДИАГНОСТИКА"} /></h3>
+            <button className="modal-close" aria-label="Закрыть" onClick={() => setTourOpen(false)}><IconText text={"✕"} /></button>
           </div>
           <div className="modal-body">
             <p style={{fontSize:'14px',color:'var(--sub)',marginBottom:'20px',lineHeight:'1.7'}}>
@@ -553,35 +591,35 @@ export default function Dashboard() {
             </p>
             <div className="tour-steps">
               <div className="tour-step">
-                <div className="ts-icon">🎯</div>
+                <div className="ts-icon"><IconText text={"🎯"} /></div>
                 <div>
                   <div className="ts-title">Что мы про тебя узнаём</div>
                   <div className="ts-desc">Тест смотрит на тебя с четырёх сторон: что тебе <strong>интересно</strong>, что у тебя <strong>получается</strong>, какой ты <strong>по характеру</strong> и в какой ты сейчас <strong>ситуации</strong>. Из этого собирается полная картина.</div>
                 </div>
               </div>
               <div className="tour-step">
-                <div className="ts-icon">📝</div>
+                <div className="ts-icon"><IconText text={"📝"} /></div>
                 <div>
                   <div className="ts-title">Начни с короткой анкеты</div>
                   <div className="ts-desc">Первый блок — анкета на 7 минут: класс, экзамены, планы, что волнует. Она подстроит все остальные блоки лично под тебя.</div>
                 </div>
               </div>
               <div className="tour-step">
-                <div className="ts-icon">💡</div>
+                <div className="ts-icon"><IconText text={"💡"} /></div>
                 <div>
                   <div className="ts-title">Главные блоки</div>
                   <div className="ts-desc">Блоки про склонности, ценности и характер дают основу профиля и первые рекомендации. После них система уже понимает, к чему ты тянешься.</div>
                 </div>
               </div>
               <div className="tour-step">
-                <div className="ts-icon">✍️</div>
+                <div className="ts-icon"><IconText text={"✍️"} /></div>
                 <div>
                   <div className="ts-title">Письмо в будущее</div>
-                  <div className="ts-desc">19 вопросов о себе сейчас и через 5 лет. Самый важный блок: ИИ читает твои ответы и видит то, что обычный тест не покажет.</div>
+                  <div className="ts-desc">19 вопросов о себе сейчас и через 5 лет. Расскажи своими словами о мечтах, переживаниях и планах — это дополнит твои результаты.</div>
                 </div>
               </div>
               <div className="tour-step">
-                <div className="ts-icon">🤝</div>
+                <div className="ts-icon"><IconText text={"🤝"} /></div>
                 <div>
                   <div className="ts-title">Встреча с наставником</div>
                   <div className="ts-desc">Когда пройдёшь основные блоки и письмо — можно записаться к наставнику. Он разберёт твой профиль и поможет составить маршрут.</div>
@@ -589,7 +627,7 @@ export default function Dashboard() {
               </div>
             </div>
             <div style={{marginTop:'20px',display:'flex',gap:'10px',flexWrap:'wrap'}}>
-              <button className="btn btn-accent" onClick={() => { setTourOpen(false); navigate('/test/1') }}>Начать с Блока 1 →</button>
+              <button className="btn btn-accent" onClick={() => { setTourOpen(false); navigate('/test/1') }}><IconText text={"Начать с Блока 1 →"} /></button>
               <button className="btn btn-outline" onClick={() => setTourOpen(false)}>Закрыть</button>
             </div>
           </div>

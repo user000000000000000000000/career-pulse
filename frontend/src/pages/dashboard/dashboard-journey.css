@@ -1,0 +1,43 @@
+/* Additions to the existing progress card and results overview. */
+.dashboard-workspace .dashboard-journey-progress {
+  margin-top: 22px;
+  padding-top: 18px;
+  border-top: 1px solid #deebfa;
+  min-width: 0;
+}
+.dashboard-workspace .dashboard-outcomes__list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 16px;
+}
+.dashboard-workspace .dashboard-outcomes__item {
+  display: grid;
+  grid-template-columns: 34px minmax(0, 1fr);
+  align-items: start;
+  gap: 11px;
+}
+.dashboard-workspace .dashboard-outcomes__icon {
+  display: grid;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  border-radius: 11px;
+  background: #edf6ff;
+  color: var(--brand-blue);
+}
+.dashboard-workspace .dashboard-outcomes__item h3 {
+  margin: 0 0 4px;
+  font: 700 13px/1.5 var(--font-body);
+  color: var(--text);
+}
+.dashboard-workspace .dashboard-outcomes__item p {
+  margin: 0;
+  font: 400 12px/1.7 var(--font-body);
+  color: var(--sub);
+}
+@media (max-width: 620px) {
+  .dashboard-workspace .dashboard-journey-progress { margin-top: 16px; padding-top: 14px; }
+  .dashboard-workspace .dashboard-outcomes__list { gap: 14px; }
+}

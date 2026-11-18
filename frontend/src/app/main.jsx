@@ -7,9 +7,17 @@ import ReactDOM from 'react-dom/client'
 import { BrowserRouter } from 'react-router-dom'
 import App from './App.jsx'
 import ErrorBoundary from './ErrorBoundary.jsx'
+import '../shared/ui/design-tokens.css'
 import './index.css'
+import '../shared/ui/design-system.css'
+import '../shared/ui/interior.css'
+import '../shared/ui/brand-ui.css'
+import '../shared/ui/motion.css'
 import '../shared/ui/print.css'
+import '../shared/ui/mobile-compact.css'
+import '../shared/ui/interior-motion.css'
 
+function mountApp() {
 ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>
     <ErrorBoundary>
@@ -19,3 +27,13 @@ ReactDOM.createRoot(document.getElementById('root')).render(
     </ErrorBoundary>
   </React.StrictMode>
 )
+}
+
+if (import.meta.env.MODE === 'demo') {
+  import('./demo/bootstrap').then(m => m.prepareDemo()).then(mountApp).catch(error => {
+    console.error('Demo initialization failed', error)
+    mountApp()
+  })
+} else {
+  mountApp()
+}

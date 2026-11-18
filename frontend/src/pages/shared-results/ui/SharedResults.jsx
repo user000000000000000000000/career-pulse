@@ -1,3 +1,5 @@
+import IconText from '../../../shared/ui/IconText.jsx'
+import Header from '../../../shared/ui/Header.jsx'
 import { useEffect, useState } from 'react'
 import BoltIcon from '../../../shared/ui/BoltIcon.jsx'
 import { useParams, Link } from 'react-router-dom'
@@ -12,7 +14,7 @@ import { usePageMeta } from '../../../shared/lib/pageMeta'
 
 export default function SharedResults() {
   const { token } = useParams()
-  usePageMeta('Результаты диагностики', 'Результаты профориентационной диагностики CareerPulse.')
+  usePageMeta('Результаты диагностики', 'Результаты профориентационной диагностики Пульс Карьеры.')
   const [state, setState] = useState({ loading: true, error: '', row: null })
 
   useEffect(() => {
@@ -25,13 +27,7 @@ export default function SharedResults() {
 
   return (
     <div className="cp-legal">
-      <nav className="legal-nav">
-        <Link to="/" className="nav-logo-link">
-          <div className="nav-logo-mark"><BoltIcon /></div>
-          <div className="nav-logo-txt">CAREER<span>PULSE</span></div>
-        </Link>
-        <Link to="/" className="nav-back-link">Пройти свою диагностику →</Link>
-      </nav>
+      <Header backTo="/" backLabel="Пройти свою диагностику →" />
       <div style={{ maxWidth: 760, margin: '0 auto', padding: '96px 16px 60px' }}>
         {state.loading
           ? <div style={{ padding: 40, textAlign: 'center', color: 'var(--ghost)' }}>Загрузка…</div>
@@ -40,7 +36,7 @@ export default function SharedResults() {
             : <>
                 <ResultsView row={state.row} professions={state.row?.diagnostic_data?.profile?.holland_scores ? matchProfessions(state.row.diagnostic_data.profile, 6) : []} />
                 <div style={{ marginTop: 28, textAlign: 'center' }}>
-                  <Link to="/" className="btn btn-accent">Пройти свою диагностику →</Link>
+                  <Link to="/" className="btn btn-accent"><IconText text={"Пройти свою диагностику →"} /></Link>
                 </div>
               </>}
       </div>

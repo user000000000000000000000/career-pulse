@@ -11,7 +11,7 @@ export function clearBlockDraft(blockNum) {
 const editDrafts = new Set()
 export function markBlockEdit(blockNum) { editDrafts.add(blockNum) }
 // Ключи позиции/фазы — их НЕ восстанавливаем в режиме правки, чтобы начать с начала.
-const POSITION_KEYS = ['step', 'qIdx', 'idx', 'pairIdx', 'phase', 'curMatIdx']
+const POSITION_KEYS = ['step', 'qIdx', 'blockIdx', 'idx', 'pairIdx', 'phase', 'curMatIdx']
 
 // Собрать черновик из СОХРАНЁННОГО результата блока (ex из CP.getBlockResult).
 // Нужно для «Изменить ответы» у блоков, пройденных до появления фичи, — тогда
@@ -31,6 +31,7 @@ export function seedDraftFromResult(blockNum, ex) {
     case 7: draft = { ans: a.likert || {}, caseAns: a.cases || [] }; break
     case 8: draft = { ans: a, openTexts: [open[0] || '', open[1] || ''] }; break
     case 9: { const { E1a, ...rest } = a; draft = { ans: rest, achieveText: E1a || '', showAchieve: !!E1a, openTexts: [open[0] || '', open[1] || ''] }; break }
+    case 10: draft = { answers: a, blockIdx: 0, qIdx: 0 }; break
     default: return
   }
   try { localStorage.setItem(STORAGE_KEYS.blockDraft(blockNum), JSON.stringify(draft)) } catch { /* ignore */ }

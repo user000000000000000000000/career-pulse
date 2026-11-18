@@ -40,7 +40,7 @@
 .atlas-card{background:var(--card);border:1px solid var(--line);border-radius:14px;
   padding:16px;cursor:pointer;transition:border-color .2s,background .2s;position:relative}
 .atlas-card:hover{border-color:rgba(var(--overlay-rgb),.18)}
-.atlas-card--open{border-color:var(--accent);background:rgba(95,150,233,.04)}
+.atlas-card--open{border-color:var(--accent);background:rgba(8,124,255,.04)}
 
 .ac-top{display:flex;justify-content:space-between;align-items:flex-start;gap:8px;margin-bottom:8px}
 .ac-category{font-size:10px;font-weight:800;letter-spacing:1px;text-transform:uppercase;

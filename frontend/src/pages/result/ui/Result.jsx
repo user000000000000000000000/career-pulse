@@ -1,3 +1,4 @@
+import IconText from '../../../shared/ui/IconText.jsx'
 import { useEffect, useState } from 'react'
 import { useLocation, useNavigate, Link } from 'react-router-dom'
 import Header from '../../../shared/ui/Header.jsx'
@@ -9,6 +10,9 @@ import { PROFESSIONS } from '../../../entities/profession'
 import { getCurrentUser } from '../../../shared/auth'
 import '../../../shared/ui/legal.css'
 import '../result.css'
+import { config } from '../../../shared/config'
+import { demoProfileRow } from '../../../shared/api'
+import { INTEREST_LABELS } from '../../../shared/lib/resultExplanation.js'
 
 export default function Result() {
   const location = useLocation()
@@ -21,6 +25,13 @@ export default function Result() {
     if (report) return
     let alive = true
     ;(async () => {
+      if (config.demoMode) {
+        const profile = demoProfileRow().diagnostic_data.profile
+        setReport(profile.ai_report || null)
+        setScores({ tech: 58, anal: 45, crea: 85, soc: 42, lead: 38, ord: 28, AN: 50, VC: 72, CR: 88, OR: 55, PT: 70, M: 3, ST: 2, FR: 5, PR: 3, HL: 4, SR: 5, DV: 5, IN: 88, SD: 55, RS: 50, CO: 70, RE: 65 })
+        setLoading(false)
+        return
+      }
       if (!isSupabaseConfigured) { setLoading(false); return }
       try {
         const user = await getCurrentUser()
@@ -57,7 +68,7 @@ export default function Result() {
     <div className="res-page">
       <div className="res-empty">
         <p style={{ marginBottom: 18 }}>Результатов пока нет — сначала пройдите диагностику.</p>
-        <Button as={Link} to="/test/1">Пройти тест →</Button>
+        <Button as={Link} to="/test/1"><IconText text={"Пройти тест →"} /></Button>
       </div>
     </div>
   )
@@ -69,7 +80,8 @@ export default function Result() {
   return wrap(
     <div className="res-page">
       <div className="res-eyebrow">Результат диагностики</div>
-      <h1 className="res-title">ВАШ КАРЬЕРНЫЙ ПРОФИЛЬ</h1>
+      <h1 className="res-title">ТВОЙ КАРЬЕРНЫЙ ПРОФИЛЬ</h1>
+      <p style={{ color: 'var(--sub)', lineHeight: 1.65 }}>Сначала прочитай сильные стороны и разбор, затем изучи профессии ниже. Результат описывает твои ответы сейчас и помогает выбрать, что попробовать дальше.</p>
 
       {/* ── Сильные стороны / Зоны роста ── */}
       <div className="res-grid">
@@ -103,6 +115,7 @@ export default function Result() {
       {/* ── Список профессий ── */}
       <Card accent style={{ marginBottom: 18 }}>
         <div className="res-card-h"><span className="dot" style={{ background: 'var(--accent)' }} />Подходящие профессии</div>
+        <p style={{ color: 'var(--sub)', fontSize: 13, lineHeight: 1.6 }}>Рекомендации из сохранённого разбора. Если указан процент, это оценка совпадения в этом отчёте, а не вероятность успеха. Сравни задачи профессии со своими интересами.</p>
         {professions.length ? professions.map((p, i) => {
           const atlas = PROFESSIONS.find(a => a.name.toLowerCase() === p.name.toLowerCase())
           return (
@@ -110,7 +123,7 @@ export default function Result() {
               <span className="res-prof__name">{p.name}</span>
               <span className="res-prof__tags">
                 {atlas ? atlas.holland.map(h => (
-                  <span key={h} className="res-prof__htag" data-h={h}>{h}</span>
+                  <span key={h} className="res-prof__htag" data-h={h} title={INTEREST_LABELS[h]}>{INTEREST_LABELS[h]}</span>
                 )) : <span className="res-prof__cat">{atlas?.category || ''}</span>}
               </span>
               {typeof p.match === 'number' && (
@@ -128,7 +141,8 @@ export default function Result() {
       </Card>
 
       <div className="res-actions">
-        <Button as={Link} to="/dashboard">← Вернуться в кабинет</Button>
+        <Button as={Link} to="/atlas" variant="ghost"><IconText text={"Изучить профессии →"} /></Button>
+        <Button as={Link} to="/dashboard"><IconText text={"← Вернуться в кабинет"} /></Button>
         <Button variant="ghost" onClick={() => navigate('/test/1')}>Пройти заново</Button>
       </div>
     </div>

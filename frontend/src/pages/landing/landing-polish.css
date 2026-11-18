@@ -1,0 +1,100 @@
+/* Detail pass: the established hero geometry and source artwork stay intact. */
+.cp-lv2 .lv-scene { animation: none; }
+.cp-lv2 .lv-scene__float picture { display: contents; }
+.cp-lv2 .lv-scene__float {
+  position: absolute; inset: -12px;
+  animation: landing-scene-hover 6.8s cubic-bezier(.45,0,.55,1) infinite;
+}
+.cp-lv2 .lv-scene__float img {
+  display: block; transform-origin: 54% 66%;
+  animation: landing-scene-sway 11.3s ease-in-out -2.4s infinite;
+}
+@keyframes landing-scene-hover {
+  0%,100% { transform: translate3d(0, 1px, 0); }
+  28% { transform: translate3d(1px, -6px, 0); }
+  56% { transform: translate3d(0, -9px, 0); }
+  80% { transform: translate3d(-1px, -3px, 0); }
+}
+@keyframes landing-scene-sway {
+  0%,100% { transform: rotate(-.12deg); }
+  42% { transform: rotate(.18deg); }
+  72% { transform: rotate(.04deg); }
+}
+.landing-accents { position: absolute; inset: 0; overflow: hidden; pointer-events: none; user-select: none; z-index: 0; }
+.landing-accents__star { position: absolute; width: 22px; height: 22px; color: var(--brand-blue); left: 2.4%; top: 28%; opacity: .7; }
+.landing-accents__trail { position: absolute; width: 56px; height: 100px; right: 2%; top: 48%; color: var(--brand-blue); opacity: .5; }
+.landing-accents__glow { position: absolute; width: 160px; height: 200px; left: -80px; bottom: 12%; border-radius: 50%; background: radial-gradient(ellipse, #b8dcff66, transparent 70%); }
+.landing-accents__diamond { position: absolute; right: 2.6%; top: 18%; width: 10px; height: 10px; border: 1px solid var(--brand-blue); border-radius: 3px; transform: rotate(25deg); opacity: .6; }
+.landing-accents--hero .landing-accents__star { top: 24%; animation: landing-star-breathe 8.7s ease-in-out -1.9s infinite; }
+.landing-accents--hero .landing-accents__trail { display: none; }
+.landing-accents--hero .landing-accents__diamond { right: auto; left: 3%; top: 61%; }
+.landing-accents--steps .landing-accents__star { top: 58%; left: auto; right: 2.4%; width: 30px; height: 30px; opacity: .45; }
+.landing-accents--steps .landing-accents__trail { right: auto; left: 1.3%; top: 32%; }
+.landing-accents--steps .landing-accents__diamond { top: 83%; }
+.landing-accents--professions .landing-accents__star { top: 21%; }
+.landing-accents--professions .landing-accents__trail { top: 70%; }
+.landing-accents--about .landing-accents__star { left: auto; right: 2.4%; top: 14%; }
+.landing-accents--about .landing-accents__trail { right: auto; left: 1.3%; top: 60%; }
+.cp-lv2 .lv-spark { pointer-events: none; }
+.cp-lv2 .lv-spark-two { animation: landing-star-breathe 10.1s ease-in-out -4.3s infinite; }
+@keyframes landing-star-breathe {
+  0%,100% { transform: translateY(0) scale(1); }
+  46% { transform: translateY(-4px) scale(1.09); }
+  74% { transform: translateY(-1px) scale(1.02); }
+}
+.cp-lv2[data-scene-awake='false'] :is(.lv-scene__float, .lv-scene__float img, .lv-spark, .landing-accents--hero .landing-accents__star) { animation-play-state: paused; }
+
+/* A solid blue closing section flows into navy waves, with no pale wash. */
+.cp-lv2 .lv-ctaband.lv-ctaband--solid { background: var(--brand-blue); }
+.cp-lv2 .lv-ctaband > :is(.blob, .grain, .ring) { display: none; }
+.cp-lv2 :is(.lv-ctaband, .lv-foot) .section-decor__orb { display: none; }
+@media (max-width: 1270px) {
+  .landing-accents__trail { width: 32px; opacity: .3; }
+}
+@media (max-width: 620px) {
+  .landing-accents__trail, .landing-accents__diamond { display: none; }
+  .landing-accents__star { width: 13px; height: 13px; left: 5px; opacity: .35; }
+  .landing-accents--hero .landing-accents__star { top: 65%; left: auto; right: 15px; }
+  .landing-accents--steps .landing-accents__star { width: 16px; height: 16px; right: 4px; }
+  .landing-accents--about .landing-accents__star { right: 4px; }
+  .landing-accents__glow { width: 90px; left: -65px; opacity: .5; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .cp-lv2 :is(.lv-scene__float, .lv-scene__float img, .lv-spark, .landing-accents__star) { animation: none; transform: none; }
+}
+@media print {
+  .landing-accents { display: none; }
+  .cp-lv2 :is(.lv-scene__float, .lv-scene__float img) { animation: none; transform: none; }
+}
+
+/* Phone-only spacing: keep the existing desktop and tablet layout intact. */
+@media (max-width: 620px) {
+  .cp-lv2 .lv-hero { display: flex; flex-direction: column; min-height: 0; }
+  .cp-lv2 .lv-hero-inner {
+    order: 0; flex: none; width: 100%; min-height: 0;
+    padding: calc(var(--site-header-clearance, 86px) - 8px) 24px 0;
+  }
+  .cp-lv2 .lv-hero-left { gap: 14px; }
+  .cp-lv2 .lv-badge { font-size: 10.5px; line-height: 1.35; padding: 8px 10px; }
+  .cp-lv2 .lv-badge > span { font-size: 22px; }
+  .cp-lv2 .lv-hero-title { font-size: clamp(34px, 9.2vw, 48px); letter-spacing: -2.2px; }
+  .cp-lv2 .lv-hero-title .accent { letter-spacing: -3px; }
+  .cp-lv2 .lv-hero-sub { font-size: 15.5px; line-height: 1.4; }
+  .cp-lv2 .lv-hero-actions { flex-direction: column; align-items: flex-start; gap: 12px; }
+  .cp-lv2 .lv-btn-primary { font-size: 15px; padding: 15px 23px; }
+  .cp-lv2 .lv-hero-note { align-self: flex-start; font-size: 12px; text-align: left; }
+  .cp-lv2 .lv-scene {
+    order: 1; flex: none; position: relative; inset: auto;
+    width: 100%; height: clamp(300px, 100vw, 410px); margin-top: 14px;
+  }
+  .cp-lv2 .lv-how { padding-top: 18px; padding-bottom: 56px; }
+  .cp-lv2 .lv-how-inner { gap: 28px; }
+  .cp-lv2 .lv-h2 { font-size: 26px; }
+  .cp-lv2 .lv-lead { font-size: 15px; }
+  .cp-lv2 .lv-eyebrow { font-size: 13px; }
+  .cp-lv2 .lv-vstep-card b { font-size: 16px; }
+  .cp-lv2 .lv-vstep-card p { font-size: 13.5px; }
+  .cp-lv2 :is(.lv-prof-card, .lv-mcard, .lv-diff, .lv-infocard) b { font-size: 15px; }
+  .cp-lv2 .lv-ctaband h2 { font-size: 25px; }
+  .cp-lv2 .lv-ctaband p { font-size: 15px; }
+}

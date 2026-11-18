@@ -1,3 +1,4 @@
+import IconText from '../../../shared/ui/IconText.jsx'
 import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { listInstitutions } from '../../../shared/api'
@@ -9,7 +10,7 @@ const TYPES = [['', 'Все'], ['university', 'Вузы'], ['college', 'Колл
 const typeLabel = (t) => (t === 'college' ? 'колледж' : 'вуз')
 
 export default function VuzCatalog() {
-  usePageMeta('Вузы России — каталог вузов и колледжей', 'Каталог вузов и колледжей России: поиск по названию, фильтр по городу и типу. Узнай, куда поступить, и пройди бесплатную профориентацию на CareerPulse.')
+  usePageMeta('Вузы России — каталог вузов и колледжей', 'Каталог вузов и колледжей России: поиск по названию, фильтр по городу и типу. Узнай, куда поступить, и пройди бесплатную профориентацию на Пульс Карьеры.')
   const navigate = useNavigate()
   const [q, setQ] = useState('')
   const [city, setCity] = useState('')
@@ -59,16 +60,16 @@ export default function VuzCatalog() {
                     <div className="cat-card-h">{v.name}</div>
                     {v.full_name && v.full_name !== v.name && <p className="cat-card-p">{v.full_name}</p>}
                     <div className="cat-card-meta">
-                      {v.city && <span>📍 {v.city}{v.region && v.region !== v.city ? `, ${v.region}` : ''}</span>}
+                      {v.city && <span><IconText text={"📍 "} />{v.city}{v.region && v.region !== v.city ? `, ${v.region}` : ''}</span>}
                     </div>
-                    {v.website && <a href={v.website} target="_blank" rel="noreferrer">Сайт вуза →</a>}
+                    {v.website && <a href={v.website} target="_blank" rel="noreferrer"><IconText text={"Сайт вуза →"} /></a>}
                   </div>
                 ))}
               </div>
             </>
           )}
 
-          <div className="cat-cta"><a href="/proba" onClick={(e) => { e.preventDefault(); navigate('/proba') }}>Подобрать профессию — бесплатный тест →</a></div>
+          <div className="cat-cta"><a href="/proba" onClick={(e) => { e.preventDefault(); navigate('/proba') }}><IconText text={"Подобрать профессию — бесплатный тест →"} /></a></div>
         </div>
       </div>
     </div>
