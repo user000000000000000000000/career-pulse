@@ -11,7 +11,7 @@ const anonKey = config.supabaseAnonKey
  * сразу после `npm install && npm run dev`.
  */
 export const isSupabaseConfigured = Boolean(
-  url && anonKey && !url.includes('ваш-проект')
+  !config.demoMode && url && anonKey && !url.includes('ваш-проект')
 )
 
 export const supabase = isSupabaseConfigured

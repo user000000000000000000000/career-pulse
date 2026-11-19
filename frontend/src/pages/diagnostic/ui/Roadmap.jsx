@@ -1,3 +1,8 @@
+import Header from '../../../shared/ui/Header.jsx'
+import Icon from '../../../shared/ui/Icon.jsx'
+import IconText from '../../../shared/ui/IconText.jsx'
+import JourneyMascot from '../../../shared/ui/JourneyMascot.jsx'
+import '../roadmap-journey.css'
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { CP } from '../../../shared/api'
@@ -9,6 +14,37 @@ import { HOLLAND } from '../../../shared/lib/blockRings'
 import BoltIcon from '../../../shared/ui/BoltIcon.jsx'
 import '../diagnostic.css'
 
+function stepIcon(title = '') {
+  if (/ЕГЭ|экзамен|предмет/i.test(title)) return 'calendar'
+  if (/проект|портфолио/i.test(title)) return 'document'
+  if (/навык|практик|курс/i.test(title)) return 'bulb'
+  if (/поступ|профиль/i.test(title)) return 'graduation'
+  if (/стажиров|знаком|нетворк/i.test(title)) return 'users'
+  if (/работ|входи/i.test(title)) return 'briefcase'
+  return 'search'
+}
+
+function RoadmapShell({ children }) {
+  return <div className="cp-diag roadmap-journey">
+    <Header backTo="/diagnostic" backLabel="← К результатам" />
+    <div className="container" style={{ maxWidth: 980 }}>{children}</div>
+  </div>
+}
+
+function JourneyHeader({ title, children }) {
+  return <section className="roadmap-journey__hero">
+    <div className="roadmap-journey__copy">
+      <div className="block-num"><Icon name="compass" size={16} />КАРЬЕРНЫЙ МАРШРУТ</div>
+      <h1 className="block-title">{title}</h1>
+      {children}
+    </div>
+    <div className="roadmap-journey__guide" aria-hidden="true">
+      <JourneyMascot num={2} variant="search" />
+      <span className="roadmap-journey__guide-note"><Icon name="route" size={16} />Шаг за шагом</span>
+    </div>
+  </section>
+}
+
 export default function Roadmap() {
   const navigate = useNavigate()
   const [profile, setProfile] = useState(null)
@@ -17,6 +53,8 @@ export default function Roadmap() {
   const [chosen, setChosen] = useState([])      // выбранные (макс 2)
   const [roadmap, setRoadmap] = useState(null)
   const [loading, setLoading] = useState(true)  // загрузка профиля/профессий
+  const [savingStep, setSavingStep] = useState(false)
+  const [saveError, setSaveError] = useState('')
   const [building, setBuilding] = useState(false)
 
   useEffect(() => {
@@ -74,15 +112,22 @@ export default function Roadmap() {
     CP.updateProfile({ roadmap: null })
   }
 
-  const Shell = ({ children }) => (
-    <div className="cp-diag">
-      <div className="topbar">
-        <div className="tb-left"><div className="tb-logo" onClick={() => navigate('/dashboard')}><div className="tb-logo-mark"><BoltIcon /></div>CAREER<span>PULSE</span></div><div className="tb-divider"></div><div className="tb-block">Карьерный маршрут</div></div>
-        <button className="tb-btn" onClick={() => navigate('/diagnostic')}>← К результатам</button>
-      </div>
-      <div className="container" style={{ maxWidth: 980 }}>{children}</div>
-    </div>
-  )
+  async function toggleStep(index) {
+    if (savingStep) return
+    setSavingStep(true)
+    setSaveError('')
+    const updated = { ...roadmap, steps: roadmap.steps.map((step, i) => i === index ? { ...step, completed: step.completed !== true } : step) }
+    try {
+      await CP.updateProfile({ roadmap: updated })
+      setRoadmap(updated)
+    } catch {
+      setSaveError('Не удалось сохранить отметку. Попробуй ещё раз.')
+    } finally {
+      setSavingStep(false)
+    }
+  }
+
+  const Shell = RoadmapShell
 
   if (loading) return <Shell><div className="block-title" style={{ marginTop: 40 }}>ЗАГРУЖАЕМ…</div></Shell>
 
@@ -95,6 +140,63 @@ export default function Roadmap() {
   }
 
   // ── Готовый маршрут (гибрид: мост «Ты → Профессия» + интерактивный чеклист) ──
+  if (roadmap && Array.isArray(roadmap.steps) && roadmap.steps.length > 0) {
+    const done = roadmap.steps.filter(step => step.completed === true).length
+    const nextStep = roadmap.steps.findIndex(step => step.completed !== true)
+    return <RoadmapShell>
+      <JourneyHeader title="ТВОЙ ПУТЬ">
+        {roadmap.goal && <p className="block-desc">{roadmap.goal}</p>}
+        <div className="roadmap-journey__professions"><Icon name="flag" size={17} /><span>{chosen.join(' · ')}</span></div>
+      </JourneyHeader>
+
+      {roadmap.intro && (
+        <div className="r-card" style={{ borderColor: 'var(--brand-border)', background: 'var(--gradient-hero)', marginBottom: 20 }}>
+          <div className="r-label" style={{ color: '#087cff', marginBottom: 8 }}><Icon name="compass" size={17} /> Твой ориентир</div>
+          <div style={{ fontSize: 14, lineHeight: 1.8 }}>{roadmap.intro}</div>
+        </div>
+      )}
+
+      <div className="roadmap-journey__progress">
+        <div><b>Твои шаги к профессии</b><span aria-live="polite">Пройдено {done} из {roadmap.steps.length}</span></div>
+        <progress max={roadmap.steps.length || 1} value={done} aria-label="Завершённые шаги карьерного маршрута" />
+        <p>Отмечай то, что уже получилось. Можно двигаться в своём темпе.</p>
+      </div>
+      {saveError && <p className="roadmap-journey__error" role="alert">{saveError}</p>}
+      <ol className="roadmap-journey__steps" aria-label="Этапы твоего карьерного маршрута">
+        {roadmap.steps.map((s, i) => {
+          const completed = s.completed === true
+          return <li className={`roadmap-journey__step${completed ? ' is-complete' : ''}${i === nextStep ? ' is-next' : ''}`} key={i}>
+            <span className="roadmap-journey__node" aria-hidden="true">{completed ? <Icon name="check" size={19} /> : s.n || i + 1}</span>
+            <article className="roadmap-journey__card">
+              <span className="roadmap-journey__illustration" aria-hidden="true"><Icon name={stepIcon(s.title)} size={30} /></span>
+              <div className="roadmap-journey__step-copy">
+                <div className="roadmap-journey__timing">{s.horizon}{i === nextStep && <span>Ближайший шаг</span>}</div>
+                <h2><IconText text={s.title} /></h2>
+                <p>{s.desc}</p>
+              </div>
+              <button type="button" className="roadmap-journey__complete" aria-pressed={completed} aria-label={`${completed ? 'Снять отметку' : 'Отметить пройденным'}: ${s.title}`} disabled={savingStep} onClick={() => toggleStep(i)}>
+                <span className="roadmap-journey__checkbox" aria-hidden="true">{completed && <Icon name="check" size={15} />}</span>{completed ? 'Пройдено' : 'Отметить'}
+              </button>
+            </article>
+          </li>
+        })}
+      </ol>
+      <div className="roadmap-journey__destination"><Icon name={done === roadmap.steps.length ? 'award' : 'flag'} size={21} /><span>{done === roadmap.steps.length ? 'Все шаги отмечены. Посмотри, какой путь уже позади!' : 'Твоя профессия становится ближе с каждым шагом'}</span></div>
+
+      {roadmap.skills?.length > 0 && (
+        <div style={{ marginTop: 24 }}>
+          <div className="r-label" style={{ textAlign: 'center', marginBottom: 10 }}>Навыки, которые пригодятся в пути</div>
+          <div className="rm-skills">{roadmap.skills.map((sk, i) => <span key={i} className="rm-skill">{sk}</span>)}</div>
+        </div>
+      )}
+
+      <div className="nav-row" style={{ marginTop: 28 }}>
+        <button className="btn btn-ghost" disabled={savingStep} onClick={reset}><IconText text={"← Выбрать другие профессии"} /></button>
+        <button className="btn btn-accent" onClick={() => navigate('/dashboard')}>В кабинет</button>
+      </div>
+    </RoadmapShell>
+  }
+
   if (roadmap) {
     const picked = roadmap.chosen || chosen
     const ctx = profile?.context || {}
@@ -119,11 +221,7 @@ export default function Roadmap() {
     const pct = total ? Math.round((done / total) * 100) : 0
 
     return <Shell>
-      <div className="rm-head">
-        <div className="rm-eyebrow">🌉 Твой маршрут</div>
-        <div className="block-title" style={{ margin: '6px 0' }}>ОТ ТЕБЯ СЕЙЧАС — К ЦЕЛИ</div>
-        <p className="rm-intro">{INTRO}</p>
-      </div>
+      <JourneyHeader title="ОТ ТЕБЯ СЕЙЧАС — К ЦЕЛИ"><p className="rm-intro">{INTRO}</p></JourneyHeader>
 
       <div className="rm-poles">
         <div className="rm-pole now">
@@ -175,7 +273,7 @@ export default function Roadmap() {
                   return (
                     <label className={'rm-task' + (checked[key] ? ' on' : '')} key={ti}>
                       <span className="rm-cb">✓</span>
-                      <input type="checkbox" checked={!!checked[key]} onChange={() => toggleTask(key)} style={{ display: 'none' }} />
+                      <input type="checkbox" checked={!!checked[key]} onChange={() => toggleTask(key)} className="rm-task-input" />
                       <span className="rm-tx">{t}</span>
                     </label>
                   )
@@ -212,8 +310,7 @@ export default function Roadmap() {
 
   // ── Выбор профессий ──
   return <Shell>
-    <div className="block-num">КАРЬЕРНЫЙ МАРШРУТ</div>
-    <div className="block-title">ВЫБЕРИ 2 ПРОФЕССИИ</div>
+    <JourneyHeader title="ВЫБЕРИ 2 ПРОФЕССИИ" />
     <div className="block-desc">Отметь две профессии из подобранных по твоему профилю — мы построим к ним пошаговый маршрут под твой возраст и класс.</div>
 
     <div className="prof-pick" style={{ marginTop: 24 }}>

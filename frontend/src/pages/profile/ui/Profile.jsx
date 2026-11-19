@@ -1,3 +1,4 @@
+import IconText from '../../../shared/ui/IconText.jsx'
 import { useEffect, useRef, useState } from 'react'
 import { useNavigate, Link } from 'react-router-dom'
 import Header from '../../../shared/ui/Header.jsx'
@@ -173,10 +174,12 @@ export default function Profile() {
   return (
     <div className="cp-legal">
       <Header backTo="/dashboard" backLabel="← В кабинет" reserveRight />
-      <div className="auth-wrap" style={{ paddingTop: 40 }}>
+      <div className="auth-wrap profile-layout">
         <Card accent className="profile-card">
+          <div className="profile-heading">
           <div className="auth-eyebrow">Личный кабинет</div>
-          <h1 className="auth-title" style={{ fontSize: 'clamp(28px,5vw,42px)', marginBottom: 28 }}>МОЙ ПРОФИЛЬ</h1>
+          <h1 className="auth-title">Мой профиль</h1>
+          </div>
 
           {/* ── Аватар ── */}
           <div className="profile-avatar-wrap">
@@ -190,7 +193,7 @@ export default function Profile() {
                 : <span>{initials}</span>
               }
               <div className="profile-avatar-overlay">
-                {uploading ? '⏳' : '📷'}
+                <IconText text={uploading ? '⏳' : '📷'} />
               </div>
             </div>
             <input ref={fileRef} type="file" accept="image/jpeg,image/png,image/webp" style={{ display: 'none' }} onChange={onFileChange} />
@@ -198,7 +201,7 @@ export default function Profile() {
           </div>
 
           {error && <div className="auth-error">{error}</div>}
-          {msg   && <div className="auth-success">{msg}</div>}
+          {msg   && <div className="auth-success"><IconText text={msg}/></div>}
 
           {/* ── Роль ── */}
           <div style={{ marginBottom: 20 }}>
@@ -210,7 +213,7 @@ export default function Profile() {
                   className={['auth-role', form.role === r.value && 'auth-role--active'].filter(Boolean).join(' ')}
                   onClick={() => setForm(f => ({ ...f, role: r.value }))}
                 >
-                  {r.label}
+                  <IconText text={r.label} />
                 </div>
               ))}
             </div>
@@ -236,12 +239,12 @@ export default function Profile() {
             value={form.phone} onChange={onPhone}
           />
 
-          <Button block onClick={onSave} disabled={saving || uploading} style={{ marginTop: 8 }}>
+          <Button block className="profile-save-button" onClick={onSave} disabled={saving || uploading} style={{ marginTop: 8 }}>
             {saving ? 'Сохраняем…' : 'Сохранить профиль'}
           </Button>
 
           <div className="auth-foot" style={{ marginTop: 20 }}>
-            <Link to="/dashboard">← Вернуться в кабинет</Link>
+            <Link to="/dashboard"><IconText text={"← Вернуться в кабинет"} /></Link>
           </div>
 
           <div style={{ marginTop: 24, paddingTop: 18, borderTop: '1px solid var(--line)' }}>
@@ -253,6 +256,13 @@ export default function Profile() {
             </div>
           </div>
         </Card>
+        <aside className="profile-links" aria-label="Разделы личного кабинета">
+          <div className="auth-eyebrow">Твой карьерный путь</div>
+          <h2>Всё о тебе — в одном месте</h2>
+          <Link to="/dashboard"><IconText text="📝" /><span>Мои тесты и прогресс</span><span aria-hidden="true"><IconText text={"↗"} /></span></Link>
+          <Link to="/diagnostic"><IconText text="🎯" /><span>Результаты диагностики</span><span aria-hidden="true"><IconText text={"↗"} /></span></Link>
+          <Link to="/roadmap"><IconText text="🧭" /><span>Карьерный маршрут</span><span aria-hidden="true"><IconText text={"↗"} /></span></Link>
+        </aside>
       </div>
     </div>
   )

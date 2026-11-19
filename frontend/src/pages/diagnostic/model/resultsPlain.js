@@ -18,10 +18,10 @@ export function buildPersonalityPortrait(pers, order) {
   const entries = order.filter(k => pers[k] != null).map(k => [k, pers[k]]).sort((a, b) => b[1] - a[1])
   if (entries.length < 2) return ''
   const [a, b] = entries
-  const ha = PERSONALITY_PLAIN[a[0]]?.hook
-  const hb = PERSONALITY_PLAIN[b[0]]?.hook
+  const ha = PERSONALITY_PLAIN[a[0]]?.title
+  const hb = PERSONALITY_PLAIN[b[0]]?.title
   if (!ha || !hb) return ''
-  return `Обычно ты ${ha}. А ещё — ${hb}.`
+  return `Среди твоих ответов выше остальных: «${ha}» (${Math.round(a[1])}/100) и «${hb}» (${Math.round(b[1])}/100). Ниже можно посмотреть, что означает каждое качество.`
 }
 
 export const COGNITIVE_PLAIN = {
@@ -37,9 +37,9 @@ export const COGNITIVE_PLAIN = {
 export function buildCognitivePortrait(cogSorted) {
   if (!cogSorted?.length) return ''
   const [topKey] = cogSorted[0]
-  const hook = COGNITIVE_PLAIN[topKey]?.hook
-  if (!hook) return ''
-  return `Тебе легче всего думать и учиться так: ${hook}.`
+  const title = COGNITIVE_PLAIN[topKey]?.title
+  if (!title) return ''
+  return `В своей самооценке ты выше всего отметил(а) «${title}» — ${Math.round(cogSorted[0][1])}/100. Проверь это наблюдение в учёбе или небольшом проекте.`
 }
 
 // title — короткая подпись на чипе, hint — расшифровка при наведении (title-атрибут)

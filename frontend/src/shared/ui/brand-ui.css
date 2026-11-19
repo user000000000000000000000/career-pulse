@@ -1,0 +1,56 @@
+.ui-icon { display: inline-block; vertical-align: -.18em; flex-shrink: 0; }
+:where(.ui-icon) { color: var(--brand-blue); }
+.icon-text { display: inline-flex; align-items: center; gap: .45em; max-width: 100%; min-width: 0; vertical-align: middle; }
+.icon-text__copy { min-width: 0; overflow-wrap: normal; word-break: normal; }
+.ui-rating { display: inline-flex; gap: 1px; align-items: center; vertical-align: -.1em; }
+.ui-rating .ui-icon { display: block; }
+.icon-text:has(> .ui-icon:only-child) { line-height: 1; }
+.btn .icon-text { justify-content: center; }
+:is(.btn-accent, .btn-violet, .cp-btn--primary, .cp-btn--violet, .p-btn-primary, .lv-cta-pill, .lv-vstep-node, .lv-prof-ic, .lv-diff-ic) .ui-icon { color: inherit; }
+:is(.journey-progress__check, .journey-key--done, .dp-milestone.is-complete .dp-milestone__icon) .ui-icon { color: inherit; }
+.brand-mark { display: inline-block; vertical-align: middle; flex-shrink: 0; object-fit: contain; background: transparent; }
+.brand-mark.brand-mark--white { background: transparent; border-radius: 0; }
+.cp-dashboard .footer-brand .fb-logo { display: flex; align-items: center; gap: 10px; color: #fff; }
+.section-wave { height: clamp(56px, 7vw, 110px); overflow: hidden; line-height: 0; margin: -1px 0; }
+.section-wave svg { display: block; width: 100%; height: calc(100% + 1px); }
+.section-wave--flip svg { transform: scaleX(-1); }
+.section-decor { position: absolute; inset: 0; overflow: hidden; pointer-events: none; z-index: 0; }
+.section-decor__star { position: absolute; opacity: .4; color: var(--brand-blue); }
+.section-decor__star--a { top: 14%; right: 3%; transform: rotate(12deg); }
+.section-decor__star--b { bottom: 12%; left: 3%; }
+.section-decor__dots { position: absolute; right: 2%; bottom: 10%; width: 60px; height: 52px; opacity: .24; background: radial-gradient(circle, var(--brand-blue) 1.5px, transparent 2px) 0 0 / 12px 12px; }
+.section-decor__orb { position: absolute; left: -110px; top: 35%; width: 210px; height: 290px; border-radius: 45% 55% 60% 40%; background: radial-gradient(ellipse, #cce6ff70, transparent 72%); transform: rotate(35deg); }
+.cp-lv2 :is(.lv-how, .lv-prof, .lv-about, .lv-ctaband, .lv-foot) { position: relative; }
+.cp-lv2 :is(.lv-how-inner, .lv-about-inner) { position: relative; z-index: 1; }
+.cp-lv2 .lv-prof { background: #eaf4ff; }
+.cp-lv2 :is(.lv-vstep-node, .lv-prof-ic, .lv-diff-ic) { background: var(--brand-gradient); }
+.cp-lv2 .lv-vstep-card, .cp-lv2 .lv-mcard, .cp-lv2 .lv-role { background: #f0f7ff; border: 1px solid #e1edfc; }
+.cp-lv2 .lv-ctaband { background: linear-gradient(180deg, var(--brand-blue), var(--brand-blue)); }
+.cp-lv2 .lv-foot { background: #070529; }
+.cp-lv2 .lv-foot > :not(.section-decor) { position: relative; z-index: 1; }
+.cp-lv2 .lv-foot .section-decor__star, .cp-lv2 .lv-foot .section-decor__dots { opacity: .18; }
+.cp-lv2 .lv-role .ui-icon { width: 28px; height: 28px; }
+.cp-lv2 .lv-foot .b { display: flex; align-items: center; gap: 10px; }
+.app-interior { position: relative; isolation: isolate; }
+.app-interior > .section-decor { z-index: -1; }
+.app-interior > .section-decor .section-decor__star--a { top: 180px; }
+.app-interior > .section-decor .section-decor__star--b { bottom: 180px; }
+.app-interior > .section-decor .section-decor__dots { bottom: 35%; }
+.app-interior[data-design='sky'] :is(.nav-logo-mark, .tb-logo-mark, .sb-logo-mark) { background: transparent; border-radius: 0; }
+.app-interior[data-design='sky'] :is(.nav-logo-txt, .tb-logo, .lf-logo, .fb-logo, .sb-logo-text) { font-family: var(--font-display); letter-spacing: -.03em; }
+.app-interior[data-design='sky'] .tb-logo { white-space: nowrap; }
+.app-interior[data-design='sky'] .tb-logo span { color: inherit; }
+.app-interior[data-design='sky'] .axis-card .ui-icon { width: 25px; height: 25px; }
+.app-interior[data-design='sky'] .bc-num { font-family: var(--font-mono); font-size: 19px; }
+.appnav-logo { font-family: var(--font-display); font-size: 15px; letter-spacing: -.03em; }
+.appnav-ic .ui-icon { width: 20px; height: 20px; }
+@media (max-width: 640px) {
+  .section-decor__star--a { right: 8px; opacity: .18; width: 16px; height: 16px; }
+  .section-decor__star--b { left: 6px; opacity: .18; width: 12px; height: 12px; }
+  .section-decor__dots { right: -12px; opacity: .12; }
+  .section-wave { height: 56px; }
+  .cp-lv2 .lv-foot-brand .b { font-size: 14px; }
+  .app-interior[data-design='sky'] .tb-logo { font-size: 10px; }
+  .app-interior[data-design='sky'] .cp-dashboard .wb-actions { flex-direction: column; align-items: stretch; }
+}
+@media print { .section-decor, .section-wave { display: none; } }

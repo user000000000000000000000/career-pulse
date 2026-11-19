@@ -13,6 +13,12 @@ node_modules/
 .env.*.local
 *.log
 .DS_Store
+frontend/dist/
+frontend/dist-demo/
+frontend/dist-demo-vercel/
+frontend/design-preview/
+.env.*
+!.env.example
 Thumbs.db
 frontend/results-lab.html
 

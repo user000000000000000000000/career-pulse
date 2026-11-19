@@ -1,0 +1,68 @@
+/* New mobile helpers are absent from the desktop layout. */
+.dashboard-workspace :is(.dashboard-mobile-summary, .dashboard-mobile-nav, .dashboard-mobile-progress, .dashboard-menu-label) { display: none; }
+
+@media screen and (max-width: 620px) {
+  #root .app-interior .dashboard-workspace { padding-top: 12px; gap: 16px; }
+  #root .dashboard-workspace .content { display: flex; flex-direction: column; gap: 16px; }
+  #root .dashboard-workspace .content > * { order: 6; }
+  #root .dashboard-workspace .dashboard-welcome-row { order: 0; position: relative; display: block; margin: 0; }
+  #root .dashboard-workspace .welcome-banner { display: grid; grid-template-columns: minmax(0,1fr) 84px; grid-template-areas: 'copy art' 'actions actions'; gap: 0 8px; align-items: start; min-height: 0; padding: 14px; border: 1px solid #d6e7fb; border-radius: 20px; }
+  #root .dashboard-workspace .dashboard-eyebrow { font-size: 10px; margin-bottom: 8px; padding-right: 0; }
+  #root .dashboard-workspace .wb-text { grid-area: copy; padding-right: 0; }
+  #root .dashboard-workspace .wb-text h1 { font-size: 21px; line-height: 1.35; margin-bottom: 8px; overflow-wrap: anywhere; }
+  #root .dashboard-workspace .wb-text > p:not(.dashboard-mobile-summary) { display: none; }
+  #root .dashboard-workspace .wb-text .dashboard-mobile-summary { display: block; font-size: 12px; line-height: 1.6; margin: 0; }
+  #root .dashboard-workspace .dashboard-artwork { grid-area: art; position: relative; top: auto; right: auto; bottom: auto; width: 84px; height: 112px; aspect-ratio: auto; margin: 44px 0 0; mask-image: linear-gradient(180deg,#000 75%,transparent); -webkit-mask-image: linear-gradient(180deg,#000 75%,transparent); }
+  #root .dashboard-workspace .wb-actions { grid-area: actions; width: 100%; max-width: none; margin-top: 8px; gap: 6px; }
+  #root .dashboard-workspace .wb-actions .btn { width: 100%; justify-content: center; min-height: 44px; font-size: 12px; padding: 11px 12px; }
+  #root .dashboard-workspace .wb-actions .btn-tour { background: #ffffff80; box-shadow: none; }
+  #root .dashboard-workspace .dashboard-menu-toggle { position: absolute; top: 10px; right: 10px; z-index: 3; width: 60px; height: 44px; gap: 3px; border-radius: 12px; }
+  #root .dashboard-workspace .dashboard-menu-toggle > span:not(.dashboard-menu-label) { width: 17px; }
+  #root .dashboard-workspace .dashboard-menu-label { display: block; width: auto; height: auto; background: none; color: var(--brand-blue); font: 600 9px/1 var(--font-body); }
+
+  #root .dashboard-workspace .dashboard-mobile-nav { order: 1; display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 8px; }
+  #root .dashboard-workspace .dashboard-mobile-nav a { display: flex; align-items: center; gap: 9px; min-height: 48px; padding: 11px 13px; border: 1px solid #d5e6fb; border-radius: 14px; background: white; color: var(--brand-blue); font: 700 12px/1.4 var(--font-body); text-decoration: none; }
+  #root .dashboard-workspace .dashboard-mobile-nav a:focus-visible { outline: 2px solid var(--brand-blue); outline-offset: 2px; }
+
+  #root .dashboard-workspace .progress-block { order: 2; margin: 0; padding: 16px; border-radius: 20px; }
+  #root .dashboard-workspace .pb-ring-wrap { gap: 12px; flex-wrap: nowrap; align-items: flex-start; }
+  #root .dashboard-workspace .pb-ring { width: 68px; height: 68px; }
+  #root .dashboard-workspace .pb-ring-pct { font-size: 17px; }
+  #root .dashboard-workspace .pb-ring-sub { font-size: 7px; letter-spacing: .4px; }
+  #root .dashboard-workspace .pb-steps { min-width: 0; }
+  #root .dashboard-workspace .pb-title { font-size: 11px; line-height: 1.5; margin-bottom: 6px; }
+  #root .dashboard-workspace .pb-steplist { display: none; }
+  #root .dashboard-workspace .dashboard-mobile-progress { display: flex; flex-direction: column; gap: 3px; color: #42658c; font-size: 11px; line-height: 1.5; }
+  #root .dashboard-workspace .dashboard-mobile-progress strong { font-size: 14px; color: var(--brand-blue); }
+  #root .dashboard-workspace .pb-hint { margin-top: 10px; font-size: 10px; line-height: 1.5; }
+
+  #root .dashboard-workspace .blocks-section { order: 3; margin: 0; scroll-margin-top: calc(var(--site-header-clearance) + 12px); }
+  #root .dashboard-workspace .section-header { gap: 6px; margin-bottom: 12px; }
+  #root .dashboard-workspace .section-title { font-size: 18px; }
+  #root .dashboard-workspace .section-sub { font-size: 11px; line-height: 1.5; }
+  #root .dashboard-workspace .blocks-grid { gap: 12px; }
+  #root .dashboard-workspace .block-card { padding: 16px; border-radius: 18px; gap: 10px; }
+  #root .dashboard-workspace .dashboard-block-icon { width: 34px; height: 34px; border-radius: 11px; }
+  #root .dashboard-workspace .dashboard-block-icon .ui-icon { width: 20px; height: 20px; }
+  #root .dashboard-workspace .bc-title { font-size: 14px; line-height: 1.5; }
+  #root .dashboard-workspace .bc-desc { font-size: 12px; line-height: 1.6; }
+  #root .dashboard-workspace .bc-meta { font-size: 10px; gap: 6px; }
+  #root .dashboard-workspace .bc-result { font-size: 11px; line-height: 1.5; padding: 9px 10px; }
+  #root .dashboard-workspace .bc-actions { display: flex; width: 100%; gap: 8px; }
+  #root .dashboard-workspace .bc-actions .bc-btn { flex: 1; min-width: 0; }
+  #root .dashboard-workspace .bc-btn { justify-content: center; min-height: 44px; font-size: 12px; }
+  #root .dashboard-workspace .bc-btn--start { width: 100%; }
+
+  #root .dashboard-workspace .axes-grid { order: 4; margin: 0; gap: 10px; }
+  #root .dashboard-workspace .axis-card { padding: 14px; grid-template-columns: 36px minmax(0,1fr); column-gap: 10px; row-gap: 4px; }
+  #root .dashboard-workspace .axis-card .ax-icon { width: 36px; height: 36px; border-radius: 12px; }
+  #root .dashboard-workspace .ax-icon .ui-icon { width: 20px; height: 20px; }
+  #root .dashboard-workspace .axis-card .ax-key { font-size: 17px; }
+  #root .dashboard-workspace .axis-card .ax-desc { font-size: 11px; line-height: 1.6; }
+  #root .dashboard-workspace .two-col { order: 5; margin-top: 0 !important; gap: 14px; }
+  #root .dashboard-workspace .panel { padding: 16px; border-radius: 18px; }
+  #root .dashboard-workspace .panel-title { font-size: 14px; }
+  #root .dashboard-workspace .sidebar { max-width: calc(100% - 24px); left: 12px; border-radius: 20px; }
+  #root .dashboard-workspace .sidebar .sb-item { min-height: 44px; }
+  #root:has(.dashboard-workspace)::after { background: #f7fbfff2; border-top: 1px solid #dce9fa; }
+}

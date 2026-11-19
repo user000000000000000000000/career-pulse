@@ -21,13 +21,13 @@
 
   /* читаемый тёмный текст на белом (цветные ЗАЛИВКИ полос/бэйджей остаются — это background) */
   .cp-diag, .cp-diag *:not(.hs-fill):not(.rc-bar-fill):not(.dtrack-fill):not(.pb-ring-fg) {
-    color: #1a1636 !important;
+    color: var(--brand-ink) !important;
   }
 
   .r-card {
     break-inside: avoid; page-break-inside: avoid;
     box-shadow: none !important;
-    border: 1px solid #e2e2ee !important;
+    border: 1px solid #e7f3ff !important;
     background: #ffffff !important;
   }
   .block-title, .block-num { break-after: avoid; page-break-after: avoid; }

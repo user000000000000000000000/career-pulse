@@ -1,0 +1,21 @@
+.social-sign-in { margin: 26px 0 6px; }
+.social-sign-in__heading { margin-bottom: 12px; font: 600 13px/1.5 var(--font-body); color: var(--text); }
+.social-sign-in__grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+.social-sign-in__provider { display: grid; grid-template-columns: 32px minmax(0, 1fr); align-items: center; gap: 1px 10px; padding: 14px 12px; min-height: 76px; border: 1px solid #d8e7f8; border-radius: 16px; background: #fff; color: var(--brand-blue); text-align: left; font-family: var(--font-body); transition: border-color .18s, background .18s, box-shadow .18s; cursor: pointer; }
+.social-sign-in__provider > svg, .social-sign-in__mark { grid-row: 1 / 3; }
+.social-sign-in__provider:not(:disabled):hover { border-color: #76b7ff; background: #f3f9ff; box-shadow: 0 5px 15px #2277bb0d; }
+.social-sign-in__provider:focus-visible { outline: 3px solid #83bdff; outline-offset: 3px; }
+.social-sign-in__provider:disabled { cursor: default; background: #f7faff; }
+.social-sign-in__name { font-size: 12px; font-weight: 700; line-height: 1.5; }
+.social-sign-in__status { font-size: 10px; line-height: 1.6; color: #6b809b; }
+.social-sign-in__provider--vk:not(:disabled) { border-color: #b9d9ff; }
+.social-sign-in__provider--vk:not(:disabled) .social-sign-in__status { color: var(--brand-blue); }
+.social-sign-in__mark { width: 32px; height: 32px; display: grid; place-items: center; border-radius: 9px; font-size: 22px; font-weight: 800; color: white; }
+.social-sign-in__mark--max { background: linear-gradient(145deg, var(--brand-blue), #6761db); font-size: 19px; }
+.social-sign-in__mark--esia { background: #fff; gap: 0; align-content: center; border: 1px solid #e5ebf2; }
+.social-sign-in__mark--esia i, .social-sign-in__mark--esia b { font-style: normal; font-size: 8px; line-height: 1.1; letter-spacing: -.04em; }
+.social-sign-in__mark--esia i { color: var(--brand-blue); }.social-sign-in__mark--esia b { color: #d64455; }
+.social-sign-in__mark--yandex { background: #f44336; }
+.social-sign-in__note { margin: 12px 0 0; font: 400 11px/1.7 var(--font-body); color: var(--sub); }
+.social-sign-in__message { padding: 12px 14px; border-radius: 12px; background: #eaf4ff; color: var(--brand-blue); font: 500 12px/1.7 var(--font-body); }
+@media (max-width: 380px) { .social-sign-in__provider { padding: 11px 9px; column-gap: 7px; }.social-sign-in__name { font-size: 11px; } }

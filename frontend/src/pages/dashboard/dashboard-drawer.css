@@ -1,0 +1,65 @@
+/* The trigger is portalled into SiteHeader; the drawer is portalled to body
+   so route reveal animations cannot constrain its viewport positioning. */
+.site-header .site-header-menu-slot { display: inline-flex; align-items: center; flex-shrink: 0; }
+.site-header .site-header-menu-slot:empty { display: none; }
+.site-header .dashboard-menu-toggle {
+  appearance: none; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 5px;
+  position: static; flex: 0 0 44px; width: 44px; height: 44px; margin: 0; padding: 0;
+  border: 1px solid #c8e1ff; border-radius: 50%; background: #eff7ff; color: var(--brand-blue);
+  cursor: pointer; box-shadow: none; transition: background .18s, border-color .18s;
+}
+.site-header .dashboard-menu-toggle > span { display: block; width: 18px; height: 2px; border-radius: 2px; background: currentColor; }
+.site-header .dashboard-menu-toggle:hover { background: #dfefff; border-color: #8ac0ff; }
+.site-header .dashboard-menu-toggle:focus-visible { outline: 3px solid var(--brand-blue); outline-offset: 3px; }
+
+.cp-dashboard.dashboard-drawer { position: fixed; inset: 0; z-index: 950; display: block; min-height: 0; background: transparent; color: #070529; isolation: isolate; line-height: 1.5; }
+.dashboard-drawer__backdrop { position: absolute; inset: 0; background: #0c254d66; backdrop-filter: blur(4px); }
+.cp-dashboard.dashboard-drawer .sidebar {
+  position: absolute; inset: 0 auto 0 0; width: min(360px, calc(100% - 24px)); height: 100%; max-height: none;
+  display: flex; flex-direction: column; gap: 0; padding: 0; overflow: hidden;
+  border: 0; border-right: 1px solid #dceaff; border-radius: 0 24px 24px 0;
+  background: #fff; opacity: 1; backdrop-filter: none; transform: none;
+  box-shadow: 16px 0 60px #061e3c33; animation: dashboard-drawer-in .22s ease-out;
+}
+.dashboard-drawer__header { display: flex; align-items: center; justify-content: space-between; flex-shrink: 0; gap: 12px; padding: 24px 22px 20px; border-bottom: 1px solid #e4eefb; }
+.cp-dashboard.dashboard-drawer .sb-logo { display: flex; align-items: center; gap: 8px; padding: 0; border: 0; min-width: 0; font: 800 12px/1.5 var(--font-display); letter-spacing: -.5px; }
+.cp-dashboard.dashboard-drawer .sb-logo-mark { width: 32px; height: 32px; background: transparent; border-radius: 0; }
+.cp-dashboard.dashboard-drawer .sb-logo-mark .brand-mark { width: 32px; height: 32px; }
+.cp-dashboard.dashboard-drawer .sb-logo-text { color: #070529; }
+.cp-dashboard.dashboard-drawer .sb-logo-text span { color: var(--brand-blue); }
+.cp-dashboard.dashboard-drawer .dashboard-nav-close {
+  appearance: none; position: static; display: grid; place-items: center; flex: 0 0 36px; width: 36px; height: 36px;
+  padding: 0; border: 1px solid #dceaff; border-radius: 50%; background: #f3f8ff; color: var(--brand-blue); cursor: pointer;
+}
+.cp-dashboard.dashboard-drawer .dashboard-nav-close:hover { background: #deedff; }
+.cp-dashboard.dashboard-drawer .dashboard-nav-close .ui-icon { width: 18px; height: 18px; }
+.dashboard-drawer__links { flex: 1; min-height: 0; overflow-y: auto; overscroll-behavior: contain; padding: 12px; scrollbar-width: thin; scrollbar-color: #b3d5fb transparent; }
+.cp-dashboard.dashboard-drawer .sb-section { padding: 16px 14px 10px; color: #7890ae; font: 700 10px/1.5 var(--font-body); letter-spacing: .09em; }
+.cp-dashboard.dashboard-drawer .sb-item { display: flex; align-items: center; gap: 12px; min-height: 48px; margin: 3px 0; padding: 12px 14px; border: 1px solid transparent; border-radius: 15px; color: #42658c; font: 600 13px/1.5 var(--font-body); text-decoration: none; }
+.cp-dashboard.dashboard-drawer .sb-item .icon { display: grid; place-items: center; flex: 0 0 20px; color: var(--brand-blue); }
+.cp-dashboard.dashboard-drawer .sb-item .ui-icon { width: 20px; height: 20px; }
+.cp-dashboard.dashboard-drawer .sb-item:hover { color: var(--brand-blue); background: #f2f8ff; }
+.cp-dashboard.dashboard-drawer .sb-item.active { color: var(--brand-blue); background: linear-gradient(120deg, #e6f2ff, #f1f8ff); border-color: #cce3ff; }
+.cp-dashboard.dashboard-drawer .sb-user { display: block; flex-shrink: 0; margin: 0; padding: 18px 20px max(18px, env(safe-area-inset-bottom)); border-top: 1px solid #e0ebfa; background: #f7fbff; }
+.cp-dashboard.dashboard-drawer .sb-user-btn { display: flex; align-items: center; gap: 10px; width: 100%; min-height: 48px; padding: 4px; border: 0; border-radius: 14px; background: transparent; color: #070529; text-align: left; font-family: var(--font-body); cursor: pointer; }
+.cp-dashboard.dashboard-drawer .sb-user-btn:hover { background: #eaf4ff; }
+.cp-dashboard.dashboard-drawer .sb-av { width: 40px; height: 40px; flex-shrink: 0; border-radius: 50%; background: var(--brand-gradient); color: #fff; font: 800 13px/1 var(--font-body); }
+.cp-dashboard.dashboard-drawer .sb-name { color: #070529; font: 700 14px/1.5 var(--font-body); }
+.cp-dashboard.dashboard-drawer .sb-role { color: #6982a3; font: 400 11px/1.5 var(--font-body); }
+.cp-dashboard.dashboard-drawer .sb-user-menu { left: 12px; right: 12px; bottom: calc(100% + 8px); padding: 8px; border: 1px solid #dceaff; border-radius: 18px; background: #fff; box-shadow: 0 12px 40px #17477d26; }
+.cp-dashboard.dashboard-drawer .sum-item { display: flex; align-items: center; gap: 10px; min-height: 44px; padding: 10px 12px; border-radius: 12px; color: #42658c; font: 600 12px/1.5 var(--font-body); text-decoration: none; }
+.cp-dashboard.dashboard-drawer .sum-item:hover { background: #eff7ff; }
+.cp-dashboard.dashboard-drawer :is(button, a):focus-visible { outline: 3px solid var(--brand-blue); outline-offset: 2px; }
+@keyframes dashboard-drawer-in { from { transform: translateX(-100%); } to { transform: translateX(0); } }
+@media (max-width: 620px) {
+  .site-header:has(.site-header-menu-slot:not(:empty)) .lv-nav { padding-inline: 12px; }
+  .site-header:has(.site-header-menu-slot:not(:empty)) .lv-nav-right { gap: 7px; }
+  .site-header .dashboard-menu-toggle { flex-basis: 36px; width: 36px; height: 36px; gap: 4px; }
+  .site-header .dashboard-menu-toggle > span { width: 16px; }
+}
+@media (max-width: 370px) {
+  .site-header:has(.site-header-menu-slot:not(:empty)) .lv-nav-avatar { display: none; }
+  .dashboard-drawer__header { padding-inline: 18px; }
+  .cp-dashboard.dashboard-drawer .sb-logo { font-size: 11px; }
+}
+@media (prefers-reduced-motion: reduce) { .cp-dashboard.dashboard-drawer .sidebar { animation: none; } .site-header .dashboard-menu-toggle { transition: none; } }

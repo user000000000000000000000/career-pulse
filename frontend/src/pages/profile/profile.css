@@ -1,5 +1,11 @@
 .profile-card{ max-width: 580px; width: 100%; }
 
+.profile-card .cp-btn.profile-save-button {
+  display: flex; align-items: center; justify-content: center;
+  width: 100%; min-height: 52px; padding: 14px 24px;
+  box-sizing: border-box; line-height: 1.4;
+}
+
 .profile-avatar-wrap{
   display: flex; flex-direction: column; align-items: center;
   gap: 8px; margin-bottom: 28px;
@@ -25,7 +31,7 @@
 .profile-avatar-hint{ font-size: 11px; color: var(--ghost); }
 
 .auth-success{
-  background: rgba(95,150,233,.12); border: 1px solid rgba(95,150,233,.3);
+  background: rgba(8,124,255,.12); border: 1px solid rgba(8,124,255,.3);
   color: var(--accent); border-radius: 8px;
   padding: 10px 14px; font-size: 13px; margin-bottom: 16px;
 }

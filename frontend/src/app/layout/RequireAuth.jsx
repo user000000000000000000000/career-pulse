@@ -27,8 +27,8 @@ export default function RequireAuth({ children }) {
     return (
       <div style={{
         minHeight: '100vh', display: 'flex', alignItems: 'center',
-        justifyContent: 'center', color: 'var(--ghost)', fontFamily: "'JetBrains Mono', monospace",
-        fontSize: 13, letterSpacing: 2
+        justifyContent: 'center', color: 'var(--brand-copy)', fontFamily: 'var(--font-body)',
+        fontSize: 13, fontWeight: 600, letterSpacing: '.04em'
       }}>
         ЗАГРУЗКА…
       </div>

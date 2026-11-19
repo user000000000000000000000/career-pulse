@@ -1,17 +1,14 @@
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import './legal.css'
+import IconText from './IconText.jsx'
+import HeaderContext from './HeaderContext.jsx'
 
-/** Шапка для правовых и служебных страниц. backTo — куда ведёт «Назад». */
-export default function Header({ backTo = '/', backLabel = '← Назад', reserveRight = false }) {
-  return (
-    <nav className={'legal-nav' + (reserveRight ? ' nav-reserve-right' : '')}>
-      <Link to="/" className="nav-logo-link">
-        <div className="nav-logo-mark">
-          <svg viewBox="0 0 32 32" width="15" height="15" aria-hidden="true"><path d="M17.8 4.5 8.5 18.2h6.1L13 27.5 23.5 13.4h-6.1z" fill="#fff"/></svg>
-        </div>
-        <div className="nav-logo-txt">CAREER<span>PULSE</span></div>
-      </Link>
-      <Link to={backTo} className="nav-back-link">{backLabel}</Link>
-    </nav>
-  )
+/** Переход страницы в левой части общей шапки. */
+export default function Header({ backTo = '/', backLabel = '← Назад', historyBack = false }) {
+  const navigate = useNavigate()
+  return <HeaderContext>
+    {historyBack
+      ? <button className="site-header-context-pill" onClick={() => navigate(-1)}><IconText text={backLabel}/></button>
+      : <Link to={backTo} className="site-header-context-pill"><IconText text={backLabel}/></Link>}
+  </HeaderContext>
 }

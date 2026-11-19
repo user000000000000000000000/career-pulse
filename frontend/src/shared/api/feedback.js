@@ -1,5 +1,6 @@
 import { supabase, isSupabaseConfigured } from './supabase'
 import { config } from '../config'
+import { readDemoFeedback, saveDemoFeedback } from './demoData'
 
 // Обратная связь. Backend: migration 006_feedback.sql (таблица) + edge-функция
 // feedback (сохраняет + шлёт письмо владельцу). Если функция недоступна —
@@ -8,6 +9,10 @@ import { config } from '../config'
 /** Отправить отзыв/сообщение о проблеме. */
 export async function submitFeedback({ category = 'other', message, email = '' }) {
   if (!message || !message.trim()) throw new Error('Опишите проблему')
+  if (config.demoMode) {
+    saveDemoFeedback([{ id: crypto.randomUUID(), category, message: message.trim(), email, status: 'new', created_at: new Date().toISOString(), page_url: location.href }, ...readDemoFeedback()])
+    return
+  }
   if (!isSupabaseConfigured) throw new Error('Supabase не настроен')
   let user = null
   try { ({ data: { user } } = await supabase.auth.getUser()) } catch { /* аноним */ }
@@ -35,6 +40,7 @@ export async function submitFeedback({ category = 'other', message, email = '' }
 
 /** Админ: список отзывов. */
 export async function adminListFeedback({ limit = 100, offset = 0 } = {}) {
+  if (config.demoMode) { const items = readDemoFeedback(); return { items: items.slice(offset, offset + limit), total: items.length } }
   if (!isSupabaseConfigured) return { items: [], total: 0 }
   const { data, count, error } = await supabase.from('feedback')
     .select('id, user_id, email, category, message, page_url, status, created_at', { count: 'exact' })
@@ -46,6 +52,7 @@ export async function adminListFeedback({ limit = 100, offset = 0 } = {}) {
 
 /** Админ: сменить статус отзыва (new/read/done). */
 export async function adminSetFeedbackStatus(id, status) {
+  if (config.demoMode) { saveDemoFeedback(readDemoFeedback().map(f => f.id === id ? { ...f, status } : f)); return }
   if (!isSupabaseConfigured) return
   const { error } = await supabase.from('feedback').update({ status }).eq('id', id)
   if (error) throw new Error(error.message)

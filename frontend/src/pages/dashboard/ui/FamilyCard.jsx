@@ -1,3 +1,4 @@
+import IconText from '../../../shared/ui/IconText.jsx'
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { generateLinkCode, redeemLinkCode, listFamily, unlinkFamily } from '../../../shared/api'
@@ -56,8 +57,8 @@ export default function FamilyCard({ role }) {
   const fmt = (c) => c || ''
 
   return (
-    <div style={{ background: 'var(--card)', border: '1px solid var(--line)', borderRadius: 14, padding: 20, marginTop: 16 }}>
-      <div style={{ fontWeight: 800, fontSize: 15, marginBottom: 4 }}>{isParent ? '👪 Мои дети' : '👪 Родители'}</div>
+    <div className="dashboard-family-card" style={{ marginTop: 16 }}>
+      <div style={{ fontWeight: 800, fontSize: 15, marginBottom: 4 }}><IconText text={isParent ? '👪 Мои дети' : '👪 Родители'} /></div>
       <div style={{ fontSize: 12.5, color: 'var(--sub)', marginBottom: 14 }}>
         {isParent
           ? 'Введите код из кабинета ребёнка — и вы увидите его результаты диагностики.'
@@ -81,7 +82,7 @@ export default function FamilyCard({ role }) {
               <button onClick={onCopy} title="Нажми, чтобы скопировать"
                 style={{ fontFamily: "'JetBrains Mono',monospace", fontSize: 26, fontWeight: 800, letterSpacing: 3, color: 'var(--accent)', background: 'var(--bg)', border: '1px dashed var(--accent)', borderRadius: 10, padding: '8px 16px', cursor: 'pointer' }}>{fmt(code)}</button>
               <div style={{ fontSize: 11.5, color: copied ? 'var(--ok)' : 'var(--ghost)' }}>
-                {copied ? 'Скопировано ✓' : <>Действует 30 минут.<br />Нажми на код, чтобы скопировать, и отправь родителю.</>}
+                {copied ? <IconText text="Скопировано ✓"/> : <>Действует 30 минут.<br />Нажми на код, чтобы скопировать, и отправь родителю.</>}
               </div>
             </div>
           ) : (
@@ -100,7 +101,7 @@ export default function FamilyCard({ role }) {
               </div>
               {isParent && p.has_passed_test && (
                 <button className="btn btn-ghost" style={{ padding: '5px 12px', fontSize: 11 }}
-                  onClick={() => navigate(`/child/${p.id}`)}>Результаты →</button>
+                  onClick={() => navigate(`/child/${p.id}`)}><IconText text={"Результаты →"} /></button>
               )}
               <button onClick={() => onUnlink(p.id, p.full_name)} title="Отвязать"
                 style={{ background: 'transparent', border: '1px solid var(--line2)', color: 'var(--sub)', borderRadius: 8, padding: '5px 10px', fontSize: 11, cursor: 'pointer' }}>Отвязать</button>

@@ -1,3 +1,4 @@
+import IconText from '../../../shared/ui/IconText.jsx'
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { CP } from '../../../shared/api'
@@ -5,6 +6,9 @@ import DiagShell from './DiagShell'
 import useDiagBlock from '../model/useDiagBlock'
 import useBlockDraft from '../model/useBlockDraft'
 import { blockSummary } from '../../../shared/lib/blockSummary'
+import JourneyMascot from '../../../shared/ui/JourneyMascot.jsx'
+import { isSupabaseConfigured } from '../../../shared/api'
+import '../letter-journey.css'
 
 const SECTIONS = [
   { id: 'now', icon: '🙂', title: 'Я сейчас', desc: 'Опиши себя — каким ты видишь себя прямо сейчас', questions: [
@@ -40,6 +44,7 @@ const SECTIONS = [
 const ACTIVE_WORDS = ['решил', 'решила', 'сделаю', 'выбираю', 'собираюсь', 'начну', 'создам', 'построю', 'буду', 'хочу', 'планирую']
 const PASSIVE_WORDS = ['надеюсь', 'может быть', 'получится', 'если повезёт', 'хотелось бы', 'наверное', 'не знаю', 'боюсь']
 const totalQ = SECTIONS.reduce((s, b) => s + b.questions.length, 0)
+const SECTION_SCENES = { now: 'self', future: 'future', values: undefined, path: 'path', message: 'letter' }
 
 export default function Block10Letter() {
   const { ready, timerRef } = useDiagBlock(10)
@@ -112,22 +117,24 @@ export default function Block10Letter() {
   }
 
   if (result) {
-    const agencyLabel = result.agency_markers.ratio > 0.7 ? 'Высокая' : result.agency_markers.ratio > 0.4 ? 'Средняя' : 'Низкая'
     return (
       <DiagShell num={10} title="ПИСЬМО ОТПРАВЛЕНО" pct={100}>
-        <div className="result">
-          <div className="result-icon">✉️</div>
+        <div className="result letter-result">
+          <div className="letter-result__mascot"><JourneyMascot num={10} variant="sent" /></div>
           <div className="result-title">ПИСЬМО ОТПРАВЛЕНО</div>
-          <div className="result-desc">Твоё письмо в будущее сохранено. ИИ проанализирует его и найдёт то, что закрытые тесты не показывают: мотивы, ценности, образ будущего из твоих собственных слов.</div>
-          <div className="letter-stat"><span>📝 {result.word_count} слов</span><span>🕐 {Math.ceil(result.durationSec / 60)} мин</span><span>🚀 Агентность: {agencyLabel}</span></div>
+          <div className="result-desc">Твоё письмо в будущее сохранено. Здесь остались твои сегодняшние мысли, мечты и цели. Позже ты сможешь вернуться к ним и посмотреть, что изменилось.</div>
+          <p className="letter-storage-note">{isSupabaseConfigured
+            ? 'Письмо сохранено в этом браузере. Для аккаунта работает синхронизация при доступном подключении. По электронной почте письмо не отправляется.'
+            : 'Письмо хранится только в этом браузере. Если очистить данные сайта или открыть другой браузер, оно будет недоступно. По электронной почте письмо не отправляется.'}</p>
+          <div className="letter-stat"><span><IconText text={"📝 "} />{result.word_count} слов</span><span><IconText text={"🕐 "} />{Math.ceil(result.durationSec / 60)} мин</span></div>
           <div className="result-summary">{blockSummary(10, result)}</div>
-          <div style={{ background: 'var(--card)', border: '1px solid rgba(245,200,66,.2)', borderRadius: 12, padding: 20, marginBottom: 24, textAlign: 'left', maxWidth: 440, margin: '0 auto 24px' }}>
+          <div style={{ background: 'var(--card)', border: '1px solid rgba(8,124,255,.2)', borderRadius: 12, padding: 20, marginBottom: 24, textAlign: 'left', maxWidth: 440, margin: '0 auto 24px' }}>
             <div style={{ fontSize: 12, color: 'var(--gold)', fontWeight: 700, letterSpacing: 1, marginBottom: 8, fontFamily: "'JetBrains Mono',monospace" }}>ЧТО ДАЛЬШЕ</div>
-            <div style={{ fontSize: 13, color: 'var(--sub)', lineHeight: 1.7 }}>Наставник получит твоё письмо вместе с результатами всех тестов. ИИ-анализ выделит ключевые мотивы, противоречия и скрытые ресурсы.</div>
+            <div style={{ fontSize: 13, color: 'var(--sub)', lineHeight: 1.7 }}>Посмотри результаты диагностики или вернись в кабинет. В блоке «Письмо в будущее» можно снова открыть свои ответы через «Изменить ответы».</div>
           </div>
           <div style={{ display: 'flex', gap: 12, justifyContent: 'center', flexWrap: 'wrap' }}>
-            <button className="btn btn-accent" onClick={() => navigate('/diagnostic')}>Посмотреть результаты 🧠</button>
-            <button className="btn btn-ghost" onClick={() => navigate('/dashboard')}>В кабинет →</button>
+            <button className="btn btn-accent" onClick={() => navigate('/diagnostic')}><IconText text={"Посмотреть результаты 🧠"} /></button>
+            <button className="btn btn-ghost" onClick={() => navigate('/dashboard')}><IconText text={"В кабинет →"} /></button>
           </div>
         </div>
       </DiagShell>
@@ -136,19 +143,19 @@ export default function Block10Letter() {
 
   return (
     <DiagShell num={10} title="ПИСЬМО В БУДУЩЕЕ"
-      desc="Это не тест. Это письмо себе через 5 лет. Пиши честно, как будто никто не прочитает."
-      meta={['🕐 ~25 мин', '📝 19 вопросов', '✨ ИИ-анализ x2']} pct={pct}>
+      desc="Напиши себе через 5 лет. О том, что радует, волнует и к чему хочется прийти. Здесь можно быть собой."
+      mascotVariant={SECTION_SCENES[section.id] || 'values'} chapter={`Часть ${blockIdx + 1} из ${SECTIONS.length} · ${section.title}`}
+      meta={['🕐 ~25 мин', '📝 19 вопросов', '✨ О мечтах и целях']} pct={pct}>
       <div className="q-area">
-        {qIdx === 0 && (
-          <div className="section-intro"><div className="si-icon">{section.icon}</div><div className="si-title">{section.title}</div><div className="si-desc">{section.desc}</div></div>
-        )}
+        <div className="letter-chapter"><span>{section.title}</span><span>Часть {blockIdx + 1} / {SECTIONS.length}</span></div>
+        {qIdx === 0 && <p className="letter-chapter__desc">{section.desc}</p>}
         <div className="q-counter">{globalIdx + 1} / {totalQ}</div>
-        <div className="q-prompt">{q.prompt}</div>
-        <div className="q-hint">{q.hint}</div>
-        <textarea className="q-textarea" style={{ minHeight: 160 }} placeholder="Пиши свободно, как будто рассказываешь близкому другу..." value={answers[q.id] || ''} onChange={e => setText(e.target.value)} />
+        <label htmlFor="letter-answer" className="q-prompt">{q.prompt}</label>
+        <div className="q-hint" id="letter-hint">{q.hint}</div>
+        <textarea id="letter-answer" aria-describedby="letter-hint" className="q-textarea" style={{ minHeight: 160 }} placeholder="Пиши свободно, как будто рассказываешь близкому другу..." value={answers[q.id] || ''} onChange={e => setText(e.target.value)} />
         <div className="nav-row">
-          {globalIdx > 0 && <button className="btn btn-ghost" onClick={goBack}>← Назад</button>}
-          <button className="btn btn-gold" disabled={!(answers[q.id] || '').trim()} onClick={goForward}>{isLast ? 'Отправить письмо ✉️' : 'Далее →'}</button>
+          {globalIdx > 0 && <button className="btn btn-ghost" onClick={goBack}><IconText text={"← Назад"} /></button>}
+          <button className="btn btn-gold" disabled={!(answers[q.id] || '').trim()} onClick={goForward}><IconText text={isLast ? 'Отправить письмо ✉️' : 'Далее →'} /></button>
         </div>
       </div>
     </DiagShell>

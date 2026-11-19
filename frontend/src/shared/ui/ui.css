@@ -6,8 +6,8 @@
   border:none;cursor:pointer;border-radius:var(--radius-full);padding:14px 28px;transition:all .2s;
   display:inline-flex;align-items:center;justify-content:center;gap:8px;text-decoration:none;
 }
-.cp-btn--primary{background:var(--gradient-accent);color:var(--on-accent);box-shadow:0 8px 24px rgba(95,150,233,.35)}
-.cp-btn--primary:hover{transform:translateY(-1px);box-shadow:0 10px 32px rgba(95,150,233,.45)}
+.cp-btn--primary{background:var(--gradient-accent);color:var(--on-accent);box-shadow:0 8px 24px rgba(8,124,255,.35)}
+.cp-btn--primary:hover{transform:translateY(-1px);box-shadow:0 10px 32px rgba(8,124,255,.45)}
 .cp-btn--ghost{background:transparent;color:var(--text);border:1px solid var(--line2)}
 .cp-btn--ghost:hover{border-color:var(--accent);color:var(--accent)}
 .cp-btn--violet{background:linear-gradient(135deg,var(--violet),var(--accent));color:#fff}
@@ -23,7 +23,7 @@
 }
 .cp-input::placeholder{color:var(--ghost)}
 .cp-input:focus{outline:none;border-color:var(--accent);box-shadow:var(--shadow-focus)}
-.cp-input--error{border-color:var(--danger);box-shadow:0 0 0 3px rgba(255,77,109,.15)}
+.cp-input--error{border-color:var(--danger);box-shadow:0 0 0 3px rgba(8,124,255,.15)}
 .cp-field__error{font-size:12px;color:var(--danger);font-weight:600}
 
 /* Карточки — скругление ~20-24px, мягкая тень, белый фон (style-guide.md §4). */
@@ -44,7 +44,7 @@
   background:var(--card2);border:1px solid var(--line);border-radius:var(--radius-md);transition:all .18s;
 }
 .cp-radio:hover{border-color:var(--line2)}
-.cp-radio--active{border-color:var(--accent);background:rgba(95,150,233,.08)}
+.cp-radio--active{border-color:var(--accent);background:rgba(8,124,255,.08)}
 .cp-radio__dot{
   width:18px;height:18px;border-radius:50%;border:2px solid var(--ghost);flex-shrink:0;margin-top:2px;
   display:flex;align-items:center;justify-content:center;transition:all .18s;

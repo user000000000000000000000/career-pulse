@@ -1,5 +1,6 @@
 import { supabase, isSupabaseConfigured } from '../api/supabase'
 import { STORAGE_KEYS } from '../lib/storageKeys'
+import { config } from '../config'
 
 const LS_KEY = STORAGE_KEYS.user
 
@@ -91,6 +92,7 @@ export async function requestPasswordReset(email) {
 
 /** Установить новый пароль (после перехода по ссылке восстановления). */
 export async function updatePassword(newPassword) {
+  if (config.demoMode) return
   if (!isSupabaseConfigured) throw new Error('Supabase не настроен')
   const { error } = await supabase.auth.updateUser({ password: newPassword })
   if (error) throw new Error(translateAuthError(error.message))

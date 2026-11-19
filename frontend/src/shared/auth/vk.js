@@ -50,6 +50,7 @@ export function vkRedirectUri() {
 
 /** Старт входа через VK ID (ручной OAuth 2.1 + PKCE). */
 export async function startVkLogin() {
+  if (config.demoMode) throw new Error('В демонстрации используй вход по email — подключение VK доступно на рабочем сайте.')
   const appId = config.vkAppId
   if (!appId) {
     alertDialog({ title: 'ВКонтакте', message: 'Вход через ВКонтакте не настроен (нет VK_APP_ID).' })

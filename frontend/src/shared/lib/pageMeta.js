@@ -1,12 +1,12 @@
 import { useEffect } from 'react'
 
-const BASE = 'CareerPulse'
+const BASE = 'Пульс Карьеры'
 const DEFAULT_DESC = 'Профориентационная диагностика из 10 блоков с ИИ-разбором и карьерным маршрутом. Узнай свои сильные стороны и подходящие профессии.'
 
 /**
  * Ставит <title> и <meta description> под конкретную страницу. Google исполняет JS,
  * поэтому подхватывает эти значения в выдаче. При размонтировании возвращает дефолт.
- * @param {string} title  заголовок страницы (без « — CareerPulse»)
+ * @param {string} title  заголовок страницы (без « — Пульс Карьеры»)
  * @param {string} [description]
  */
 export function usePageMeta(title, description) {

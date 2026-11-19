@@ -1,3 +1,4 @@
+import IconText from './IconText.jsx'
 import { forwardRef } from 'react'
 import './ui.css'
 
@@ -7,7 +8,7 @@ const Input = forwardRef(function Input(
 ) {
   return (
     <div className="cp-field">
-      {label && <label htmlFor={id}>{label}</label>}
+      {label && <label htmlFor={id}><IconText text={label} /></label>}
       <input
         id={id}
         ref={ref}

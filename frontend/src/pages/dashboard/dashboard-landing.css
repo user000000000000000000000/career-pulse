@@ -1,0 +1,357 @@
+/* Shared landing language for the cabinet. Phone layout first; wide-screen
+   composition below reuses the same palette, type, cards, buttons and artwork. */
+@media screen {
+  #root .app-interior .dashboard-workspace {
+    --dashboard-gutter: 24px;
+    padding-top: 0;
+    font-family: var(--font-body);
+    color: var(--brand-ink);
+  }
+  #root .app-interior .dashboard-workspace .content { gap: 28px; }
+
+  /* An open hero, with the same blue light and large serif accent as the home. */
+  #root .app-interior .dashboard-workspace .dashboard-welcome-row {
+    margin-inline: calc(-1 * var(--dashboard-gutter));
+    background: radial-gradient(ellipse at 20% 44%, #fff 0%, #eaf4ff 35%, #c6e1ff 85%);
+  }
+  #root .app-interior .dashboard-workspace .welcome-banner {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    min-height: 0;
+    padding: calc(var(--site-header-clearance) + 16px) 24px 0;
+    border: 0;
+    border-radius: 0;
+    background: transparent;
+    box-shadow: none;
+  }
+  #root .app-interior .dashboard-workspace .wb-text { order: 0; width: 100%; }
+  #root .app-interior .dashboard-workspace .dashboard-eyebrow {
+    display: inline-flex;
+    max-width: calc(100% - 56px);
+    gap: 6px;
+    margin: 0 0 20px;
+    padding: 8px 10px;
+    border: 1px solid #fff;
+    border-radius: 100px;
+    background: #ffffff8f;
+    box-shadow: 0 8px 30px #8abafa22;
+    color: var(--brand-blue);
+    font: 600 10.5px/1.35 var(--font-body);
+    letter-spacing: -.2px;
+  }
+  #root .app-interior .dashboard-workspace .dashboard-eyebrow .ui-icon { flex-shrink: 0; }
+  #root .app-interior .dashboard-workspace .wb-text h1 {
+    margin: 0 0 18px;
+    font: 800 clamp(34px, 9.2vw, 48px)/1.08 var(--font-display);
+    letter-spacing: -2.2px;
+    color: #050322;
+    overflow-wrap: anywhere;
+  }
+  #root .app-interior .dashboard-workspace .wb-text h1 .heading-accent {
+    font-family: var(--font-heading-accent);
+    font-size: 1.38em;
+    font-style: italic;
+    font-weight: 700;
+    line-height: .8;
+    letter-spacing: -3px;
+    color: var(--brand-blue);
+    -webkit-text-fill-color: var(--brand-blue);
+    background: none;
+  }
+  #root .app-interior .dashboard-workspace .wb-text .dashboard-mobile-summary {
+    max-width: 390px;
+    margin: 0;
+    color: var(--brand-copy);
+    font: 500 15.5px/1.4 var(--font-body);
+  }
+  #root .app-interior .dashboard-workspace .wb-actions {
+    order: 1;
+    align-items: flex-start;
+    gap: 12px;
+    margin-top: 24px;
+    max-width: 100%;
+  }
+  #root .app-interior .dashboard-workspace .wb-actions .btn {
+    width: auto;
+    max-width: 100%;
+    min-height: 48px;
+    padding: 15px 23px;
+    border-radius: 100px;
+    font: 600 14px/1.35 var(--font-body);
+    white-space: normal;
+    text-align: center;
+  }
+  #root .app-interior .dashboard-workspace .wb-actions .btn-accent {
+    border: 0;
+    color: #fff;
+    background: var(--brand-gradient);
+    box-shadow: 0 6px 24px #0781ff55;
+  }
+  #root .app-interior .dashboard-workspace .wb-actions .btn-tour {
+    min-height: 44px;
+    padding: 10px 0;
+    border: 0;
+    background: transparent;
+    color: var(--brand-copy);
+    box-shadow: none;
+  }
+  #root .app-interior .dashboard-workspace .dashboard-menu-toggle {
+    position: absolute;
+    z-index: 3;
+    top: calc(var(--site-header-clearance) + 12px);
+    right: 24px;
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    border-color: #fff;
+    background: #ffffffa6;
+    box-shadow: 0 8px 30px #8abafa22;
+  }
+  #root .app-interior .dashboard-workspace .dashboard-menu-label { display: none; }
+  #root .app-interior .dashboard-workspace .dashboard-artwork {
+    order: 2;
+    flex: none;
+    position: relative;
+    width: calc(100% + 48px);
+    height: clamp(260px, 82vw, 360px);
+    margin: 8px -24px 0;
+    overflow: hidden;
+    border-radius: 38% 0 0 0;
+    background: #e1efff;
+    mask-image: none;
+    -webkit-mask-image: none;
+  }
+  #root .app-interior .dashboard-workspace .dashboard-artwork__photo {
+    width: 100%;
+    height: 100%;
+    transform: scale(1.08);
+    transform-origin: 70% 65%;
+  }
+  #root .app-interior .dashboard-workspace .welcome-banner::after {
+    content: '';
+    position: absolute;
+    z-index: 2;
+    inset: auto 0 -1px;
+    height: 52px;
+    pointer-events: none;
+    background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 400 60' preserveAspectRatio='none'%3E%3Cpath fill='%23deedff' d='M0 28C55 2 105 58 180 25S310 55 400 12V60H0Z'/%3E%3Cpath fill='%23f7fbff' d='M0 40C40 14 100 62 180 40S310 65 400 30V60H0Z'/%3E%3C/svg%3E") center/100% 100% no-repeat;
+  }
+
+  /* Frosted navigation cards echo the landing's profession and profile cards. */
+  #root .app-interior .dashboard-workspace .dashboard-mobile-nav { gap: 12px; }
+  #root .app-interior .dashboard-workspace .dashboard-mobile-nav a {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    text-decoration: none;
+    min-height: 64px;
+    padding: 15px 14px;
+    border: 1px solid #dceaff;
+    border-radius: 20px;
+    background: linear-gradient(135deg, #fff, #f0f7ff);
+    box-shadow: 0 12px 28px -20px #2675ce55;
+    color: var(--brand-blue);
+    font: 700 12px/1.4 var(--font-body);
+  }
+  #root .app-interior .dashboard-workspace .dashboard-mobile-nav .ui-icon { color: var(--brand-blue); flex-shrink: 0; }
+  #root .app-interior .dashboard-workspace :is(.progress-block, .panel, .dashboard-family-card) {
+    padding: 22px 20px;
+    border: 1px solid #dceaff;
+    border-radius: 24px;
+    background: linear-gradient(135deg, #fff 25%, #f0f7ff);
+    box-shadow: 0 20px 40px -28px #17477d55;
+  }
+  #root .app-interior .dashboard-workspace .pb-title {
+    color: var(--brand-blue);
+    font: 700 12px/1.4 var(--font-body);
+  }
+  #root .app-interior .dashboard-workspace .pb-ring { width: 80px; height: 80px; }
+  #root .app-interior .dashboard-workspace .pb-ring-pct { font: 800 22px/1.1 var(--font-display); letter-spacing: -1px; }
+  #root .app-interior .dashboard-workspace .dashboard-mobile-progress strong { font-size: 19px; color: var(--brand-ink); }
+  #root .app-interior .dashboard-workspace .dashboard-mobile-progress { font-size: 12px; }
+  #root .app-interior .dashboard-workspace .pb-hint { font-size: 12px; line-height: 1.6; padding: 14px; border-radius: 16px; }
+  #root .app-interior .dashboard-workspace .dashboard-journey-progress { margin-top: 20px; padding-top: 20px; }
+
+  /* The home uses spacious sections, Unbounded headings and soft blue step cards. */
+  #root .app-interior .dashboard-workspace .section-header { gap: 12px; margin-bottom: 22px; }
+  #root .app-interior .dashboard-workspace .section-title {
+    color: var(--brand-ink);
+    font: 700 26px/1.2 var(--font-display);
+    letter-spacing: -1px;
+  }
+  #root .app-interior .dashboard-workspace .section-sub { color: var(--brand-copy); font-size: 13px; line-height: 1.6; }
+  #root .app-interior .dashboard-workspace .blocks-grid { gap: 20px; }
+  #root .app-interior .dashboard-workspace .block-card {
+    padding: 22px;
+    gap: 14px;
+    border: 1px solid #e0ecfc;
+    border-radius: 20px;
+    background: #f0f7ff;
+    box-shadow: 0 12px 30px -24px #17477d44;
+  }
+  #root .app-interior .dashboard-workspace :is(.dashboard-block-icon, .axis-card .ax-icon, .dashboard-outcomes__icon) {
+    width: 44px;
+    height: 44px;
+    border-radius: 14px;
+    color: var(--brand-blue);
+    background: #fff;
+    box-shadow: 0 8px 24px -12px #5b93e855;
+  }
+  #root .app-interior .dashboard-workspace .bc-num { color: var(--brand-blue); font-size: 12px; }
+  #root .app-interior .dashboard-workspace .bc-title { font: 700 16px/1.45 var(--font-display); letter-spacing: -.4px; }
+  #root .app-interior .dashboard-workspace :is(.bc-desc, .axis-card .ax-desc) { color: var(--brand-copy); font: 400 13.5px/1.55 var(--font-body); }
+  #root .app-interior .dashboard-workspace .bc-result { color: var(--brand-blue); background: #ffffffb3; border-radius: 14px; font-size: 12px; }
+  #root .app-interior .dashboard-workspace .bc-result-ico { color: var(--brand-blue); background: #e4f1ff; }
+  #root .app-interior .dashboard-workspace .bc-meta { color: var(--brand-copy); font-size: 11px; row-gap: 10px; }
+  #root .app-interior .dashboard-workspace .bc-btn { min-height: 44px; border-radius: 100px; font: 700 12px/1.4 var(--font-body); }
+  #root .app-interior .dashboard-workspace :is(.bc-btn--start, .bc-btn--result, .m-btn) { border: 0; color: #fff; background: var(--brand-gradient); box-shadow: 0 6px 18px #0781ff26; }
+  #root .app-interior .dashboard-workspace :is(.bc-btn--start, .bc-btn--result, .m-btn) .ui-icon { color: #fff; }
+  #root .app-interior .dashboard-workspace .axes-grid { gap: 16px; }
+  #root .app-interior .dashboard-workspace .axis-card { grid-template-columns: 44px minmax(0, 1fr); gap: 8px 16px; padding: 22px; border: 1px solid #dceaff; border-radius: 20px; background: #fff; }
+  #root .app-interior .dashboard-workspace .axis-card .ax-key { font-size: 22px; color: var(--brand-ink); }
+  #root .app-interior .dashboard-workspace .axis-card .heading-accent { color: var(--brand-blue); -webkit-text-fill-color: var(--brand-blue); }
+  #root .app-interior .dashboard-workspace .axis-card .ax-blocks { margin-top: 4px; }
+  #root .app-interior .dashboard-workspace .two-col { gap: 24px; }
+  #root .app-interior .dashboard-workspace .panel-title { margin-bottom: 18px; font: 700 20px/1.3 var(--font-display); letter-spacing: -.6px; }
+  #root .app-interior .dashboard-workspace .mentor-card { display: grid; grid-template-columns: 56px minmax(0,1fr); align-items: start; gap: 14px; padding: 16px; border-radius: 18px; background: #eaf4ff; }
+  #root .app-interior .dashboard-workspace .mentor-card .m-av { width: 56px; height: 56px; }
+  #root .app-interior .dashboard-workspace .mentor-card .m-name { font-size: 15px; }
+  #root .app-interior .dashboard-workspace .mentor-card .m-btn { grid-column: 1/-1; width: 100%; min-height: 44px; }
+  #root .app-interior .dashboard-workspace .dashboard-outcomes__list { gap: 20px; }
+  #root .app-interior .dashboard-workspace .dashboard-outcomes__item { grid-template-columns: 44px minmax(0,1fr); gap: 12px; }
+  #root .app-interior .dashboard-workspace .dashboard-outcomes__item h3 { font-size: 14px; color: var(--brand-ink); }
+  #root .app-interior .dashboard-workspace .dashboard-outcomes__item p { color: var(--brand-copy); font-size: 13px; line-height: 1.55; }
+  #root .app-interior .dashboard-workspace :is(a, button):focus-visible { outline: 3px solid var(--brand-blue); outline-offset: 4px; }
+}
+
+@media screen and (min-width: 621px) {
+  #root .app-interior .dashboard-workspace {
+    --dashboard-gutter: max(32px, calc((100vw - 1200px) / 2));
+    grid-template-columns: minmax(0, 1fr);
+    gap: 40px;
+  }
+  #root .app-interior .dashboard-workspace .main { grid-column: 1; }
+  #root .app-interior .dashboard-workspace .content { display: flex; flex-direction: column; gap: 40px; }
+  #root .app-interior .dashboard-workspace .dashboard-sidebar-region { display: contents; }
+  #root .app-interior .dashboard-workspace .sidebar {
+    position: fixed;
+    z-index: 430;
+    top: calc(var(--site-header-clearance) + 12px);
+    left: max(24px, calc((100vw - 1304px) / 2));
+    width: 310px;
+    max-height: calc(100dvh - var(--site-header-clearance) - 36px);
+    border-radius: 24px;
+    box-shadow: 0 24px 60px -20px #17477d55;
+  }
+  #root .app-interior .dashboard-workspace .dashboard-nav-close { display: grid; }
+  #root .app-interior .dashboard-workspace .dashboard-welcome-row { position: relative; display: block; margin-block: 0; }
+  #root .app-interior .dashboard-workspace .welcome-banner {
+    position: relative;
+    min-height: calc(610px + var(--site-header-clearance));
+    padding: calc(var(--site-header-clearance) + 76px) var(--dashboard-gutter) 120px;
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+  }
+  #root .app-interior .dashboard-workspace .wb-text {
+    width: 54%;
+    max-width: 650px;
+    padding-right: 0;
+  }
+  #root .app-interior .dashboard-workspace .dashboard-eyebrow {
+    max-width: 100%;
+    padding: 10px 18px;
+    font-size: 13px;
+    gap: 9px;
+    margin-bottom: 26px;
+  }
+  #root .app-interior .dashboard-workspace .wb-text h1 {
+    font-size: clamp(48px, 5.25vw, 76px);
+    line-height: 1.06;
+    letter-spacing: -3.5px;
+    margin-bottom: 26px;
+  }
+  #root .app-interior .dashboard-workspace .wb-text h1 .heading-accent { letter-spacing: -4px; }
+  #root .app-interior .dashboard-workspace .wb-text > p:not(.dashboard-mobile-summary) { display: none; }
+  #root .app-interior .dashboard-workspace .wb-text .dashboard-mobile-summary {
+    display: block;
+    max-width: 470px;
+    font-size: 19px;
+    line-height: 1.45;
+  }
+  #root .app-interior .dashboard-workspace .wb-actions {
+    width: 54%;
+    max-width: 650px;
+    flex-direction: row;
+    align-items: center;
+    flex-wrap: wrap;
+    margin-top: 30px;
+    gap: 14px 22px;
+  }
+  #root .app-interior .dashboard-workspace .wb-actions .btn { font-size: 16px; padding: 18px 28px; min-height: 54px; }
+  #root .app-interior .dashboard-workspace .wb-actions .btn-tour { font-size: 13px; padding: 12px 0; }
+  #root .app-interior .dashboard-workspace .dashboard-artwork {
+    position: absolute;
+    inset: 0 0 28px auto;
+    width: 48%;
+    height: auto;
+    margin: 0;
+    border-radius: 42% 0 0 8% / 67% 0 0 12%;
+    background: #ddecfc;
+  }
+  #root .app-interior .dashboard-workspace .dashboard-artwork__photo { transform: none; }
+  #root .app-interior .dashboard-workspace .welcome-banner::after { height: 100px; }
+  #root .app-interior .dashboard-workspace .dashboard-menu-toggle { top: calc(var(--site-header-clearance) + 24px); right: var(--dashboard-gutter); width: 48px; height: 48px; }
+  #root .app-interior .dashboard-workspace .dashboard-mobile-nav { display: grid; grid-template-columns: repeat(4, minmax(0,1fr)); gap: 20px; }
+  #root .app-interior .dashboard-workspace .dashboard-mobile-nav a { justify-content: center; padding: 20px; font-size: 15px; min-height: 76px; border-radius: 24px; }
+  #root .app-interior .dashboard-workspace :is(.progress-block, .blocks-section, .axes-grid, .two-col) { margin-block: 0; }
+  #root .app-interior .dashboard-workspace :is(.progress-block, .panel, .dashboard-family-card) { padding: 32px; }
+  #root .app-interior .dashboard-workspace .pb-ring { width: 112px; height: 112px; }
+  #root .app-interior .dashboard-workspace .pb-ring-pct { font-size: 28px; }
+  #root .app-interior .dashboard-workspace .pb-title { font-size: 14px; }
+  #root .app-interior .dashboard-workspace .dashboard-mobile-progress strong { font-size: 26px; }
+  #root .app-interior .dashboard-workspace .dashboard-mobile-progress { font-size: 14px; }
+  #root .app-interior .dashboard-workspace .pb-hint { font-size: 13px; }
+  #root .app-interior .dashboard-workspace .dashboard-journey-progress { margin-top: 28px; padding-top: 28px; }
+  #root .app-interior .dashboard-workspace .section-header { margin-bottom: 26px; }
+  #root .app-interior .dashboard-workspace .section-title { font-size: clamp(30px, 3vw, 40px); letter-spacing: -1.8px; text-transform: none; }
+  #root .app-interior .dashboard-workspace .section-sub { font-size: 14px; }
+  #root .app-interior .dashboard-workspace .blocks-grid { grid-template-columns: repeat(2,minmax(0,1fr)); gap: 24px; }
+  #root .app-interior .dashboard-workspace .block-card { padding: 28px; gap: 18px; border-radius: 24px; }
+  #root .app-interior .dashboard-workspace .bc-title { font-size: 20px; }
+  #root .app-interior .dashboard-workspace :is(.bc-desc, .axis-card .ax-desc) { font-size: 15px; line-height: 1.6; }
+  #root .app-interior .dashboard-workspace .bc-meta { font-size: 12px; }
+  #root .app-interior .dashboard-workspace .bc-result { padding: 14px; font-size: 14px; }
+  #root .app-interior .dashboard-workspace .bc-btn { padding: 13px 22px; font-size: 13px; }
+  #root .app-interior .dashboard-workspace .axes-grid { grid-template-columns: repeat(2,minmax(0,1fr)); gap: 24px; }
+  #root .app-interior .dashboard-workspace .axis-card { padding: 28px; }
+  #root .app-interior .dashboard-workspace .axis-card .ax-key { font-size: 28px; }
+  #root .app-interior .dashboard-workspace .two-col { grid-template-columns: minmax(0,1fr) minmax(0,1fr); align-items: start; gap: 24px; margin-top: 0 !important; }
+  #root .app-interior .dashboard-workspace .panel-title { font-size: 24px; margin-bottom: 24px; }
+  #root .app-interior .dashboard-workspace .mentor-card { padding: 22px; gap: 20px; grid-template-columns: 72px minmax(0,1fr); }
+  #root .app-interior .dashboard-workspace .mentor-card .m-av { width: 72px; height: 72px; }
+  #root .app-interior .dashboard-workspace .mentor-card .m-name { font-size: 18px; }
+  #root .app-interior .dashboard-workspace .mentor-card .m-btn { grid-column: 2; justify-self: start; margin-left: 0; width: auto; min-width: 180px; }
+  #root .app-interior .dashboard-workspace .dashboard-outcomes__item h3 { font-size: 16px; }
+  #root .app-interior .dashboard-workspace .dashboard-outcomes__item p { font-size: 14px; }
+}
+
+@media screen and (min-width: 621px) and (max-width: 960px) {
+  #root .app-interior .dashboard-workspace { --dashboard-gutter: 32px; }
+  #root .app-interior .dashboard-workspace .welcome-banner { min-height: calc(560px + var(--site-header-clearance)); padding-top: calc(var(--site-header-clearance) + 60px); padding-bottom: 100px; }
+  #root .app-interior .dashboard-workspace .wb-text { width: 57%; }
+  #root .app-interior .dashboard-workspace .wb-text h1 { font-size: clamp(42px, 6.2vw, 58px); }
+  #root .app-interior .dashboard-workspace .wb-text .dashboard-mobile-summary { font-size: 17px; }
+  #root .app-interior .dashboard-workspace .wb-actions { width: 57%; gap: 10px; }
+  #root .app-interior .dashboard-workspace .wb-actions .btn { font-size: 14px; padding: 15px 20px; min-height: 48px; }
+  #root .app-interior .dashboard-workspace .dashboard-artwork { width: 44%; }
+  #root .app-interior .dashboard-workspace .dashboard-mobile-nav { gap: 12px; }
+  #root .app-interior .dashboard-workspace .dashboard-mobile-nav a { padding: 16px 10px; font-size: 12px; }
+  #root .app-interior .dashboard-workspace :is(.block-card, .axis-card, .progress-block, .panel) { padding: 24px; }
+  #root .app-interior .dashboard-workspace .blocks-grid { gap: 16px; }
+  #root .app-interior .dashboard-workspace .bc-title { font-size: 17px; }
+  #root .app-interior .dashboard-workspace .bc-actions { flex-wrap: wrap; }
+  #root .app-interior .dashboard-workspace .bc-actions .bc-btn { flex: 1; min-width: 0; padding-inline: 14px; }
+  #root .app-interior .dashboard-workspace .two-col { grid-template-columns: minmax(0,1fr); }
+}

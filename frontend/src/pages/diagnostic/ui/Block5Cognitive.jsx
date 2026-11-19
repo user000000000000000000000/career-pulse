@@ -1,3 +1,4 @@
+import IconText from '../../../shared/ui/IconText.jsx'
 import { useState } from 'react'
 import { CP } from '../../../shared/api'
 import DiagShell, { ResultNav } from './DiagShell'
@@ -56,7 +57,7 @@ const VARK_QS = [
 const VARK_MAP = ['V', 'A', 'R', 'K']
 const SCALE_NAMES = { LANG: 'Вербальное', MATH: 'Логико-мат.', SPAT: 'Пространств.', KINE: 'Практическое', MUSI: 'Музыкальное', SOC: 'Социальный инт.', SYS: 'Системное' }
 const VARK_NAMES = { V: 'Визуальный', A: 'Аудиальный', R: 'Чтение/Письмо', K: 'Кинестетический', multimodal: 'Мультимодальный' }
-const COLORS = ['#5f96e9', '#8b6fe8', '#e8a0c4', '#72a2eb', '#22d97a', '#72a2eb', '#8b6fe8']
+const COLORS = ['#087cff', '#087cff', '#a1ccf5', '#087cff', '#087cff', '#087cff', '#087cff']
 const TOTAL = SELF_QS.length + TASKS.length + VARK_QS.length
 
 export default function Block5Cognitive() {
@@ -114,7 +115,7 @@ export default function Block5Cognitive() {
     return (
       <DiagShell num={5} title="КОГНИТИВНЫЙ ПРОФИЛЬ" pct={100}>
         <div className="result">
-          <div className="result-icon">🧠</div>
+          <div className="result-icon"><IconText text={"🧠"} /></div>
           <div className="result-title">{result.archetype.toUpperCase()}</div>
           <div className="result-desc">Топ-3 по самооценке: <b>{result.top3.map(k => SCALE_NAMES[k]).join(', ')}</b></div>
           <div className="result-summary">{blockSummary(5, result)}</div>

@@ -9,7 +9,7 @@ export default function Footer() {
       <div className="lf-inner">
         <div className="lf-grid">
           <div className="lf-brand">
-            <div className="lf-logo">CAREER<span>PULSE</span></div>
+            <div className="lf-logo">Пульс<span> Карьеры</span></div>
             <p>Персональная платформа карьерной диагностики. Психодиагностика, анализ рынка и живой наставник.</p>
           </div>
           <div className="lf-col">
@@ -31,7 +31,7 @@ export default function Footer() {
           </div>
         </div>
         <div className="lf-bottom">
-          <div className="lf-copy">© 2026 CareerPulse · careerpulse.ru · Никита Соколов</div>
+          <div className="lf-copy">© 2026 Пульс Карьеры · careerpulse.ru · Никита Соколов</div>
           <div className="lf-links">
             <Link to="/legal/privacy">Конфиденциальность</Link>
             <Link to="/legal/terms">Соглашение</Link>

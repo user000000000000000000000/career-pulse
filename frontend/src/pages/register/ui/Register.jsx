@@ -1,9 +1,11 @@
+import IconText from '../../../shared/ui/IconText.jsx'
 import { useState } from 'react'
 import { useNavigate, Link } from 'react-router-dom'
-import Header from '../../../shared/ui/Header.jsx'
+import AuthLayout from '../../../shared/ui/AuthLayout.jsx'
 import Card from '../../../shared/ui/Card.jsx'
 import Input from '../../../shared/ui/Input.jsx'
 import Button from '../../../shared/ui/Button.jsx'
+import SocialSignIn from '../../../shared/ui/SocialSignIn.jsx'
 import { register as doRegister, resendConfirmation } from '../../../shared/auth'
 import { isSupabaseConfigured } from '../../../shared/api'
 import { usePageMeta } from '../../../shared/lib/pageMeta'
@@ -20,7 +22,7 @@ const ROLES = [
 ]
 
 export default function Register() {
-  usePageMeta('Регистрация', 'Создайте аккаунт CareerPulse и пройдите профориентационную диагностику из 10 блоков.')
+  usePageMeta('Регистрация', 'Создайте аккаунт Пульс Карьеры и пройдите профориентационную диагностику из 10 блоков.')
   const navigate = useNavigate()
   const [form, setForm] = useState({ name: '', email: '', password: '', role: 'parent' })
   const [agree, setAgree]         = useState(false)
@@ -74,12 +76,10 @@ export default function Register() {
   }
 
   if (confirmed) return (
-    <div className="cp-legal">
-      <Header backTo="/" backLabel="← На главную" />
-      <div className="auth-wrap">
+    <AuthLayout registration>
         <Card accent className="auth-card">
           <div style={{ textAlign: 'center', padding: '20px 0' }}>
-            <div style={{ fontSize: 48, marginBottom: 16 }}>📬</div>
+            <div style={{ fontSize: 48, marginBottom: 16 }}><IconText text={"📬"} /></div>
             <div className="auth-eyebrow">Почти готово</div>
             <h1 className="auth-title" style={{ fontSize: 'clamp(28px,5vw,40px)' }}>ПОДТВЕРДИТЕ EMAIL</h1>
             <p className="auth-sub">
@@ -88,7 +88,7 @@ export default function Register() {
             </p>
             {resendMsg && <div className="auth-success" style={{ marginTop: 18 }}>{resendMsg}</div>}
             <div style={{ marginTop: 24 }}>
-              <Button block onClick={() => navigate('/login')}>Перейти ко входу →</Button>
+              <Button block onClick={() => navigate('/login')}><IconText text={"Перейти ко входу →"} /></Button>
             </div>
             <div style={{ textAlign: 'center', marginTop: 12 }}>
               <button type="button" className="auth-link-btn" onClick={onResend}>
@@ -97,20 +97,19 @@ export default function Register() {
             </div>
           </div>
         </Card>
-      </div>
-    </div>
+    </AuthLayout>
   )
 
   return (
-    <div className="cp-legal">
-      <Header backTo="/" backLabel="← На главную" />
-      <div className="auth-wrap">
+    <AuthLayout registration>
         <Card accent className="auth-card">
           <div className="auth-eyebrow">Регистрация</div>
           <h1 className="auth-title">НАЙДИ СВОЙ ПУТЬ</h1>
           <p className="auth-sub">Создайте аккаунт и пройдите диагностику из 293 вопросов.</p>
 
           {error && <div className="auth-error">{error}</div>}
+
+          <SocialSignIn registration />
 
           <div style={{ fontSize: 12, fontWeight: 700, color: 'var(--sub)', marginBottom: 10 }}>Кто вы?</div>
           <div className="auth-roles">
@@ -120,7 +119,7 @@ export default function Register() {
                 className={['auth-role', form.role === r.value && 'auth-role--active'].filter(Boolean).join(' ')}
                 onClick={() => setForm({ ...form, role: r.value })}
               >
-                {r.label}
+                <IconText text={r.label} />
               </div>
             ))}
           </div>
@@ -153,14 +152,13 @@ export default function Register() {
           </label>
 
           <Button block onClick={onSubmit} disabled={busy}>
-            {busy ? 'Создаём…' : 'Начать диагностику →'}
+            <IconText text={busy ? 'Создаём…' : 'Начать диагностику →'} />
           </Button>
 
           <div className="auth-foot">
             Уже есть аккаунт? <Link to="/login">Войти</Link>
           </div>
         </Card>
-      </div>
-    </div>
+    </AuthLayout>
   )
 }

@@ -1,13 +1,14 @@
+import IconText from '../../../shared/ui/IconText.jsx'
 // Графики результатов — чистый CSS, без внешних библиотек (recharts удалён).
 // Единый визуальный язык: горизонтальные ранжированные бары.
 
-const ACCENT = '#5f96e9'
-const VIOLET = '#8b6fe8'
-const EMBER  = '#e8a0c4'
-const GOLD   = '#72a2eb'
-const PINK   = '#ff4d6d'
-const BLUE   = '#3b82f6'
-const GREEN  = '#22c55e'
+const ACCENT = 'var(--chart-1)'
+const VIOLET = 'var(--chart-2)'
+const EMBER  = 'var(--chart-3)'
+const GOLD   = 'var(--chart-4)'
+const PINK   = 'var(--chart-5)'
+const BLUE   = 'var(--chart-6)'
+const GREEN  = 'var(--chart-7)'
 
 /** Общий блок ранжированных баров (интересы / способности / ценности / поведение). */
 function Bars({ title, rows }) {
@@ -15,7 +16,7 @@ function Bars({ title, rows }) {
   const sorted = [...rows].sort((a, b) => (b.val || 0) - (a.val || 0))
   return (
     <div className="chart-block">
-      <div className="chart-title">{title}</div>
+      <div className="chart-title"><IconText text={title} /></div>
       {!hasData && <div className="chart-empty">Нет данных по этому блоку</div>}
       <div className="rc-bars">
         {sorted.map(r => (

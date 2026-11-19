@@ -8,3 +8,4 @@ export { generateLinkCode, redeemLinkCode, listFamily, unlinkFamily, getChildPro
 export { checkIsAdmin, adminDashboardStats, adminListUsers, publicUserCount } from './admin'
 export { submitFeedback, adminListFeedback, adminSetFeedbackStatus } from './feedback'
 export { enableResultSharing, disableResultSharing, getSharedResults } from './share'
+export { demoProfileRow } from './demoData'

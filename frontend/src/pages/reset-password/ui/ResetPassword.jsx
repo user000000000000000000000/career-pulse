@@ -1,3 +1,4 @@
+import IconText from '../../../shared/ui/IconText.jsx'
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import Header from '../../../shared/ui/Header.jsx'
@@ -37,12 +38,12 @@ export default function ResetPassword() {
       <div className="auth-wrap">
         <Card accent className="auth-card">
           <div style={{ textAlign: 'center', padding: '20px 0' }}>
-            <div style={{ fontSize: 48, marginBottom: 16 }}>✅</div>
+            <div style={{ fontSize: 48, marginBottom: 16 }}><IconText text={"✅"} /></div>
             <div className="auth-eyebrow">Готово</div>
             <h1 className="auth-title" style={{ fontSize: 'clamp(28px,5vw,40px)' }}>ПАРОЛЬ ОБНОВЛЁН</h1>
             <p className="auth-sub">Теперь можно войти с новым паролем.</p>
             <div style={{ marginTop: 24 }}>
-              <Button block onClick={() => navigate('/login')}>Перейти ко входу →</Button>
+              <Button block onClick={() => navigate('/login')}><IconText text={"Перейти ко входу →"} /></Button>
             </div>
           </div>
         </Card>

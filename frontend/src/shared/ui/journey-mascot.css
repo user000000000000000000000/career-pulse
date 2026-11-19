@@ -1,0 +1,122 @@
+.diagnostic-mascot {
+  position: relative; display: grid; place-items: center; width: 240px; height: 240px;
+  --diagnostic-wing-speed: 2.8s; --diagnostic-hover-speed: 5.8s; --diagnostic-wing-angle: 5deg;
+}
+.diagnostic-mascot .bird-helper__flight {
+  width: 100%; aspect-ratio: 4 / 3;
+  animation: diagnostic-cartoon-hover var(--diagnostic-hover-speed) cubic-bezier(.45,0,.55,1) infinite;
+}
+.diagnostic-mascot .bird-helper__wing--greeting {
+  animation: diagnostic-cartoon-wing var(--diagnostic-wing-speed) cubic-bezier(.45,0,.55,1) infinite;
+  animation-delay: 0s;
+}
+.diagnostic-mascot .bird-helper__wing--left { --diagnostic-direction: 1; }
+.diagnostic-mascot .bird-helper__wing--right { --diagnostic-direction: -1; animation-delay: -.12s; }
+@keyframes diagnostic-cartoon-wing {
+  0%, 100% { transform: rotate(calc(var(--diagnostic-direction) * -1deg)); }
+  50% { transform: rotate(calc(var(--diagnostic-direction) * var(--diagnostic-wing-angle))); }
+}
+@keyframes diagnostic-cartoon-hover {
+  0%, 100% { transform: translateY(3px) rotate(-1deg); }
+  50% { transform: translateY(-5px) rotate(1deg); }
+}
+.diagnostic-mascot--explorer { --diagnostic-wing-speed: 3.2s; --diagnostic-hover-speed: 6.2s; }
+.diagnostic-mascot--heart { --diagnostic-wing-speed: 3.6s; --diagnostic-wing-angle: 3deg; }
+.diagnostic-mascot--mirror { --diagnostic-wing-speed: 3.4s; --diagnostic-hover-speed: 6.8s; }
+.diagnostic-mascot--think-write { --diagnostic-wing-speed: 3.8s; --diagnostic-wing-angle: 3deg; }
+.diagnostic-mascot--workshop { --diagnostic-wing-speed: 2.6s; --diagnostic-hover-speed: 5.2s; }
+.diagnostic-mascot--confidence { --diagnostic-wing-speed: 2.4s; --diagnostic-wing-angle: 6deg; }
+.diagnostic-mascot--flight { --diagnostic-wing-speed: 1.8s; --diagnostic-hover-speed: 4.4s; --diagnostic-wing-angle: 7deg; }
+.diagnostic-mascot--conversation { --diagnostic-wing-speed: 3s; --diagnostic-hover-speed: 6s; }
+.diagnostic-mascot--letter { --diagnostic-wing-speed: 4s; --diagnostic-wing-angle: 3deg; }
+.diagnostic-mascot__scene { display: block; width: 100%; height: 100%; overflow: visible; }
+.diagnostic-mascot__living { transform-box: view-box; transform-origin: 240px 410px; animation: diagnostic-scene-breathe 5.6s cubic-bezier(.45,0,.55,1) infinite; }
+.diagnostic-mascot__part { transform-box: view-box; transform-origin: var(--scene-pivot); animation: diagnostic-scene-gesture var(--scene-speed) cubic-bezier(.45,0,.55,1) infinite; }
+@keyframes diagnostic-scene-gesture { 0%, 100% { transform: rotate(0); } 50% { transform: rotate(var(--scene-angle)); } }
+@keyframes diagnostic-scene-breathe { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-2px); } }
+.diagnostic-mascot--heart .diagnostic-mascot__part { animation-name: diagnostic-scene-heart; }
+@keyframes diagnostic-scene-heart { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.025); } }
+.diagnostic-mascot--think-write .diagnostic-mascot__part, .diagnostic-mascot--letter .diagnostic-mascot__part { animation-name: diagnostic-scene-write; }
+@keyframes diagnostic-scene-write {
+  0%, 100% { transform: rotate(0); }
+  15% { transform: rotate(-1deg); }
+  30% { transform: rotate(1deg); }
+  45% { transform: rotate(-1.2deg); }
+  60% { transform: rotate(.8deg); }
+  78% { transform: rotate(-.4deg); }
+}
+/* Longer choreography: several gestures with eased changes of direction. */
+.diagnostic-mascot--welcome .diagnostic-mascot__part,
+.diagnostic-mascot--conversation .diagnostic-mascot__part { animation: diagnostic-scene-wave-sequence 8s cubic-bezier(.45,0,.55,1) infinite; }
+@keyframes diagnostic-scene-wave-sequence {
+  0%,100% { transform: rotate(0); }
+  12%,36% { transform: rotate(var(--scene-angle)); }
+  24%,48% { transform: rotate(-1deg); }
+  66% { transform: rotate(2deg); }
+  82% { transform: rotate(.3deg); }
+}
+.diagnostic-mascot--explorer .diagnostic-mascot__part,
+.diagnostic-mascot--workshop .diagnostic-mascot__part,
+.diagnostic-mascot--confidence .diagnostic-mascot__part { animation: diagnostic-scene-present 9s cubic-bezier(.45,0,.55,1) infinite; }
+@keyframes diagnostic-scene-present {
+  0%,100% { transform: rotate(0); }
+  20% { transform: rotate(var(--scene-angle)); }
+  38% { transform: rotate(.3deg); }
+  58% { transform: rotate(calc(var(--scene-angle) * -.5)); }
+  76% { transform: rotate(calc(var(--scene-angle) * .7)); }
+}
+.diagnostic-mascot--think-write .diagnostic-mascot__part,
+.diagnostic-mascot--letter .diagnostic-mascot__part { animation: diagnostic-scene-write-long 10s cubic-bezier(.45,0,.55,1) infinite; }
+@keyframes diagnostic-scene-write-long {
+  0%,100% { transform: rotate(0); }
+  8% { transform: rotate(-.4deg); }
+  20% { transform: rotate(.2deg); }
+  28%,42%,56% { transform: rotate(-1.3deg); }
+  35%,49%,63% { transform: rotate(1.2deg); }
+  75% { transform: rotate(.1deg); }
+  84% { transform: rotate(-.8deg); }
+  92% { transform: rotate(.6deg); }
+}
+.diagnostic-mascot__detail { transform-box: view-box; transform-origin: var(--detail-pivot); animation: diagnostic-detail-sway 6.7s cubic-bezier(.45,0,.55,1) infinite; }
+@keyframes diagnostic-detail-sway {
+  0%,100% { transform: rotate(0); }
+  25% { transform: rotate(var(--detail-angle)); }
+  65% { transform: rotate(calc(var(--detail-angle) * -.6)); }
+}
+.diagnostic-mascot__detail--tassel { animation-duration: 3.8s; animation-delay: -.6s; }
+.diagnostic-mascot__detail--tail { animation-duration: 5.3s; animation-delay: -1.2s; }
+.diagnostic-mascot__detail--speech { animation-duration: 4.7s; }
+.diagnostic-mascot__detail--envelope { animation-duration: 8.3s; }
+.diagnostic-mascot__accents { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; pointer-events: none; fill: none; stroke: var(--brand-blue); stroke-width: 2.5; stroke-linecap: round; stroke-linejoin: round; }
+.diagnostic-mascot__spark { transform-box: fill-box; transform-origin: center; animation: diagnostic-accent-twinkle 6s ease-in-out infinite; }
+.diagnostic-mascot__spark--two { animation-delay: -3s; }
+@keyframes diagnostic-accent-twinkle { 0%,100% { opacity: .15; transform: scale(.7) rotate(-8deg); } 50% { opacity: .75; transform: scale(1) rotate(8deg); } }
+.diagnostic-mascot__idea { animation: diagnostic-idea-rise 10s ease-in-out infinite; }
+@keyframes diagnostic-idea-rise { 0%,100% { opacity: .15; transform: translateY(3px); } 20%,45% { opacity: .85; transform: translateY(-3px); } 70% { opacity: .25; transform: translateY(0); } }
+.diagnostic-mascot__breeze { animation: diagnostic-breeze 2.8s ease-in-out infinite; }
+@keyframes diagnostic-breeze { 0%,100% { opacity: .15; transform: translateX(5px); } 50% { opacity: .6; transform: translateX(-4px); } }
+.diagnostic-mascot__glint { transform-box: fill-box; transform-origin: center; animation: diagnostic-accent-twinkle 7s ease-in-out infinite; }
+.diagnostic-mascot__reply { animation: diagnostic-reply 6s ease-in-out infinite; }
+@keyframes diagnostic-reply { 0%,100% { opacity: .15; transform: translateY(2px); } 50% { opacity: .7; transform: translateY(-2px); } }
+.diagnostic-mascot__ink { stroke: #577fba; stroke-width: 1.7; stroke-dasharray: 60; animation: diagnostic-ink 10s ease-in-out infinite; }
+@keyframes diagnostic-ink { 0%,100% { opacity: 0; stroke-dashoffset: 60; } 30% { opacity: .3; stroke-dashoffset: 40; } 65%,85% { opacity: .55; stroke-dashoffset: 0; } 95% { opacity: 0; stroke-dashoffset: 0; } }
+@media (min-width: 641px) and (max-width: 820px) { .diagnostic-mascot { width: 190px; height: 190px; } }
+@media (max-width: 640px) { .diagnostic-mascot { width: 190px; height: 190px; } }
+@media (prefers-reduced-motion: reduce) {
+  .diagnostic-mascot .bird-helper__flight, .diagnostic-mascot .bird-helper__wing,
+  .diagnostic-mascot .diagnostic-mascot__part, .diagnostic-mascot .diagnostic-mascot__living,
+  .diagnostic-mascot .diagnostic-mascot__detail, .diagnostic-mascot__accents * { animation: none; transform: none; }
+  .diagnostic-mascot__accents { display: none; }
+}
+
+/* At most the character gesture and one story prop move; thumbnails stay still. */
+.diagnostic-mascot__living, .diagnostic-mascot__detail, .diagnostic-mascot__spark,
+.diagnostic-mascot__glint, .diagnostic-mascot__reply { animation: none; }
+.diagnostic-mascot__spark { opacity: .45; }
+.journey-mascot__props { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; fill: none; stroke: var(--brand-blue); stroke-width: 3; stroke-linecap: round; stroke-linejoin: round; }
+.journey-mascot__cloud { animation: journey-cloud-drift 7s ease-in-out infinite; }
+.journey-mascot__map, .journey-mascot__envelope { filter: drop-shadow(0 4px 5px #3469a31a); }
+.diagnostic-mascot--still * { animation: none !important; }
+.diagnostic-mascot--still > .diagnostic-mascot__scene { overflow: hidden; }
+@keyframes journey-cloud-drift { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-5px); } }
+@media (prefers-reduced-motion: reduce) { .journey-mascot__props * { animation: none; transform: none; } }

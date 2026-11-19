@@ -6,6 +6,11 @@
   "description": "CareerPulse — платформа карьерной диагностики (фронтенд)",
   "scripts": {
     "dev": "vite --base=/",
+    "dev:demo": "vite --mode demo --host 127.0.0.1 --port 5174 --strictPort",
+    "build:demo": "vite build --mode demo",
+    "build:demo:vercel": "vite build --mode demo --base=/ --outDir dist-demo-vercel && node scripts/check-demo-artifact.mjs",
+    "build:demo:prebuilt": "vite build --mode demo --base=/ --outDir dist-demo-vercel && node scripts/check-demo-artifact.mjs && node scripts/prepare-demo-prebuilt.mjs",
+    "preview:demo": "vite preview --mode demo --host 127.0.0.1 --port 5174 --strictPort",
     "build": "vite build",
     "build:prod": "vite build --base=/",
     "preview": "vite preview",

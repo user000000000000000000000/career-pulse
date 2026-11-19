@@ -1,3 +1,4 @@
+import IconText from '../../../shared/ui/IconText.jsx'
 import { useState, useMemo } from 'react'
 import { useNavigate, useLocation } from 'react-router-dom'
 import { PROFESSIONS, PROFESSION_CATEGORIES } from '../../../entities/profession'
@@ -6,7 +7,7 @@ import Header from '../../../shared/ui/Header.jsx'
 import '../atlas.css'
 
 const HOLLAND_LABEL = { R: 'Реалист', I: 'Исследователь', A: 'Артист', S: 'Социальный', E: 'Предприниматель', C: 'Конвенциональный' }
-const HOLLAND_COLOR = { R: '#e8a0c4', I: '#5f96e9', A: '#8b6fe8', S: '#3b82f6', E: '#72a2eb', C: '#ff4d6d' }
+const HOLLAND_COLOR = { R: '#087cff', I: '#087cff', A: '#087cff', S: '#087cff', E: '#087cff', C: '#087cff' }
 
 export default function Atlas() {
   const navigate = useNavigate()
@@ -41,7 +42,7 @@ export default function Atlas() {
       <Header backTo="/dashboard" backLabel="← В кабинет" reserveRight />
 
       <div className="atlas-hero">
-        <div className="atlas-eyebrow">CareerPulse</div>
+        <div className="atlas-eyebrow">Пульс Карьеры</div>
         <h1 className="atlas-title">АТЛАС ПРОФЕССИЙ</h1>
         <p className="atlas-sub">200 профессий с описаниями, типами по Holland и категориями. Найди своё направление.</p>
       </div>
@@ -75,11 +76,11 @@ export default function Atlas() {
                   className={['atlas-chip atlas-chip--holland', on && 'active'].filter(Boolean).join(' ')}
                   style={{ '--hc': HOLLAND_COLOR[k], opacity: dim ? 0.4 : 1 }}
                   onClick={() => toggleHolland(k)}
-                >{k} — {label}</button>
+                >{k} — <IconText text={label} /></button>
               )
             })}
             {activeHolland.length > 0 && (
-              <button className="atlas-chip" onClick={() => setActiveHolland([])}>× сбросить</button>
+              <button className="atlas-chip" onClick={() => setActiveHolland([])}><IconText text={"× сбросить"} /></button>
             )}
           </div>
           <div className="atlas-filter-hint">
@@ -132,7 +133,7 @@ export default function Atlas() {
                 })()}
               </div>
             )}
-            <div className="ac-arrow">{expanded === p.id ? '▲' : '▼'}</div>
+            <div className="ac-arrow"><IconText text={expanded === p.id ? '▲' : '▼'} /></div>
           </div>
         ))}
       </div>

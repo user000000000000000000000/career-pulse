@@ -1,0 +1,102 @@
+/* Completion count drives the ring, milestones and journey. */
+#root .app-interior .dashboard-workspace .progress-block.dashboard-progress {
+  padding: 32px; border: 1px solid #d7e9ff; border-radius: 28px;
+  background: radial-gradient(ellipse at 0 0, #eaf5ff 0, transparent 42%), linear-gradient(135deg, #fff 25%, #f5faff);
+  box-shadow: 0 16px 48px -30px #2369b950;
+}
+.dashboard-progress .dp-overview { display: grid; grid-template-columns: 160px minmax(0,1fr) minmax(240px,.8fr); align-items: center; gap: 32px; }
+.dashboard-progress .dp-chart { position: relative; width: 160px; height: 160px; flex-shrink: 0; }
+.dashboard-progress .dp-chart__svg { display: block; width: 100%; height: 100%; overflow: visible; }
+.dashboard-progress .dp-chart__track, .dashboard-progress .dp-chart__value { fill: none; stroke-width: 8; }
+.dashboard-progress .dp-chart__track { stroke: #deedfc; }
+.dashboard-progress .dp-chart__value { transition: stroke-dashoffset .6s ease; }
+.dashboard-progress .dp-chart__center { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px; }
+.dashboard-progress .dp-chart__number { display: flex; align-items: baseline; justify-content: center; gap: 2px; color: #070529; font-family: var(--font-body); font-variant-numeric: tabular-nums; line-height: 1; }
+.dashboard-progress .dp-chart__number strong { font-size: 40px; font-weight: 800; letter-spacing: -1.5px; }
+.dashboard-progress .dp-chart__number > span { font-size: 19px; font-weight: 700; color: #527aa8; }
+.dashboard-progress .dp-chart__caption { color: #527aa8; font: 500 11px/1.4 var(--font-body); letter-spacing: .02em; }
+.dashboard-progress .dp-summary { min-width: 0; }
+.dashboard-progress .dp-eyebrow { display: flex; align-items: center; gap: 6px; margin: 0 0 10px; color: var(--brand-blue); font: 700 12px/1.5 var(--font-body); }
+#root .dashboard-workspace .dashboard-progress .dp-count { margin: 0 0 12px; color: #070529; font: 800 30px/1.25 var(--font-body); letter-spacing: -.8px; text-transform: none; }
+.dashboard-progress .dp-count > span { font-weight: 600; }
+.dashboard-progress .dp-next { max-width: 440px; color: #52749b; font: 400 13px/1.6 var(--font-body); }
+.dashboard-progress .dp-next strong { color: #315d90; font-weight: 600; }
+.dashboard-progress .dp-action { display: inline-flex; align-items: center; justify-content: center; gap: 10px; min-height: 44px; margin-top: 16px; padding: 11px 18px; border: 1px solid #bad9fc; border-radius: 100px; background: white; color: var(--brand-blue); font: 700 12px/1.5 var(--font-body); text-decoration: none; transition: background .2s, border-color .2s; }
+.dashboard-progress .dp-action:hover { background: #eaf4ff; border-color: var(--brand-blue); }
+.dashboard-progress .dp-milestones { display: grid; gap: 10px; list-style: none; margin: 0; padding: 0; }
+.dashboard-progress .dp-milestone { display: flex; align-items: center; gap: 12px; padding: 11px 14px; border: 1px solid #e0ebf8; border-radius: 16px; background: #f8fbff; }
+.dashboard-progress .dp-milestone.is-done { border-color: #dbeafd; background: #edf6ff; }
+.dashboard-progress .dp-milestone__icon { display: grid; place-items: center; flex: 0 0 28px; width: 28px; height: 28px; border-radius: 50%; background: #e8eff8; color: #7189a6; }
+.dashboard-progress .is-done .dp-milestone__icon { background: var(--brand-blue); color: white; }
+.dashboard-progress .dp-milestone__copy { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.dashboard-progress .dp-milestone__copy strong { color: #25486f; font: 700 12px/1.45 var(--font-body); }
+.dashboard-progress .dp-milestone__copy > span { color: #52749b; font: 400 11px/1.5 var(--font-body); }
+#root .app-interior .dashboard-workspace .dashboard-progress .dp-journey { margin-top: 28px; padding-top: 26px; border-top: 1px solid #dfebf9; }
+#root .dashboard-workspace .dashboard-progress .journey-progress__caption { margin-bottom: 20px; font-size: 12px; color: #58799e; }
+#root .dashboard-workspace .dashboard-progress .journey-progress__caption > :first-child { color: #25486f; font-size: 14px; }
+#root .dashboard-workspace .dashboard-progress .journey-progress__list { gap: 10px; }
+#root .dashboard-workspace .dashboard-progress .journey-progress__item { gap: 10px; }
+#root .dashboard-workspace .dashboard-progress .journey-progress__portrait { width: 54px; height: 54px; box-sizing: border-box; background: #f1f6fc; }
+#root .dashboard-workspace .dashboard-progress .journey-progress__portrait .diagnostic-mascot { width: 46px; height: 46px; }
+#root .dashboard-workspace .dashboard-progress .is-complete .journey-progress__portrait { background: #e3f1ff; }
+#root .dashboard-workspace .dashboard-progress .is-current .journey-progress__portrait { border: 2px solid var(--brand-blue); background: white; box-shadow: 0 0 0 4px #e1efff; }
+#root .dashboard-workspace .dashboard-progress .journey-progress__check { width: 18px; height: 18px; right: -3px; bottom: -2px; color: white; background: var(--brand-blue); border: 2px solid white; }
+#root .dashboard-workspace .dashboard-progress .journey-progress__label { font: 500 11px/1.45 var(--font-body); color: #52749b; }
+#root .dashboard-workspace .dashboard-progress .is-current .journey-progress__label { font-weight: 800; color: var(--brand-blue); }
+#root .dashboard-workspace .dashboard-progress .journey-progress__legend { align-items: center; justify-content: center; gap: 20px; margin-top: 22px; font-size: 11px; }
+#root .dashboard-workspace .dashboard-progress .journey-progress__legend > span { display: inline-flex; align-items: center; gap: 6px; }
+#root .dashboard-workspace .dashboard-progress .journey-key { display: inline-grid; place-items: center; flex-shrink: 0; width: 12px; height: 12px; border-radius: 50%; border: 1px solid #c6d7ec; background: #edf2f8; }
+#root .dashboard-workspace .dashboard-progress .journey-key--done { background: var(--brand-blue); border-color: var(--brand-blue); color: white; }
+#root .dashboard-workspace .dashboard-progress .journey-key--current { border: 2px solid var(--brand-blue); background: white; }
+#root .dashboard-workspace .dashboard-progress :is(.journey-progress__check, .journey-key--done) .ui-icon { display: block; width: 10px; height: 10px; stroke: white; color: white; }
+#root .dashboard-workspace .dashboard-progress .dp-milestone__icon .ui-icon { width: 16px; height: 16px; color: inherit; }
+.dashboard-progress .dp-consult { display: flex; align-items: center; gap: 14px; margin-top: 26px; padding: 18px 20px; border: 1px solid #dceaff; border-radius: 20px; background: #eaf4ff; }
+.dashboard-progress .dp-consult__icon { display: grid; place-items: center; flex: 0 0 42px; width: 42px; height: 42px; border-radius: 14px; color: var(--brand-blue); background: #fff; }
+.dashboard-progress .dp-consult > div { flex: 1; min-width: 0; }
+.dashboard-progress .dp-consult strong { color: #25486f; font: 700 13px/1.5 var(--font-body); }
+.dashboard-progress .dp-consult p { margin-top: 3px; color: #52749b; font: 400 12px/1.6 var(--font-body); }
+.dashboard-progress .dp-consult__action { display: inline-flex; align-items: center; justify-content: center; gap: 8px; flex-shrink: 0; min-height: 44px; padding: 11px 20px; border: 0; border-radius: 100px; background: var(--brand-gradient); color: white; font: 700 12px/1.5 var(--font-body); cursor: pointer; }
+@media (max-width: 1100px) {
+  #root .app-interior .dashboard-workspace .progress-block.dashboard-progress { padding: 28px; }
+  .dashboard-progress .dp-overview { grid-template-columns: 144px minmax(0,1fr); gap: 24px; }
+  .dashboard-progress .dp-chart { width: 144px; height: 144px; }
+  .dashboard-progress .dp-milestones { grid-column: 1/-1; grid-template-columns: repeat(3,minmax(0,1fr)); gap: 10px; }
+  .dashboard-progress .dp-milestone { padding: 12px; gap: 8px; }
+  #root .dashboard-workspace .dashboard-progress .journey-progress__list { grid-template-columns: repeat(5,minmax(0,1fr)); gap: 22px 12px; }
+  .dashboard-progress .journey-progress .journey-progress__item:nth-child(n) .journey-progress__tooltip { left: 50%; right: auto; transform: translateX(-50%); }
+  .dashboard-progress .journey-progress .journey-progress__item:nth-child(5n+1) .journey-progress__tooltip { left: 0; transform: none; }
+  .dashboard-progress .journey-progress .journey-progress__item:nth-child(5n+2) .journey-progress__tooltip { left: calc(-100% - 12px); transform: none; }
+  .dashboard-progress .journey-progress .journey-progress__item:nth-child(5n+4) .journey-progress__tooltip { left: auto; right: calc(-100% - 12px); transform: none; }
+  .dashboard-progress .journey-progress .journey-progress__item:nth-child(5n) .journey-progress__tooltip { left: auto; right: 0; transform: none; }
+}
+@media (max-width: 620px) {
+  #root .app-interior .dashboard-workspace .progress-block.dashboard-progress { padding: 22px 18px; border-radius: 24px; }
+  .dashboard-progress .dp-overview { grid-template-columns: 104px minmax(0,1fr); gap: 20px 14px; }
+  .dashboard-progress .dp-chart { width: 104px; height: 104px; }
+  .dashboard-progress .dp-chart__number strong { font-size: 29px; letter-spacing: -1px; }
+  .dashboard-progress .dp-chart__number > span { font-size: 15px; }
+  .dashboard-progress .dp-chart__caption { font-size: 9px; }
+  .dashboard-progress .dp-chart__center { gap: 4px; }
+  .dashboard-progress .dp-eyebrow { font-size: 11px; margin-bottom: 8px; }
+  #root .dashboard-workspace .dashboard-progress .dp-count { font-size: 22px; letter-spacing: -.5px; margin-bottom: 8px; }
+  .dashboard-progress .dp-next { font-size: 12px; line-height: 1.5; }
+  .dashboard-progress .dp-action { font-size: 11px; gap: 5px; margin-top: 12px; padding: 10px 12px; }
+  .dashboard-progress .dp-milestones { grid-template-columns: minmax(0,1fr); gap: 8px; }
+  .dashboard-progress .dp-milestone { padding: 10px 12px; gap: 10px; }
+  .dashboard-progress .dp-milestone__copy { flex: 1; flex-direction: row; justify-content: space-between; align-items: center; gap: 8px; }
+  .dashboard-progress .dp-milestone__copy strong { font-size: 11px; }
+  .dashboard-progress .dp-milestone__copy > span { flex-shrink: 0; font-size: 10px; }
+  #root .app-interior .dashboard-workspace .dashboard-progress .dp-journey { margin-top: 22px; padding-top: 20px; }
+  #root .dashboard-workspace .dashboard-progress .journey-progress__caption { flex-direction: column; gap: 3px; margin-bottom: 18px; font-size: 11px; }
+  #root .dashboard-workspace .dashboard-progress .journey-progress__portrait { width: 40px; height: 40px; }
+  #root .dashboard-workspace .dashboard-progress .journey-progress__portrait .diagnostic-mascot { width: 34px; height: 34px; }
+  #root .dashboard-workspace .dashboard-progress .journey-progress__label { font-size: 9px; }
+  #root .dashboard-workspace .dashboard-progress .journey-progress__list { gap: 18px 5px; }
+  #root .dashboard-workspace .dashboard-progress .journey-progress__legend { gap: 12px; font-size: 10px; margin-top: 20px; }
+  .dashboard-progress .dp-consult { padding: 14px; gap: 10px; margin-top: 22px; align-items: start; flex-wrap: wrap; }
+  .dashboard-progress .dp-consult__icon { flex-basis: 32px; width: 32px; height: 32px; border-radius: 10px; }
+  .dashboard-progress .dp-consult strong { font-size: 12px; }
+  .dashboard-progress .dp-consult p { font-size: 11px; }
+  .dashboard-progress .dp-consult__action { width: 100%; margin-top: 4px; }
+}
+@media (prefers-reduced-motion: reduce) { .dashboard-progress .dp-chart__value { transition: none; } }

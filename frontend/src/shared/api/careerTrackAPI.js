@@ -1,4 +1,6 @@
 import { supabase, isSupabaseConfigured } from './supabase'
+import { config } from '../config'
+import { demoInstitutions } from './demoData'
 
 /**
  * Карьерный трек: профессия → специальность (ЕГЭ) → программы вузов/колледжей.
@@ -23,6 +25,11 @@ export const EGE_SUBJECT_NAMES = {
  * @returns {Promise<{status: 'ready'|'empty'|'unavailable', specialties: Array}>}
  */
 export async function getCareerTrack(professionId, userCity = '') {
+  if (config.demoMode) return { status: 'ready', specialties: [{
+    code: 'Демо', name: 'Пример образовательного направления', level: 'bachelor',
+    ege_required: ['Русский язык', 'Математика (профиль)'], ege_choose_one_of: ['Информатика', 'Физика'],
+    programs: demoInstitutions.filter(i => i.type === 'university').map(i => ({ institution_name: i.name, institution_type: i.type, city: i.city, program_name: 'Демонстрационная программа', form: 'Очная', has_budget_places: true })),
+  }] }
   if (!isSupabaseConfigured) return { status: 'unavailable', specialties: [] }
 
   const { data: mapRows, error: mapErr } = await supabase
@@ -86,6 +93,7 @@ export async function getCareerTracksForProfessions(professionIds = [], userCity
 
 /** Публичный каталог вузов/колледжей (страница «Вузы России»). Фильтры: город, тип, поиск. */
 export async function listInstitutions({ city = '', type = '', q = '', limit = 100 } = {}) {
+  if (config.demoMode) return demoInstitutions.filter(i => (!city || i.city.toLowerCase().includes(city.toLowerCase())) && (!type || i.type === type) && (i.name + i.full_name).toLowerCase().includes(q.toLowerCase())).slice(0, limit)
   if (!isSupabaseConfigured) return []
   let query = supabase.from('institutions').select('name, full_name, type, city, region, website').order('name').limit(limit)
   if (city) query = query.ilike('city', `%${city}%`)

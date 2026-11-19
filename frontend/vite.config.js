@@ -2,6 +2,7 @@ import { defineConfig, loadEnv } from 'vite'
 import react from '@vitejs/plugin-react'
 import fs from 'node:fs'
 import path from 'node:path'
+import { demoIsolation } from './scripts/demo-isolation.mjs'
 
 // GitHub Pages не умеет SPA-fallback (в отличие от .htaccess на reg.ru): прямой заход
 // на /t/<...>, /r/<...>, /login и т.п. даёт 404. Копируем index.html → 404.html —
@@ -26,11 +27,11 @@ export default defineConfig(({ mode }) => {
   //   свой домен careerpulse.ru   → собирать с VITE_BASE=/
   const base = process.env.VITE_BASE || env.VITE_BASE || '/career-pulse/'
   return {
-    plugins: [react(), spaFallback()],
+    plugins: [react(), spaFallback(), ...(mode === 'demo' ? [demoIsolation()] : [])],
     base,
-    server: { port: 5173, open: true },
+    server: { port: 5173, open: mode !== 'demo' },
     build: {
-      outDir: 'dist',
+      outDir: mode === 'demo' ? 'dist-demo' : 'dist',
       // Вендор в отдельных чанках: React/Router и Supabase меняются редко, поэтому
       // между релизами их хэш стабилен → браузер берёт их из кэша, качает только наш код.
       rollupOptions: {

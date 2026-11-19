@@ -1,0 +1,41 @@
+.journey-progress { width: 100%; min-width: 0; color: #36577f; font-family: var(--font-body); }
+.journey-progress__caption { display: flex; justify-content: space-between; gap: 12px; font-size: 12px; line-height: 1.5; margin-bottom: 12px; }
+.journey-progress__caption > :first-child { font-weight: 700; color: var(--brand-blue); }
+.journey-progress__list { list-style: none; display: grid; grid-template-columns: repeat(10, minmax(0, 1fr)); gap: 5px; margin: 0; padding: 0; }
+.journey-progress__item { position: relative; display: flex; flex-direction: column; align-items: center; gap: 6px; min-width: 0; border-radius: 10px; outline-offset: 3px; }
+.journey-progress__item:focus-visible { outline: 2px solid var(--brand-blue); }
+.journey-progress__portrait { position: relative; width: 46px; height: 46px; display: grid; place-items: center; border: 1px solid #d4e3f5; border-radius: 50%; background: #f1f6fc; transition: background .2s, transform .2s, box-shadow .2s; }
+.journey-progress__portrait .diagnostic-mascot { width: 40px; height: 40px; opacity: .38; filter: saturate(.2); }
+.journey-progress__item.is-complete .journey-progress__portrait { background: #dfefff; border-color: #89bafa; }
+.journey-progress__item.is-complete .diagnostic-mascot, .journey-progress__item.is-current .diagnostic-mascot { opacity: 1; filter: none; }
+.journey-progress__item.is-current .journey-progress__portrait { border: 2px solid var(--brand-blue); background: white; box-shadow: 0 0 0 3px #dfedff; }
+.journey-progress__item:hover .journey-progress__portrait, .journey-progress__item:focus-visible .journey-progress__portrait { transform: translateY(-2px); }
+.journey-progress__check { position: absolute; right: -3px; bottom: -1px; width: 15px; height: 15px; display: grid; place-items: center; color: white; background: var(--brand-blue); border: 2px solid white; border-radius: 50%; }
+.journey-progress__label { font-size: 10px; line-height: 1.35; text-align: center; overflow-wrap: anywhere; }
+.journey-progress__item.is-current .journey-progress__label { color: var(--brand-blue); font-weight: 700; }
+.journey-progress .journey-progress__tooltip { position: absolute; bottom: calc(100% + 12px); left: 50%; transform: translateX(-50%); z-index: 5; visibility: hidden; opacity: 0; pointer-events: none; display: flex; flex-direction: column; justify-content: center; align-items: center; gap: 6px; box-sizing: border-box; width: min(260px, calc(100vw - 96px)); min-height: 80px; padding: 14px 18px; background: var(--brand-blue); color: #fff; border: 1px solid #ffffff24; border-radius: 16px; text-align: center; white-space: normal; overflow-wrap: anywhere; box-shadow: 0 10px 28px #153c7033; }
+.journey-progress .journey-progress__tooltip-title { display: block; width: 100%; color: #fff; font: 700 13px/1.5 var(--font-body); text-align: center; text-wrap: balance; }
+.journey-progress .journey-progress__tooltip-state { display: block; color: #d7eaff; font: 500 12px/1.4 var(--font-body); text-align: center; }
+.journey-progress__item:nth-child(-n+2) .journey-progress__tooltip { left: 0; transform: none; }
+.journey-progress__item:nth-last-child(-n+2) .journey-progress__tooltip { left: auto; right: 0; transform: none; }
+.journey-progress__item:hover .journey-progress__tooltip, .journey-progress__item:focus .journey-progress__tooltip { visibility: visible; opacity: 1; }
+.journey-progress__list:has(.journey-progress__item:hover) .journey-progress__item:not(:hover) .journey-progress__tooltip { visibility: hidden; opacity: 0; }
+.journey-progress__list:has(.journey-progress__item:focus-visible) .journey-progress__item:not(:focus-visible) .journey-progress__tooltip { visibility: hidden; opacity: 0; }
+.journey-progress__list:has(.journey-progress__item:focus-visible) .journey-progress__item:focus-visible .journey-progress__tooltip { visibility: visible; opacity: 1; }
+.journey-progress__legend { display: flex; gap: 14px; justify-content: flex-end; margin-top: 12px; font-size: 10px; color: #496a91; }
+.journey-progress__legend > :first-child { color: var(--brand-blue); }
+.journey-progress__item.is-celebrating .journey-progress__portrait { animation: journey-block-done .7s ease-out; }
+@keyframes journey-block-done { 0%,100% { transform: scale(1); } 40% { transform: translateY(-4px) scale(1.12); box-shadow: 0 0 0 6px #cee4ff; } }
+.diag-journey { width: min(1080px, calc(100% - 48px)); margin: 22px auto 0; border: 1px solid #d8e8fb; border-radius: 20px; background: #fff; padding: 18px 22px; box-sizing: border-box; }
+@media (max-width: 760px) { .journey-progress__list { grid-template-columns: repeat(5, minmax(0,1fr)); row-gap: 14px; } .journey-progress__item:nth-child(5n) .journey-progress__tooltip { left: auto; right: 0; transform: none; } .journey-progress__item:nth-child(5n+1) .journey-progress__tooltip { left: 0; transform: none; } }
+@media (max-width: 620px) { .diag-journey { width: calc(100% - 32px); padding: 16px 12px; margin-top: 16px; } .journey-progress__caption { font-size: 11px; } .journey-progress__portrait { width: 40px; height: 40px; } .journey-progress__portrait .diagnostic-mascot { width: 35px; height: 35px; } .journey-progress__label { font-size: 9px; } .journey-progress__legend { justify-content: center; } }
+@media (prefers-reduced-motion: reduce) { .journey-progress__portrait { transition: none; } .journey-progress__item.is-celebrating .journey-progress__portrait { animation: none; } .journey-progress__item:hover .journey-progress__portrait, .journey-progress__item:focus-visible .journey-progress__portrait { transform: none; } }
+
+/* Keep wide readable tooltips within either edge of each five-column row. */
+@media (max-width: 760px) {
+  .journey-progress .journey-progress__item:nth-child(n) .journey-progress__tooltip { left: 50%; right: auto; transform: translateX(-50%); }
+  .journey-progress .journey-progress__item:nth-child(5n+1) .journey-progress__tooltip { left: 0; transform: none; }
+  .journey-progress .journey-progress__item:nth-child(5n+2) .journey-progress__tooltip { left: calc(-100% - 12px); transform: none; }
+  .journey-progress .journey-progress__item:nth-child(5n+4) .journey-progress__tooltip { left: auto; right: calc(-100% - 12px); transform: none; }
+  .journey-progress .journey-progress__item:nth-child(5n) .journey-progress__tooltip { left: auto; right: 0; transform: none; }
+}

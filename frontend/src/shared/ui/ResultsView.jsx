@@ -1,16 +1,17 @@
+import IconText from './IconText.jsx'
+import { INTEREST_LABELS, MATCH_EXPLANATION } from '../lib/resultExplanation.js'
 // Read-only рендер результатов диагностики по строке профиля
 // ({ full_name, diagnostic_data }). Используется и в просмотре родителем
 // (ChildResults), и в публичном шаринге (SharedResults). Ничего не редактирует.
 // professions передаёт страница (shared-слой не может импортить entities).
 
 const HOLLAND = {
-  R: 'Реалистичный', I: 'Исследовательский', A: 'Артистичный',
-  S: 'Социальный', E: 'Предприимчивый', C: 'Конвенциональный',
+  ...INTEREST_LABELS,
 }
 
 const Card = ({ title, children }) => (
-  <div style={{ background: 'var(--card)', border: '1px solid var(--line)', borderRadius: 14, padding: 18, marginTop: 14 }}>
-    <div style={{ fontWeight: 800, fontSize: 14, marginBottom: 10 }}>{title}</div>
+  <div className="shared-result-card">
+    <div style={{ fontWeight: 800, fontSize: 14, marginBottom: 10 }}><IconText text={title} /></div>
     {children}
   </div>
 )
@@ -35,10 +36,11 @@ export default function ResultsView({ row, professions = [], eyebrow = 'РЕЗУ
       <div style={{ fontSize: 11, letterSpacing: 2, color: 'var(--ghost)', fontFamily: "'JetBrains Mono',monospace" }}>{eyebrow}</div>
       <h1 style={{ fontSize: 'clamp(24px,4vw,34px)', margin: '4px 0 2px' }}>{row?.full_name || 'Профиль'}</h1>
       <div style={{ fontSize: 13, color: 'var(--sub)' }}>Пройдено блоков: {progress.completed?.length || 0} / 10 · {progress.pct || 0}%</div>
+      <p style={{ fontSize: 13, lineHeight: 1.65, color: 'var(--sub)' }}>Это описание ответов на момент прохождения. Интересы и уверенность могут меняться с опытом. Обсудите, что совпало с наблюдениями в учёбе и хобби и какие занятия хочется попробовать.</p>
 
       {!prof.holland_scores && !report && (
         <Card title="Диагностика ещё не пройдена">
-          <div style={{ fontSize: 13, color: 'var(--sub)' }}>Как только все блоки диагностики будут пройдены, здесь появится профиль и разбор.</div>
+          <div style={{ fontSize: 13, color: 'var(--sub)' }}>В профиле пока нет результатов об интересах или текстового разбора. Пройденные блоки можно проверить в кабинете.</div>
         </Card>
       )}
 
@@ -48,8 +50,8 @@ export default function ResultsView({ row, professions = [], eyebrow = 'РЕЗУ
             {String(report.full_report).split(/\n+/).map(s => s.trim()).filter(Boolean).map((p, i) => <p key={i} style={{ margin: i ? '10px 0 0' : 0 }}>{p}</p>)}
           </div>
           {report.key_insights?.length > 0 && (
-            <div style={{ marginTop: 14, background: 'rgba(139,111,232,.07)', border: '1px solid rgba(139,111,232,.22)', borderRadius: 12, padding: '14px 16px' }}>
-              <div style={{ fontSize: 12, fontWeight: 700, color: 'var(--violet)', marginBottom: 8 }}>💡 Неочевидное</div>
+            <div style={{ marginTop: 14, background: 'rgba(161,204,245,.07)', border: '1px solid rgba(161,204,245,.22)', borderRadius: 12, padding: '14px 16px' }}>
+              <div style={{ fontSize: 12, fontWeight: 700, color: 'var(--violet)', marginBottom: 8 }}><IconText text={"💡 Неочевидное"} /></div>
               <ul style={{ margin: 0, paddingLeft: 18, display: 'flex', flexDirection: 'column', gap: 6, fontSize: 14, lineHeight: 1.55 }}>
                 {report.key_insights.map((x, i) => <li key={i}>{x}</li>)}
               </ul>
@@ -65,20 +67,21 @@ export default function ResultsView({ row, professions = [], eyebrow = 'РЕЗУ
       )}
 
       {archetypes.length > 0 && (
-        <Card title="Типология">
+        <Card title="Профиль с четырёх сторон">
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2,1fr)', gap: 10 }}>
             {archetypes.map(([label, val]) => (
-              <div key={label}><div style={{ fontSize: 11, color: 'var(--ghost)' }}>{label}</div><div style={{ fontSize: 15, fontWeight: 700, color: 'var(--accent)' }}>{val}</div></div>
+              <div key={label}><div style={{ fontSize: 11, color: 'var(--ghost)' }}><IconText text={label} /></div><div style={{ fontSize: 15, fontWeight: 700, color: 'var(--accent)' }}>{val}</div></div>
             ))}
           </div>
         </Card>
       )}
 
       {holland.length > 0 && (
-        <Card title="Что интересно (профиль Голланда)">
+        <Card title="Какие занятия интересны">
+          <p style={{ fontSize: 13, color: 'var(--sub)', lineHeight: 1.6 }}>Каждая шкала — от 0 до 100. Чем выше значение, тем чаще выбирались занятия этого типа. Значения не должны складываться в 100% и не являются оценкой способностей.</p>
           {holland.map(({ t, v }) => (
             <div key={t} style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 6 }}>
-              <div style={{ width: 140, fontSize: 12.5 }}>{HOLLAND[t]}</div>
+              <div style={{ width: 140, flexShrink: 0, fontSize: 12.5 }}>{HOLLAND[t]}</div>
               <div style={{ flex: 1, height: 8, background: 'var(--line)', borderRadius: 4, overflow: 'hidden' }}><div style={{ width: v + '%', height: '100%', background: 'var(--accent)' }} /></div>
               <div style={{ width: 34, textAlign: 'right', fontSize: 12, color: 'var(--sub)' }}>{v}%</div>
             </div>
@@ -88,6 +91,7 @@ export default function ResultsView({ row, professions = [], eyebrow = 'РЕЗУ
 
       {professions.length > 0 && (
         <Card title="Подходящие профессии">
+          <p style={{ fontSize: 13, color: 'var(--sub)', lineHeight: 1.6 }}>{MATCH_EXPLANATION}</p>
           <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
             {professions.map(p => (
               <div key={p.id} style={{ display: 'flex', justifyContent: 'space-between', fontSize: 13 }}>
@@ -98,6 +102,7 @@ export default function ResultsView({ row, professions = [], eyebrow = 'РЕЗУ
           </div>
         </Card>
       )}
+      {professions.length > 0 && <Card title="Как использовать результат"><div style={{ fontSize: 13, color: 'var(--sub)', lineHeight: 1.65 }}>Выберите интересные профессии и изучите их задачи в атласе. В своём кабинете ученик может выбрать две профессии и построить маршрут. Затем стоит попробовать небольшую задачу и обсудить впечатления.</div></Card>}
     </>
   )
 }

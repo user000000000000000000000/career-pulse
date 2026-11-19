@@ -1,0 +1,67 @@
+const { chromium } = require(process.env.PLAYWRIGHT_MODULE || 'playwright')
+const fs = require('fs')
+const path = require('path')
+const out = path.resolve('design-preview/brand-ui')
+const base = 'http://127.0.0.1:5174/career-pulse/'
+;(async () => {
+  fs.mkdirSync(out, { recursive: true })
+  const browser = await chromium.launch({ headless: true, channel: 'msedge' })
+  const page = await browser.newPage({ viewport: { width: 1440, height: 1000 } })
+  const errors = [], checks = {}
+  page.on('pageerror', e => errors.push(e.message))
+  await page.goto(base, { waitUntil: 'domcontentloaded' })
+  await page.locator('.site-header nav').waitFor()
+  await page.evaluate(() => document.fonts.ready)
+  checks.waves = await page.locator('.section-wave').count() === 4
+  checks.logo = await page.locator('.site-header .brand-mark').count() === 1
+  checks.header = await page.locator('.site-header nav').evaluate(el => getComputedStyle(el.parentElement).position === 'fixed')
+  await page.screenshot({ path: path.join(out, 'home-desktop.png') })
+  await page.evaluate(() => window.scrollTo({ top: 380, behavior: 'instant' }))
+  await page.locator('.bird-helper__toggle img').waitFor()
+  checks.helperAsset = await page.locator('.bird-helper__toggle img').evaluate(img => img.complete && img.naturalWidth > 0)
+  await page.evaluate(() => {
+    const section = document.getElementById('how')
+    window.scrollTo(0, section.offsetTop + section.offsetHeight - 320)
+  })
+  await page.waitForTimeout(900)
+  await page.screenshot({ path: path.join(out, 'wave-transition-desktop.png') })
+  await page.getByRole('button', { name: 'Открыть подсказку птички', exact: true }).click()
+  checks.helperManual = await page.locator('#bird-helper-tip').isVisible()
+  await page.screenshot({ path: path.join(out, 'helper-desktop.png') })
+  await page.keyboard.press('Escape')
+  checks.escape = !(await page.locator('#bird-helper-tip').count())
+  await page.setViewportSize({ width: 390, height: 844 })
+  await page.goto(base + 'dashboard')
+  await page.locator('.welcome-banner').waitFor()
+  await page.getByRole('button', { name: 'Открыть подсказку птички', exact: true }).click()
+  checks.mobileTooltip = await page.locator('#bird-helper-tip').evaluate(el => {
+    const r = el.getBoundingClientRect()
+    return r.left >= 0 && r.right <= innerWidth && r.bottom < innerHeight
+  })
+  await page.screenshot({ path: path.join(out, 'helper-mobile.png') })
+  await page.getByRole('button', { name: 'Закрыть подсказку', exact: true }).click()
+  await page.goto(base + 'profile')
+  await page.locator('#p-name').click()
+  checks.inputHidesHelper = await page.locator('.bird-helper').evaluate(el => getComputedStyle(el).visibility === 'hidden')
+  await page.locator('#p-name').blur()
+  await page.getByRole('button', { name: 'Скрыть птичку-помощника до перезагрузки', exact: true }).click()
+  checks.hideHelper = !(await page.locator('.bird-helper').count())
+  const branding = []
+  for (const route of ['', 'dashboard', 'diagnostic', 'legal/privacy', 'admin', 'atlas']) {
+    await page.goto(base + route)
+    await page.waitForTimeout(200)
+    branding.push({ route, oldBrand: await page.evaluate(() => /\bCareer\s*Pulse\b/i.test(document.body.innerText.replace(/careerpulse\.ru/gi, ''))) })
+  }
+  checks.branding = branding.every(r => !r.oldBrand)
+  const autoPage = await browser.newPage({ viewport: { width: 1440, height: 1000 } })
+  await autoPage.goto(base)
+  await autoPage.locator('.lv-hero').waitFor()
+  await autoPage.evaluate(() => window.scrollTo({ top: 380, behavior: 'instant' }))
+  await autoPage.waitForTimeout(19000)
+  checks.periodicTip = await autoPage.locator('#bird-helper-tip').isVisible()
+  await autoPage.screenshot({ path: path.join(out, 'helper-auto-desktop.png') })
+  console.log(JSON.stringify({ checks, branding, errors }, null, 2))
+  fs.writeFileSync(path.join(out, 'report.json'), JSON.stringify({ checks, branding, errors }, null, 2))
+  await browser.close()
+  if (errors.length || Object.values(checks).some(v => !v)) process.exitCode = 1
+})().catch(e => { console.error(e); process.exit(1) })

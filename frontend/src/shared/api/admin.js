@@ -1,10 +1,13 @@
 import { supabase, isSupabaseConfigured } from './supabase'
+import { config } from '../config'
+import { demoUsers } from './demoData'
 
 // Админ-панель. Backend: supabase/migrations/003_admin.sql + 004_admin_stats.sql
 // (admins + is_admin() + RLS profiles_select_admin + public_user_count() + admin_dashboard_stats()).
 
 /** Текущий пользователь — админ? */
 export async function checkIsAdmin() {
+  if (config.demoMode) return Boolean(localStorage.getItem('cp_user'))
   if (!isSupabaseConfigured) return false
   // is_admin() требует авторизации — для анонима вернёт 401. Не дёргаем RPC без сессии,
   // чтобы не сыпать 401 в консоль на публичных страницах.
@@ -17,6 +20,7 @@ export async function checkIsAdmin() {
 
 /** Полная сводка одним запросом: total, passed, new7, with_report, links, by_role. */
 export async function adminDashboardStats() {
+  if (config.demoMode) return { total: 4, passed: 1, new7: 4, with_report: 1, links: 1, by_role: { student: 2, parent: 1, specialist: 1 } }
   if (!isSupabaseConfigured) return null
   const { data, error } = await supabase.rpc('admin_dashboard_stats')
   if (error || !data) return { total: 0, passed: 0, new7: 0, with_report: 0, links: 0, by_role: {} }
@@ -25,6 +29,10 @@ export async function adminDashboardStats() {
 
 /** Список пользователей: пагинация, поиск, фильтр по роли + город/прогресс/ИИ из diagnostic_data. */
 export async function adminListUsers({ search = '', role = '', limit = 40, offset = 0 } = {}) {
+  if (config.demoMode) {
+    const filtered = demoUsers.filter(u => (!role || u.role === role) && (u.full_name + u.email).toLowerCase().includes(search.trim().toLowerCase()))
+    return { users: filtered.slice(offset, offset + limit), total: filtered.length }
+  }
   if (!isSupabaseConfigured) return { users: [], total: 0 }
   let q = supabase.from('profiles')
     .select(
@@ -47,6 +55,7 @@ export async function adminListUsers({ search = '', role = '', limit = 40, offse
 
 /** Публичный счётчик пользователей (для лендинга). */
 export async function publicUserCount() {
+  if (config.demoMode) return 39
   if (!isSupabaseConfigured) return 0
   const { data, error } = await supabase.rpc('public_user_count')
   if (error) return 0

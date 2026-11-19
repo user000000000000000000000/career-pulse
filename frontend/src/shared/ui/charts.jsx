@@ -1,3 +1,5 @@
+import IconText from './IconText.jsx'
+import '../../pages/diagnostic/charts.css'
 // Визуализация результатов диагностики — инлайн SVG/CSS, без библиотек, с полными
 // подписями. Цвета — токены темы (работает в светлой и тёмной). Варианты из галереи:
 // A радар, B столбцы, E кольцо, F мини-кольца, H карточки-ранги, J сегменты.
@@ -15,20 +17,20 @@ export function RadarChart({ data, color = 'var(--accent)' }) {
   }
   const ring = (f) => data.map((_, i) => pt(i, R * f).join(',')).join(' ')
   const shape = data.map((d, i) => pt(i, R * Math.max(0, Math.min(100, d.value)) / 100).join(',')).join(' ')
-  const sorted = [...data].sort((a, b) => b.value - a.value)
   return (
-    <div style={{ display: 'flex', gap: 16, flexWrap: 'wrap', alignItems: 'center', justifyContent: 'center' }}>
-      <svg viewBox="0 0 220 220" width="200" role="img" aria-label="Диаграмма профиля">
+    <div className="diag-radar" style={{ display: 'flex', gap: 16, flexWrap: 'wrap', alignItems: 'center', justifyContent: 'center' }}>
+      <svg viewBox="0 0 220 220" width="220" role="img" aria-label={`Диаграмма интересов: ${data.map(d => `${d.label} — ${Math.round(d.value)} из 100`).join('; ')}`}>
         {[1, 0.66, 0.33].map((f, i) => <polygon key={i} points={ring(f)} fill="none" stroke="var(--line)" strokeWidth="1" />)}
         {data.map((_, i) => { const [x, y] = pt(i, R); return <line key={i} x1={cx} y1={cy} x2={x} y2={y} stroke="var(--line)" strokeWidth="1" /> })}
         <polygon points={shape} fill={color} fillOpacity="0.22" stroke={color} strokeWidth="2" />
         {data.map((d, i) => { const [x, y] = pt(i, R * Math.max(0, Math.min(100, d.value)) / 100); return <circle key={i} cx={x} cy={y} r="3" fill={color} /> })}
+        {data.map((d, i) => { const [x, y] = pt(i, R + 15); return <text key={d.label} x={x} y={y} textAnchor="middle" dominantBaseline="central" fill="var(--sub)" fontSize="10" fontFamily="var(--font-body)" fontWeight="700">{i + 1}</text> })}
       </svg>
-      <div style={{ display: 'flex', flexDirection: 'column', gap: 5, minWidth: 180 }}>
-        {sorted.map((d, i) => (
+      <div className="diag-radar__legend">
+        {data.map((d, i) => (
           <div key={d.label} style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 13 }}>
-            <span style={{ width: 8, height: 8, borderRadius: 2, background: i === 0 ? color : 'var(--line2)', flexShrink: 0 }} />
-            <span style={{ flex: 1, color: 'var(--text)' }}>{d.label}</span>
+            <span className="diag-radar__key">{i + 1}</span>
+            <span style={{ flex: 1, color: 'var(--text)' }}><IconText text={d.label} /></span>
             <span style={{ fontFamily: "'JetBrains Mono',monospace", color: 'var(--sub)' }}>{Math.round(d.value)}</span>
           </div>
         ))}
@@ -43,14 +45,14 @@ export function BarList({ data, unit = '' }) {
   const sorted = [...data].sort((a, b) => b.value - a.value)
   const avg = data.reduce((s, d) => s + d.value, 0) / (data.length || 1)
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 9 }}>
+    <div className="diag-bars">
       {sorted.map((d) => (
-        <div key={d.label} style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-          <div style={{ width: 170, fontSize: 13, color: 'var(--text)' }}>{d.label}</div>
-          <div style={{ flex: 1, height: 10, background: 'var(--card2)', borderRadius: 5, overflow: 'hidden' }}>
+        <div key={d.label} className="diag-bars__row">
+          <div className="diag-bars__label"><IconText text={d.label} /></div>
+          <div className="diag-bars__track" role="meter" aria-label={d.label} aria-valuenow={d.value} aria-valuemin={0} aria-valuemax={100}>
             <div style={{ width: Math.max(0, Math.min(100, d.value)) + '%', height: '100%', background: d.value >= avg ? 'var(--accent)' : 'var(--ghost)', borderRadius: 5 }} />
           </div>
-          <div style={{ width: 40, textAlign: 'right', fontSize: 12.5, color: 'var(--sub)', fontFamily: "'JetBrains Mono',monospace" }}>{Math.round(d.value)}{unit}</div>
+          <div className="diag-bars__value">{Math.round(d.value)}{unit}</div>
         </div>
       ))}
     </div>
@@ -72,7 +74,7 @@ export function RingGauge({ value, max = 100, label, caption, color = 'var(--acc
       </svg>
       {(label || caption) && (
         <div style={{ maxWidth: 160 }}>
-          {label && <div style={{ fontSize: 14, fontWeight: 700, color: 'var(--text)', marginBottom: 2 }}>{label}</div>}
+          {label && <div style={{ fontSize: 14, fontWeight: 700, color: 'var(--text)', marginBottom: 2 }}><IconText text={label} /></div>}
           {caption && <div style={{ fontSize: 13, color: 'var(--sub)', lineHeight: 1.5 }}>{caption}</div>}
         </div>
       )}
@@ -85,18 +87,18 @@ const lvlColor = (v) => (v >= 66 ? 'var(--ok)' : v >= 40 ? 'var(--accent)' : 'va
 export function MiniRings({ data }) {
   // data: [{ label, value }] (value 0..100)
   return (
-    <div style={{ display: 'flex', gap: 14, justifyContent: 'space-around', flexWrap: 'wrap' }}>
+    <div className="diag-minirings">
       {data.map((d) => {
-        const r = 27, c = 2 * Math.PI * r, frac = Math.max(0, Math.min(1, d.value / 100))
+        const r = 27, frac = Math.max(0, Math.min(1, d.value / 100))
         return (
-          <div key={d.label} style={{ textAlign: 'center' }}>
-            <svg viewBox="0 0 70 70" width="66" role="img" aria-label={`${d.label}: ${Math.round(d.value)}%`}>
+          <div key={d.label} className="diag-minirings__item">
+            <svg viewBox="0 0 70 70" width="76" role="img" aria-label={`${d.label}: ${Math.round(d.value)} из 100`}>
               <circle cx="35" cy="35" r={r} fill="none" stroke="var(--card2)" strokeWidth="7" />
-              <circle cx="35" cy="35" r={r} fill="none" stroke={lvlColor(d.value)} strokeWidth="7" strokeLinecap="round"
-                strokeDasharray={`${c * frac} ${c}`} transform="rotate(-90 35 35)" />
+              <circle cx="35" cy="35" r={r} fill="none" stroke={lvlColor(d.value)} strokeWidth="7" strokeLinecap={frac === 1 ? 'butt' : 'round'} opacity={frac === 0 ? 0 : 1} pathLength="100"
+                strokeDasharray={frac === 1 ? undefined : '100'} strokeDashoffset={100 - frac * 100} transform="rotate(-90 35 35)" />
               <text x="35" y="40" textAnchor="middle" fontSize="16" fontWeight="700" fill="var(--text)">{Math.round(d.value)}</text>
             </svg>
-            <div style={{ fontSize: 12, color: 'var(--sub)', marginTop: 3, maxWidth: 92 }}>{d.label}</div>
+            <div className="diag-minirings__label"><IconText text={d.label} /></div>
           </div>
         )
       })}
@@ -129,7 +131,7 @@ export function SegmentScale({ data, max = 5 }) {
         return (
           <div key={d.label}>
             <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 13, color: 'var(--text)', marginBottom: 5 }}>
-              <span>{d.label}</span><span style={{ color: 'var(--sub)', fontFamily: "'JetBrains Mono',monospace", fontSize: 12 }}>{Math.round(d.value)}</span>
+              <span><IconText text={d.label} /></span><span style={{ color: 'var(--sub)', fontFamily: "'JetBrains Mono',monospace", fontSize: 12 }}>{Math.round(d.value)}</span>
             </div>
             <div style={{ display: 'flex', gap: 4 }}>
               {Array.from({ length: max }, (_, i) => (

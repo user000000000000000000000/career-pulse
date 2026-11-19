@@ -1,3 +1,4 @@
+import IconText from '../../../shared/ui/IconText.jsx'
 import { useState } from 'react'
 import { CP } from '../../../shared/api'
 import DiagShell, { ResultNav } from './DiagShell'
@@ -110,7 +111,7 @@ export default function Block9Social() {
     return (
       <DiagShell num={9} title="КОНТЕКСТ СОХРАНЁН" pct={100}>
         <div className="result">
-          <div className="result-icon">🌐</div>
+          <div className="result-icon"><IconText text={"🌐"} /></div>
           <div className="result-title">КОНТЕКСТ СОХРАНЁН</div>
           <div className="result-desc">Профиль поддержки, опыта и ресурсов обновлён.</div>
           <div className="result-summary">{blockSummary(9, result)}</div>
@@ -151,11 +152,11 @@ export default function Block9Social() {
   } else if (phase === 'achieve') {
     body = (
       <>
-        <div className="type-badge">🏆 Достижения</div>
+        <div className="type-badge"><IconText text={"🏆 Достижения"} /></div>
         <div className="q-text">Какое достижение? Расскажи кратко.</div>
         <textarea className="q-textarea" placeholder="1–3 предложения..." maxLength={300} value={achieveText} onChange={e => setAchieveText(e.target.value)} />
         <div className="char-count">{achieveText.length} / 300</div>
-        <div className="nav-row"><button className="btn btn-accent" disabled={!achieveText.trim()} onClick={() => { ans.E1a = achieveText; setPhase('open'); setIdx(0) }}>Далее →</button></div>
+        <div className="nav-row"><button className="btn btn-accent" disabled={!achieveText.trim()} onClick={() => { ans.E1a = achieveText; setPhase('open'); setIdx(0) }}><IconText text={"Далее →"} /></button></div>
       </>
     )
   } else {
@@ -163,11 +164,11 @@ export default function Block9Social() {
     body = (
       <>
         <div className="q-counter" style={{ color: 'var(--gold)' }}>Открытый {idx + 1} / {OPEN.length}</div>
-        <div className="q-text">{o.title}</div>
+        <div className="q-text"><IconText text={o.title} /></div>
         <div className="q-text" style={{ fontSize: 13, color: 'var(--ghost)', marginTop: -12, fontWeight: 400 }}>{o.text}</div>
         <textarea className="q-textarea" placeholder="Минимум 2–3 предложения..." maxLength={500} value={openTexts[idx]} onChange={e => { const c = [...openTexts]; c[idx] = e.target.value; setOpenTexts(c) }} />
         <div className="char-count">{openTexts[idx].length} / 500</div>
-        <div className="nav-row"><button className="btn btn-accent" disabled={!(openTexts[idx] || '').trim()} onClick={() => { const ni = idx + 1; if (ni >= OPEN.length) submit(); else setIdx(ni) }}>{idx < OPEN.length - 1 ? 'Далее →' : 'Завершить блок ✓'}</button></div>
+        <div className="nav-row"><button className="btn btn-accent" disabled={!(openTexts[idx] || '').trim()} onClick={() => { const ni = idx + 1; if (ni >= OPEN.length) submit(); else setIdx(ni) }}><IconText text={idx < OPEN.length - 1 ? 'Далее →' : 'Завершить блок ✓'} /></button></div>
       </>
     )
   }

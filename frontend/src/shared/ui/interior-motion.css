@@ -1,0 +1,62 @@
+/* Interior choreography follows the landing; its existing scenes stay intact. */
+.app-interior {
+  --interior-motion-fast: 160ms;
+  --interior-motion-base: 300ms;
+  --interior-motion-ease: cubic-bezier(.22, 1, .36, 1);
+}
+#root .app-interior :is(.btn, .cp-btn, .p-btn, .materials-button, .cat-chip, .atlas-chip, .results-sections a, .auth-role) {
+  transition: color var(--interior-motion-fast) ease, background-color var(--interior-motion-fast) ease, border-color var(--interior-motion-fast) ease, box-shadow var(--interior-motion-base) ease, translate var(--interior-motion-fast) ease, scale 120ms ease;
+}
+#root .app-interior :is(.block-card, .axis-card, .cat-card, .atlas-card, .doc-card, .roadmap-journey__card) {
+  transition: border-color var(--interior-motion-base) ease, box-shadow var(--interior-motion-base) ease, background-color var(--interior-motion-base) ease, translate var(--interior-motion-base) var(--interior-motion-ease);
+}
+#root .app-interior :is(input:not([type='range']), textarea, select) {
+  transition: border-color var(--interior-motion-fast) ease, box-shadow var(--interior-motion-fast) ease, background-color var(--interior-motion-fast) ease;
+}
+#root .app-interior :is(.btn, .cp-btn, .p-btn, .materials-button, .cat-chip, .atlas-chip):not(:disabled):active { scale: .985; translate: 0 0; }
+@media (hover: hover) and (pointer: fine) {
+  #root .app-interior :is(.btn, .cp-btn, .p-btn, .materials-button):not(:disabled):hover { transform: none; translate: 0 -3px; box-shadow: 0 10px 24px #087cff26; }
+  #root .app-interior :is(.block-card, .cat-card, .atlas-card, .doc-card, .roadmap-journey__card):hover { transform: none; translate: 0 -5px; box-shadow: 0 15px 32px -16px #087cff45; }
+}
+.app-interior .question-stage__track > span { transition: width 280ms cubic-bezier(.22, 1, .36, 1); }
+.app-interior .question-stage :is(.pair-card, .chip, .scale-btn, .int-btn, .ii-btn):is(.sel, .selected)::after { animation: cp-interior-check 160ms ease-out; }
+.navigation-panel.open .nav-panel-item { animation: cp-interior-menu-item 360ms cubic-bezier(.22, 1, .36, 1) backwards; }
+.navigation-panel.open .nav-panel-item:nth-of-type(2) { animation-delay: 20ms; }
+.navigation-panel.open .nav-panel-item:nth-of-type(3) { animation-delay: 40ms; }
+.navigation-panel.open .nav-panel-item:nth-of-type(n+4) { animation-delay: 60ms; }
+.navigation-panel .drawer-journey { animation: cp-interior-panel-in 280ms cubic-bezier(.22, 1, .36, 1); }
+body:has(.app-interior) :is(.brm-card, .consultation-chat) { animation: cp-interior-panel-in 220ms cubic-bezier(.22, 1, .36, 1); }
+@keyframes cp-interior-menu-item { from { opacity: 0; translate: -12px 0; } to { opacity: 1; translate: 0 0; } }
+@keyframes cp-interior-panel-in { from { opacity: .65; translate: 0 6px; } to { opacity: 1; translate: 0 0; } }
+@keyframes cp-interior-check { from { opacity: .3; scale: .85; } to { opacity: 1; scale: 1; } }
+/* The art floats as a whole while the character keeps its existing gestures. */
+.app-interior :is(.dashboard-artwork__photo, .diagnostic-overview__art > .diagnostic-mascot, .results-hero__art > .diagnostic-mascot, .results-empty > .diagnostic-mascot, .roadmap-journey__guide > .diagnostic-mascot, .auth-scene__mascot) { animation: cp-interior-scene-float 6.8s cubic-bezier(.45,0,.55,1) infinite; }
+.app-interior .results-hero__art > .diagnostic-mascot { animation-delay: -1.6s; }
+.app-interior .roadmap-journey__guide > .diagnostic-mascot { animation-delay: -2.8s; }
+.app-interior :is(.section-decor__star, .diagnostic-overview__star, .auth-scene__star) { animation: cp-interior-star-breathe 7.5s ease-in-out infinite; }
+.app-interior :is(.section-decor__star--b, .auth-scene__star--two) { animation-delay: -3.7s; }
+.app-interior :is(.diagnostic-overview__orbit, .section-decor__circle) { animation: cp-interior-orbit 42s linear infinite; }
+.app-interior .section-decor__orb { animation: cp-interior-glow 11s ease-in-out infinite; }
+.app-interior :is(.section-decor__line path, .auth-scene__route > path) { animation: cp-interior-route-flow 18s linear infinite; }
+.app-interior [data-interior-motion-active='false'], .app-interior [data-interior-motion-active='false'] * { animation-play-state: paused !important; }
+.app-interior .diagnostic-overview__privacy-arrow { transition: translate 260ms var(--interior-motion-ease); }
+.app-interior .diagnostic-overview__privacy:hover .diagnostic-overview__privacy-arrow { translate: 3px 0; }
+@keyframes cp-interior-scene-float { 0%,100% { translate: 0 1px; } 35% { translate: 0 -7px; } 65% { translate: 0 -10px; } }
+@keyframes cp-interior-star-breathe { 0%,100% { translate: 0 0; scale: 1; rotate: -5deg; } 50% { translate: 0 -6px; scale: 1.14; rotate: 7deg; } }
+@keyframes cp-interior-orbit { to { rotate: 360deg; } }
+@keyframes cp-interior-glow { 0%,100% { translate: 0 0; scale: 1; } 50% { translate: 12px -10px; scale: 1.08; } }
+@keyframes cp-interior-route-flow { to { stroke-dashoffset: -120; } }
+@media (max-width: 640px) {
+  .app-interior :is(.dashboard-artwork__photo, .diagnostic-overview__art > .diagnostic-mascot, .results-hero__art > .diagnostic-mascot, .results-empty > .diagnostic-mascot, .roadmap-journey__guide > .diagnostic-mascot, .auth-scene__mascot) { animation-name: cp-interior-scene-float-mobile; }
+}
+@keyframes cp-interior-scene-float-mobile { 0%,100% { translate: 0 0; } 50% { translate: 0 -6px; } }
+@media (prefers-reduced-motion: reduce) {
+  #root .app-interior, #root .app-interior *, .navigation-panel, .navigation-panel *, body:has(.app-interior) :is(.brm-card, .consultation-chat) {
+    animation: none !important; transition: none !important;
+  }
+  #root .app-interior :is(.btn, .cp-btn, .p-btn, .materials-button, .cat-chip, .atlas-chip, .block-card, .cat-card, .atlas-card, .doc-card, .roadmap-journey__card) { transform: none !important; translate: none !important; scale: none !important; }
+  .app-interior .question-stage :is(.pair-card, .chip, .scale-btn, .int-btn, .ii-btn)::after { animation: none !important; }
+}
+@media print {
+  .app-interior, .app-interior *, .app-interior *::before, .app-interior *::after { animation: none !important; transition: none !important; translate: none !important; scale: none !important; }
+}

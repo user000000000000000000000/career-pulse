@@ -1,24 +1,27 @@
+import IconText from '../../../shared/ui/IconText.jsx'
+import Icon from '../../../shared/ui/Icon.jsx'
 import { useEffect, useState, useCallback } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { checkIsAdmin, adminDashboardStats, adminListUsers, adminListFeedback, adminSetFeedbackStatus } from '../../../shared/api'
 import Header from '../../../shared/ui/Header.jsx'
 import '../admin.css'
 
-const FB_CAT = { bug: '🐞 Ошибка', idea: '💡 Идея', other: '💬 Другое' }
+const FB_CAT = { bug: 'Ошибка', idea: 'Идея', other: 'Другое' }
+const FB_ICON = { bug: 'alert', idea: 'bulb', other: 'message' }
 const FB_NEXT = { new: 'read', read: 'done', done: 'new' }
 const FB_STATUS = { new: 'Новое', read: 'Просмотрено', done: 'Решено' }
-const FB_COLOR = { new: '#e08a2e', read: '#4079d3', done: '#16a085' }
+const FB_COLOR = { new: '#087cff', read: '#087cff', done: '#087cff' }
 const fbDate = (d) => d ? new Date(d).toLocaleString('ru-RU', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' }) : ''
 
 const PAGE = 40
 // Различимые по тону цвета для каждой роли (синий/фиолет/розовый/оранжевый/бирюза/серый).
 const ROLES = {
-  student:      { ru: 'Школьник',       color: '#4079d3' },
-  parent:       { ru: 'Родитель',        color: '#8b6fe8' },
-  specialist:   { ru: 'Специалист',      color: '#e0699b' },
-  entrepreneur: { ru: 'Предприниматель', color: '#e08a2e' },
-  hr:           { ru: 'HR / Компания',   color: '#16a085' },
-  '—':          { ru: 'Не указана',      color: '#82819b' },
+  student:      { ru: 'Школьник',       color: '#087cff' },
+  parent:       { ru: 'Родитель',        color: '#087cff' },
+  specialist:   { ru: 'Специалист',      color: '#087cff' },
+  entrepreneur: { ru: 'Предприниматель', color: '#087cff' },
+  hr:           { ru: 'HR / Компания',   color: '#087cff' },
+  '—':          { ru: 'Не указана',      color: '#42658c' },
 }
 const roleInfo = (r) => ROLES[r] || ROLES['—']
 const fmtDate = (d) => d ? new Date(d).toLocaleDateString('ru-RU', { day: '2-digit', month: '2-digit', year: '2-digit' }) : '—'
@@ -26,9 +29,9 @@ const fmtDate = (d) => d ? new Date(d).toLocaleDateString('ru-RU', { day: '2-dig
 function Tile({ ic, value, label, sub }) {
   return (
     <div className="adm-tile">
-      <div className="adm-tile__ic">{ic}</div>
+      <div className="adm-tile__ic"><Icon name={ic} size={24} /></div>
       <div className="adm-tile__val">{value}</div>
-      <div className="adm-tile__label">{label}</div>
+      <div className="adm-tile__label"><IconText text={label} /></div>
       {sub && <div className="adm-tile__sub">{sub}</div>}
     </div>
   )
@@ -114,14 +117,14 @@ export default function AdminPanel() {
       <div className="adm-wrap">
         <div className="adm-eyebrow">АДМИН-ПАНЕЛЬ</div>
         <h1 className="adm-title">Обзор</h1>
-        <div className="adm-sub">Пользователи, диагностика и разборы CareerPulse.</div>
+        <div className="adm-sub">Пользователи, диагностика и разборы Пульс Карьеры.</div>
 
         <div className="adm-tiles">
-          <Tile ic="👥" value={stats.total} label="Всего зарегистрировано" />
-          <Tile ic="✅" value={stats.passed} label="Прошли диагностику" sub={`конверсия ${conv}%`} />
-          <Tile ic="🆕" value={stats.new7} label="Новых за 7 дней" />
-          <Tile ic="🧠" value={stats.with_report} label="С ИИ-разбором" />
-          <Tile ic="👪" value={stats.links} label="Связок родитель↔ребёнок" />
+          <Tile ic="users" value={stats.total} label="Всего зарегистрировано" />
+          <Tile ic="clipboard-check" value={stats.passed} label="Прошли диагностику" sub={`конверсия ${conv}%`} />
+          <Tile ic="user-plus" value={stats.new7} label="Новых за 7 дней" />
+          <Tile ic="brain" value={stats.with_report} label="С ИИ-разбором" />
+          <Tile ic="link" value={stats.links} label="Связок родитель↔ребёнок" />
         </div>
 
         <RoleBreakdown byRole={stats.by_role} total={stats.total} />
@@ -164,10 +167,10 @@ export default function AdminPanel() {
                           <span className="adm-mini-val">{pct}%</span>
                         </div>
                       </td>
-                      <td>{passed ? <span className="adm-yes">✓</span> : <span className="adm-no">—</span>}</td>
+                      <td>{passed ? <span className="adm-yes"><IconText text={"✓"} /></span> : <span className="adm-no">—</span>}</td>
                       <td>{u.ai_src ? <span className="adm-badge-ai">{u.ai_src === 'yandexgpt' ? 'YandexGPT' : 'есть'}</span> : <span className="adm-no">—</span>}</td>
                       <td className="col-date"><span className="adm-date">{fmtDate(u.created_at)}</span></td>
-                      <td>{(u.has_passed_test || u.pct) && <button className="adm-open" onClick={() => navigate(`/child/${u.id}`)}>Разбор →</button>}</td>
+                      <td>{(u.has_passed_test || u.pct) && <button className="adm-open" onClick={() => navigate(`/child/${u.id}`)}><IconText text={"Разбор →"} /></button>}</td>
                     </tr>
                   )
                 })}
@@ -180,8 +183,8 @@ export default function AdminPanel() {
         <div className="adm-pager">
           <span>Показаны {total ? offset + 1 : 0}–{Math.min(offset + PAGE, total)} из {total}</span>
           <span className="adm-pager-btns">
-            <button className="btn btn-ghost" disabled={offset === 0 || busy} onClick={() => page(-1)}>← Назад</button>
-            <button className="btn btn-ghost" disabled={offset + PAGE >= total || busy} onClick={() => page(1)}>Вперёд →</button>
+            <button className="btn btn-ghost" disabled={offset === 0 || busy} onClick={() => page(-1)}><IconText text={"← Назад"} /></button>
+            <button className="btn btn-ghost" disabled={offset + PAGE >= total || busy} onClick={() => page(1)}><IconText text={"Вперёд →"} /></button>
           </span>
         </div>
 
@@ -195,9 +198,9 @@ export default function AdminPanel() {
             {feedback.map(f => (
               <div key={f.id} className="adm-tile" style={{ opacity: f.status === 'done' ? 0.65 : 1 }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 10, flexWrap: 'wrap', marginBottom: 8 }}>
-                  <span className="adm-chip" style={{ background: 'var(--line)', color: 'var(--sub)' }}>{FB_CAT[f.category] || f.category}</span>
+                  <span className="adm-chip" style={{ display: 'inline-flex', alignItems: 'center', gap: 6, background: 'var(--line)', color: 'var(--sub)' }}><Icon name={FB_ICON[f.category] || 'message'} size={15} />{FB_CAT[f.category] || f.category}</span>
                   <button onClick={() => cycleStatus(f)} className="adm-chip" title="Переключить статус"
-                    style={{ background: (FB_COLOR[f.status] || '#82819b') + '22', color: FB_COLOR[f.status] || '#82819b', border: 0, cursor: 'pointer', fontFamily: 'inherit' }}>{FB_STATUS[f.status] || f.status}</button>
+                    style={{ background: (FB_COLOR[f.status] || '#42658c') + '22', color: FB_COLOR[f.status] || '#42658c', border: 0, cursor: 'pointer', fontFamily: 'inherit' }}>{FB_STATUS[f.status] || f.status}</button>
                   <span style={{ marginLeft: 'auto', fontSize: 11.5, color: 'var(--ghost)' }}>{fbDate(f.created_at)}</span>
                 </div>
                 <div style={{ fontSize: 14, lineHeight: 1.55, color: 'var(--text)', whiteSpace: 'pre-wrap' }}>{f.message}</div>

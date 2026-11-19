@@ -1,3 +1,4 @@
+import IconText from '../../../shared/ui/IconText.jsx'
 import { useState } from 'react'
 import { CP } from '../../../shared/api'
 import DiagShell, { ResultNav } from './DiagShell'
@@ -164,7 +165,7 @@ export default function Block2Holland() {
     return (
       <DiagShell num={2} title="СКЛОННОСТИ В ДЕЯТЕЛЬНОСТИ" pct={100}>
         <div className="result">
-          <div className="result-icon">🎯</div>
+          <div className="result-icon"><IconText text={"🎯"} /></div>
           <div className="result-title">{result.career_archetype.toUpperCase()}</div>
           <div className="result-desc">Твой карьерный архетип по Holland RIASEC: <b>{TYPE_NAMES[result.holland_top2[0]]}</b> + <b>{TYPE_NAMES[result.holland_top2[1]]}</b></div>
           <div className="result-summary">{blockSummary(2, result)}</div>
@@ -231,12 +232,12 @@ export default function Block2Holland() {
     const m = MATURITY[curMatIdx]
     body = (
       <>
-        <div className="q-counter" style={{ color: 'var(--gold)' }}>⏸ Микро-вопрос: {TYPE_NAMES[m.type]}</div>
+        <div className="q-counter" style={{ color: 'var(--gold)' }}><IconText text={"⏸ Микро-вопрос: "} />{TYPE_NAMES[m.type]}</div>
         <div className="q-text" style={{ fontSize: 15 }}>{m.q}</div>
         {MAT_OPTS.map((o, i) => (
           <div key={i} className={'mat-card' + (matSel === i ? ' sel' : '')} onClick={() => { matAnswers[m.type] = MAT_SCORES[i]; setMatSel(i) }}><div className="mat-dot"></div>{o}</div>
         ))}
-        <div className="nav-row"><button className="btn btn-accent" disabled={matSel === null} onClick={afterMat}>Далее →</button></div>
+        <div className="nav-row"><button className="btn btn-accent" disabled={matSel === null} onClick={afterMat}><IconText text={"Далее →"} /></button></div>
       </>
     )
   } else if (phase === 'anti') {
@@ -246,7 +247,7 @@ export default function Block2Holland() {
         <div className="q-text">Выбери 3 занятия, которыми ты <b>точно не хотел(а) бы</b> заниматься каждый день</div>
         <div className="chip-grid">{ANTI_ITEMS.map(a => <div key={a.v} className={'chip' + (antiSel.includes(a.v) ? ' sel' : '')} onClick={() => toggleSel(antiSel, setAntiSel, a.v, 3)}>{a.t}</div>)}</div>
         <div className="chip-hint">Выбрано: {antiSel.length} / 3</div>
-        <div className="nav-row"><button className="btn btn-accent" disabled={antiSel.length !== 3} onClick={() => setPhase('energy')}>Далее →</button></div>
+        <div className="nav-row"><button className="btn btn-accent" disabled={antiSel.length !== 3} onClick={() => setPhase('energy')}><IconText text={"Далее →"} /></button></div>
       </>
     )
   } else if (phase === 'energy') {
@@ -256,7 +257,7 @@ export default function Block2Holland() {
         <div className="q-text">Что тебя обычно больше всего <b>заряжает</b>? Выбери 2 варианта</div>
         <div className="chip-grid">{ENERGY_ITEMS.map(e => <div key={e.v} className={'chip' + (energySel.includes(e.v) ? ' sel' : '')} onClick={() => toggleSel(energySel, setEnergySel, e.v, 2)}>{e.t}</div>)}</div>
         <div className="chip-hint">Выбрано: {energySel.length} / 2</div>
-        <div className="nav-row"><button className="btn btn-accent" disabled={energySel.length !== 2} onClick={() => setPhase('exploration')}>Далее →</button></div>
+        <div className="nav-row"><button className="btn btn-accent" disabled={energySel.length !== 2} onClick={() => setPhase('exploration')}><IconText text={"Далее →"} /></button></div>
       </>
     )
   } else if (phase === 'exploration') {
@@ -266,7 +267,7 @@ export default function Block2Holland() {
         <div className="q-text">Насколько хорошо ты изучал(а) профессии, которые тебе интересны?</div>
         <div className="scale-labels"><span>Почти ничего не знаю</span><span>Хорошо понимаю изнутри</span></div>
         <div className="scale-row">{[1, 2, 3, 4, 5].map(n => <button key={n} className={'scale-btn' + (explorationVal === n ? ' sel' : '')} onClick={() => setExplorationVal(n)}>{n}</button>)}</div>
-        <div className="nav-row"><button className="btn btn-accent" disabled={!explorationVal} onClick={() => setPhase('open')}>Далее →</button></div>
+        <div className="nav-row"><button className="btn btn-accent" disabled={!explorationVal} onClick={() => setPhase('open')}><IconText text={"Далее →"} /></button></div>
       </>
     )
   } else if (phase === 'open') {
@@ -277,7 +278,7 @@ export default function Block2Holland() {
         <div className="q-text" style={{ fontSize: 13, color: 'var(--ghost)', marginTop: -12 }}>Напиши 2–3 предложения — как будто рассказываешь другу</div>
         <textarea className="q-textarea" placeholder="Напиши здесь..." maxLength={500} value={openText} onChange={e => setOpenText(e.target.value)} />
         <div className="char-count">{openText.length} / 500</div>
-        <div className="nav-row"><button className="btn btn-accent" onClick={submit}>Завершить блок ✓</button></div>
+        <div className="nav-row"><button className="btn btn-accent" onClick={submit}><IconText text={"Завершить блок ✓"} /></button></div>
       </>
     )
   }

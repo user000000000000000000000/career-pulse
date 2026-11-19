@@ -1,3 +1,4 @@
+import IconText from '../../../shared/ui/IconText.jsx'
 import { useState } from 'react'
 import { CP } from '../../../shared/api'
 import DiagShell, { ResultNav } from './DiagShell'
@@ -81,7 +82,8 @@ export default function Block1Anketa() {
   function go(n) {
     const cur = Number(step)
     const forward = !Number.isNaN(cur) && n !== 'intro' && Number(n) > cur
-    if (!forward || validate(cur)) { setStep(String(n)); window.scrollTo({ top: 0, behavior: 'smooth' }) }
+    // The shared question surface handles positioning at the new section.
+    if (!forward || validate(cur)) setStep(String(n))
   }
 
   async function submit() {
@@ -99,7 +101,7 @@ export default function Block1Anketa() {
 
   // ── функции-рендеры (не компоненты — чтобы поля не теряли фокус) ──
   const radio = (id, v, label) => (
-    <label key={v} className={'opt-card' + (a[id] === v ? ' selected' : '')} onClick={() => set(id, v)}><div className="opt-dot"></div><div className="opt-text">{label}</div></label>
+    <label key={v} className={'opt-card' + (a[id] === v ? ' selected' : '')} onClick={() => set(id, v)}><div className="opt-dot"></div><div className="opt-text"><IconText text={label} /></div></label>
   )
   const scale = (id, lo, hi) => (
     <div>
@@ -109,7 +111,7 @@ export default function Block1Anketa() {
   )
   const group = (id, label, sub, inner) => (
     <div key={id} className={'q-group' + (errors[id] ? ' error' : '')}>
-      <div className="q-label"><span className="q-id">{id}</span> {label}</div>
+      <div className="q-label"><span className="q-id">{id}</span> <IconText text={label} /></div>
       {sub && <div className="q-sub">{sub}</div>}
       {inner}
       <div className="q-error">Заполни это поле</div>
@@ -129,7 +131,7 @@ export default function Block1Anketa() {
     return (
       <DiagShell num={1} title="АНКЕТА ГОТОВА" pct={100} wide>
         <div className="result">
-          <div className="result-icon">✅</div>
+          <div className="result-icon"><IconText text={"✅"} /></div>
           <div className="result-desc">Контекстный профиль создан. Все блоки настроены под твою ситуацию.</div>
           <div className="result-summary">{blockSummary(1, result)}</div>
           <div className="result-cards">
@@ -148,12 +150,12 @@ export default function Block1Anketa() {
   if (step === 'intro') {
     body = (
       <div style={{ textAlign: 'center', padding: '24px 0' }}>
-        <div style={{ fontSize: 48, marginBottom: 16 }}>📋</div>
+        <div style={{ fontSize: 48, marginBottom: 16 }}><IconText text={"📋"} /></div>
         <div style={{ display: 'flex', flexWrap: 'wrap', gap: 12, justifyContent: 'center', margin: '24px 0' }}>
-          {['👤 О тебе', '📚 Учёба', '🎯 Планы', '💭 Что беспокоит'].map(t => <div key={t} style={{ background: 'var(--card)', border: '1px solid var(--line)', borderRadius: 8, padding: '10px 16px', fontSize: 12, color: 'var(--sub)' }}>{t}</div>)}
+          {['👤 О тебе', '📚 Учёба', '🎯 Планы', '💭 Что беспокоит'].map(t => <div key={t} style={{ background: 'var(--card)', border: '1px solid var(--line)', borderRadius: 8, padding: '10px 16px', fontSize: 12, color: 'var(--sub)' }}><IconText text={t} /></div>)}
         </div>
         <p style={{ fontSize: 13, color: 'var(--ghost)', marginBottom: 28 }}>Отвечай быстро и честно — первая реакция самая точная</p>
-        <button className="btn btn-accent" onClick={() => go(1)}>Начать анкету →</button>
+        <button className="btn btn-accent" onClick={() => go(1)}><IconText text={"Начать анкету →"} /></button>
       </div>
     )
   } else if (step === '1') {
@@ -166,7 +168,7 @@ export default function Block1Anketa() {
         {group('A4', 'Город', null, <input className="q-input" placeholder="Например: Санкт-Петербург" value={a.A4 || ''} onChange={e => set('A4', e.target.value)} />)}
         {group('A5', 'Пол', null, <div className="opt-grid cols-3">{[['male', 'Мужской'], ['female', 'Женский'], ['skip', 'Не указывать']].map(([v, l]) => radio('A5', v, l))}</div>)}
         {group('A6', 'Формат обучения', null, <div className="opt-grid">{[['school', 'Общеобразовательная школа'], ['lyceum', 'Гимназия / лицей'], ['college', 'Колледж / техникум'], ['home', 'Домашнее обучение'], ['other', 'Другое']].map(([v, l]) => radio('A6', v, l))}</div>)}
-        <div className="nav-row spread"><button className="btn btn-ghost" onClick={() => go('intro')}>← Назад</button><button className="btn btn-accent" onClick={() => go(2)}>Далее →</button></div>
+        <div className="nav-row spread"><button className="btn btn-ghost" onClick={() => go('intro')}><IconText text={"← Назад"} /></button><button className="btn btn-accent" onClick={() => go(2)}><IconText text={"Далее →"} /></button></div>
       </>
     )
   } else if (step === '2') {
@@ -178,7 +180,7 @@ export default function Block1Anketa() {
         {showB2a && group('B2a', 'Почему именно эти предметы?', 'Можно несколько причин', chipRow('B2a', B2A))}
         {group('B3', 'Какие предметы не нравятся?', 'До 3 предметов', <>{chipRow('B3', SUBJ_DISLIKE, 3)}<div className="chip-limit">{chipLen('B3')} / 3</div></>)}
         {group('B4', 'Средний балл (примерно)', null, <div className="opt-grid cols-2">{[['below3.5', 'Ниже 3.5'], ['3.5-4', '3.5 — 4.0'], ['4-4.5', '4.0 — 4.5'], ['4.5-5', '4.5 — 5.0']].map(([v, l]) => radio('B4', v, l))}</div>)}
-        <div className="nav-row spread"><button className="btn btn-ghost" onClick={() => go(1)}>← Назад</button><button className="btn btn-accent" onClick={() => go(3)}>Далее →</button></div>
+        <div className="nav-row spread"><button className="btn btn-ghost" onClick={() => go(1)}><IconText text={"← Назад"} /></button><button className="btn btn-accent" onClick={() => go(3)}><IconText text={"Далее →"} /></button></div>
       </>
     )
   } else if (step === '3') {
@@ -192,7 +194,7 @@ export default function Block1Anketa() {
         {showCond && group('V4a', 'Насколько уверен(а) в выборе?', null, scale('V4a', 'Совсем не уверен(а)', 'Полностью'))}
         {showCond && group('V4b', 'Откуда появилась идея?', 'Можно несколько', chipRow('V4b', V4B))}
         {showCond && group('V4c', 'Общался(ась) с представителем профессии?', null, <div className="opt-grid cols-3">{[['yes', 'Да'], ['no', 'Нет'], ['want', 'Нет, но хочу']].map(([v, l]) => radio('V4c', v, l))}</div>)}
-        <div className="nav-row spread"><button className="btn btn-ghost" onClick={() => go(2)}>← Назад</button><button className="btn btn-accent" onClick={() => go(4)}>Далее →</button></div>
+        <div className="nav-row spread"><button className="btn btn-ghost" onClick={() => go(2)}><IconText text={"← Назад"} /></button><button className="btn btn-accent" onClick={() => go(4)}><IconText text={"Далее →"} /></button></div>
       </>
     )
   } else if (step === '4') {
@@ -203,7 +205,7 @@ export default function Block1Anketa() {
         {group('G2', 'Давление со стороны родителей', null, scale('G2', 'Никакого', 'Очень сильное'))}
         {group('G3', 'Что беспокоит больше всего?', null, <div className="opt-grid">{[['dont_know', 'Не знаю, чего хочу'], ['fear_mistake', 'Знаю, но боюсь ошибиться'], ['fear_admission', 'Боюсь не поступить'], ['parents_disagree', 'Родители хотят не то, что я'], ['self_doubt', 'Не уверен(а) в способностях']].map(([v, l]) => radio('G3', v, l))}</div>)}
         {group('G4', 'Кто принимает решения об образовании?', null, <div className="opt-grid">{[['self', 'Я сам(а)'], ['together', 'Вместе с родителями'], ['parents', 'В основном родители'], ['unaware', 'Не задумывался(ась)']].map(([v, l]) => radio('G4', v, l))}</div>)}
-        <div className="nav-row spread"><button className="btn btn-ghost" onClick={() => go(3)}>← Назад</button><button className="btn btn-accent" onClick={submit}>Завершить анкету ✓</button></div>
+        <div className="nav-row spread"><button className="btn btn-ghost" onClick={() => go(3)}><IconText text={"← Назад"} /></button><button className="btn btn-accent" onClick={submit}><IconText text={"Завершить анкету ✓"} /></button></div>
       </>
     )
   }

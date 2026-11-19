@@ -1,3 +1,4 @@
+import IconText from '../../../shared/ui/IconText.jsx'
 import { useState } from 'react'
 import { CP } from '../../../shared/api'
 import DiagShell, { ResultNav } from './DiagShell'
@@ -55,7 +56,7 @@ const QS = [
   { id: 'SJ4', t: 'Я никогда не говорю о людях плохо за их спиной', s: 'sj' },
 ]
 const SCALE_NAMES = { agreeableness: 'Дружелюбие', conscientiousness: 'Добросовестность', extraversion: 'Экстраверсия', openness: 'Открытость опыту', stress_resilience: 'Стрессоустойчивость', anxiety: 'Тревожность', impulse_control: 'Управление импульсами', ambiguity_tolerance: 'Толерантность к неопр.' }
-const SCALE_COLORS = { agreeableness: '#5f96e9', conscientiousness: '#8b6fe8', extraversion: '#e8a0c4', openness: '#72a2eb', stress_resilience: '#22d97a', anxiety: '#ff4d6d', impulse_control: '#72a2eb', ambiguity_tolerance: '#8b6fe8' }
+const SCALE_COLORS = { agreeableness: '#087cff', conscientiousness: '#087cff', extraversion: '#a1ccf5', openness: '#087cff', stress_resilience: '#087cff', anxiety: '#087cff', impulse_control: '#087cff', ambiguity_tolerance: '#087cff' }
 const TOTAL = QS.length
 
 export default function Block4Personality() {
@@ -99,7 +100,7 @@ export default function Block4Personality() {
     return (
       <DiagShell num={4} title="ЛИЧНОСТНЫЕ КАЧЕСТВА" pct={100}>
         <div className="result">
-          <div className="result-icon">🧠</div>
+          <div className="result-icon"><IconText text={"🧠"} /></div>
           <div className="result-title">{result.archetype.toUpperCase()}</div>
           <div className="result-desc">Твои сильные стороны: <b>{result.top3.map(s => SCALE_NAMES[s]).join(', ')}</b></div>
           <div className="result-summary">{blockSummary(4, result)}</div>

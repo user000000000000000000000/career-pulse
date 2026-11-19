@@ -1,1 +1,1 @@
-export { PROFESSIONS, PROFESSION_CATEGORIES, matchProfessions } from './model'
+export { PROFESSIONS, PROFESSION_CATEGORIES, matchProfessions, professionMatchSignals } from './model'

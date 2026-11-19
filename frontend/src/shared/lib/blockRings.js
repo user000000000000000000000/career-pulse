@@ -2,15 +2,15 @@
 // В shared-слое, чтобы использовать и в кабинете (dashboard), и на мини-тесте.
 // Названия шкал вшиты здесь (shared не импортирует из pages/entities).
 
-export const HOLLAND = { R: 'Реалистичный', I: 'Исследоват.', A: 'Артистичный', S: 'Социальный', E: 'Предприимч.', C: 'Конвенц.' }
+export const HOLLAND = { R: 'Практика и техника', I: 'Исследования', A: 'Творчество', S: 'Помощь людям', E: 'Лидерство', C: 'Порядок и точность' }
 export const BIG5 = {
-  agreeableness: 'Дружелюбие', conscientiousness: 'Добросовестность', extraversion: 'Экстраверсия',
-  openness: 'Открытость', stress_resilience: 'Стрессоустойч.', anxiety: 'Тревожность',
+  agreeableness: 'Дружелюбие', conscientiousness: 'Организованность', extraversion: 'Общительность',
+  openness: 'Любопытство', stress_resilience: 'Спокойствие при стрессе', anxiety: 'Тревожность',
   impulse_control: 'Самоконтроль', ambiguity_tolerance: 'Гибкость',
 }
 export const COG = {
-  LANG: 'Языки', MATH: 'Логика', SPAT: 'Пространство', KINE: 'Моторика',
-  MUSI: 'Музыка', SOC: 'Социальный', SYS: 'Системность',
+  LANG: 'Работа со словом', MATH: 'Логика и числа', SPAT: 'Воображение в объёме', KINE: 'Учёба через действие',
+  MUSI: 'Музыкальный слух', SOC: 'Понимание людей', SYS: 'Связи между частями',
 }
 
 // r — сохранённые scores блока (форма из cpStorage). Пусто → нечего рисовать.
